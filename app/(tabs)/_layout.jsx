@@ -3,21 +3,33 @@ import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
   return (
+    
     <Tabs screenOptions={{  tabBarActiveTintColor: 'red' , headerShown: false }}>
+      <Tabs.Screen
+        name="chats"
+        options={{
+          title: 'Chats',
+          tabBarIcon: ({ color }) => {
+            return <FontAwesome size={30} name="comments" color={color} />
+          },
+        }}
+      />
       <Tabs.Screen
         name="main"
         options={{
           title: 'Live Chat',
           tabBarIcon: ({ color }) => {
-            return <FontAwesome size={24} name="cog" color={color} />
+            return <FontAwesome size={30} name="heart" color={color} />
           },
         }}
       />
       <Tabs.Screen
-        name="prolife"
+        name="profile"
         options={{
-          title: 'Prolife',
-          tabBarIcon: ({ color }) => <FontAwesome size={24} name="plane" color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => {
+            return <FontAwesome size={30} name="user" color={color} />
+          },
         }}
       />
     </Tabs>
