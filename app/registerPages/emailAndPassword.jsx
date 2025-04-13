@@ -1,8 +1,6 @@
 import { Text, View, Dimensions } from "react-native";
 import { router, Link } from 'expo-router';
-import { Input } from '@rneui/themed';
-import { Button } from '@rneui/themed';
-
+import { Input, Button } from '@rneui/themed';
 
 
 const windowWidth = Dimensions.get('window').width;

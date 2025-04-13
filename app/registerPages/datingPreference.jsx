@@ -12,7 +12,7 @@ export default function DatingPreference() {
       }}
     >
       <Text>Dating Preference</Text>
-      <Button title="Next" onPress={() => router.navigate("/registerPages/datingPreference")}/>
+      <Button title="Next" onPress={() => router.navigate("/(tabs)/main")}/>
 
     </View>
   );

@@ -7,6 +7,7 @@ export const DataContext = createContext();
 
 export default function DataContextProvider(props) {
   const [users, setUsers] = useState([{ id: 1, name: 'avi', pass: '123' }]);
+  let gotSms = false;
 
   const AddUser = (name, pass) => {
     let newUsers = [...users, { id: uuid.v4(), name, pass }];
@@ -25,7 +26,7 @@ export default function DataContextProvider(props) {
   }
 
   return (
-    <DataContext.Provider value={{ users, AddUser, RemoveUser, LoginUser }}>
+    <DataContext.Provider value={{ users, AddUser, RemoveUser, LoginUser, gotSms}}>
       {props.children}
     </DataContext.Provider>
   )
