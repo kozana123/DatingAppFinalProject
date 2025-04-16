@@ -1,14 +1,42 @@
-import { Text, View, Button, StyleSheet } from "react-native";
-import { router, Link } from 'expo-router';
+import { Text, View, Button, StyleSheet, Image, Alert } from "react-native";
+import { router } from 'expo-router';
+import { useState, useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 
 
 export default function AddImage() {
 
+    const [image, setImage] = useState(null);   
+    const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+    const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
+
+    const handleImageChoice = () => {
+        Alert.alert(
+          "Select Image",
+          "Choose image source",
+          [
+            {
+              text: "Camera",
+              onPress: takePhoto,
+            },
+            {
+              text: "Gallery",
+              onPress: pickImage,
+            },
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+          ],
+          { cancelable: true }
+        );
+      };
 
     const pickImage = async () => {
+        if (!status?.granted) requestPermission();
         // No permissions request is necessary for launching the image library
         let result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images', 'videos'],
+          mediaTypes: ['images'],
           allowsEditing: true,
           aspect: [4, 3],
           quality: 1,
@@ -22,6 +50,20 @@ export default function AddImage() {
       };
 
 
+    const takePhoto = async () => {
+    if (!cameraStatus?.granted) requestCameraPermission();
+    let result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+    });
+
+    if (!result.canceled) {
+        setImage(result.assets[0].uri);
+    }
+    };
+
+
 
   return (
     <View
@@ -32,7 +74,7 @@ export default function AddImage() {
       }}
     >
       <Text>Dating Preference</Text>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      <Button title="Upload Photo" onPress={handleImageChoice} />
       <Image source={{ uri: image }} style={styles.image} />
 
       <Button title="Next" onPress={() => router.navigate("/registerPages/location")}/>

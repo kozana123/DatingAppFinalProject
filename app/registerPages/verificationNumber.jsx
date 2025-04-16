@@ -45,9 +45,9 @@ export default function VerificationNumber(props) {
 
     } 
 
-    inputCode = (event) => {
-      setCode(event.target.value)
-    } 
+    // inputCode = (event) => {
+    //   setCode(event.target.value)
+    // } 
 
     return (
     <View
