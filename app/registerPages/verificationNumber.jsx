@@ -1,12 +1,11 @@
 import { View, Text } from 'react-native';
-// const textlink = require("textlink-sms")
 import { DataContext } from "../DataContextProvider";
 import { useFocusEffect } from 'expo-router';
 import { Input, Button } from '@rneui/themed';
 import { useState } from 'react';
-import * as SMS from 'expo-sms';
 import {getHash, startOtpListener, useOtpVerify,} from 'react-native-otp-verify';
 
+// const textlink = require("textlink-sms")
 // textlink.useKey("6Thz4V69FrD0sYzryZHbnQcM5P1sXPj7jdhqHGRqsNkGkBbdt9jJkdYEbx9xyFiS")
 
 
@@ -31,24 +30,24 @@ export default function VerificationNumber(props) {
     //     if (gotSms == false){
     //         const result = await textlink.sendVerificationSMS(phoneNumber)
     //         gotSms = true;
-        // }
+    //     }
     // }
 
-//     btnCheckVerification = async () => {
-//       const result = await textlink.verifyCode(phoneNumber, code)
-//       if (result){
-//         gotSms = false
-//         router.navigate("/(tabs)/main")   
-//       }
-//       else{
-//         console.log("The code is incorrect!")
-//       }
+    btnCheckVerification = async () => {
+      const result = await textlink.verifyCode(phoneNumber, code)
+      if (result){
+        gotSms = false
+        router.navigate("/(tabs)/main")   
+      }
+      else{
+        console.log("The code is incorrect!")
+      }
 
-//     } 
+    } 
 
-//     inputCode = (event) => {
-//       setCode(event.target.value)
-//     } 
+    inputCode = (event) => {
+      setCode(event.target.value)
+    } 
 
     return (
     <View
