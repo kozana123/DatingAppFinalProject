@@ -1,8 +1,14 @@
 import { Text, View, Button } from "react-native";
 import { router, Link } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 
 
 export default function Location() {
+
+
+  
+
+
   return (
     <View
       style={{
@@ -12,8 +18,10 @@ export default function Location() {
       }}
     >
       <Text>Location page</Text>
+      
       <Button title="Next" onPress={() => router.navigate("/registerPages/datingPreference")}/>
 
     </View>
   );
 }
+

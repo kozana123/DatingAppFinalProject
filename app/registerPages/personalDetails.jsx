@@ -12,7 +12,7 @@ export default function PersonalDetails() {
       }}
     >
       <Text>Personal Details</Text>
-      <Button title="Next" onPress={() => router.navigate("/registerPages/location")}/>
+      <Button title="Next" onPress={() => router.navigate("/registerPages/addImage")}/>
     </View>
   );
 }
