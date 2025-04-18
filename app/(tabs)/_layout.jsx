@@ -1,17 +1,21 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+
 import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
   return (
     
-    <Tabs screenOptions={{  tabBarActiveTintColor: 'rgb(219, 43, 43)', headerShown: false }}>
+    <Tabs screenOptions={{  tabBarActiveTintColor: 'rgb(219, 43, 43)', headerShown: false,  tabBarStyle: {elevation: 0},}}>
       <Tabs.Screen
         name="chats"
         options={{
           title: 'Chats',
           tabBarIcon: ({ color }) => {
             return <FontAwesome size={30} name="comments" color={color} />
-          },
+          },tabBarButton: (props) => (
+            <TouchableOpacity activeOpacity={1} {...props} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -20,7 +24,9 @@ export default function TabLayout() {
           title: 'Live Chat',
           tabBarIcon: ({ color }) => {
             return <FontAwesome size={30} name="heart" color={color} />
-          },
+          },tabBarButton: (props) => (
+            <TouchableOpacity activeOpacity={1} {...props} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -29,7 +35,9 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => {
             return <FontAwesome size={30} name="user" color={color} />
-          },
+          },tabBarButton: (props) => (
+            <TouchableOpacity activeOpacity={1} {...props} />
+          ),
         }}
       />
     </Tabs>
