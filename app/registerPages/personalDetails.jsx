@@ -13,7 +13,7 @@ export default function PersonalDetails() {
 
   const handleNext = () => {
     if (birthDate && genderIndex !== null) {
-      router.navigate("/registerPages/location");
+      router.navigate("/registerPages/addImage");
     } else {
       alert("Please fill in all fields");
     }
