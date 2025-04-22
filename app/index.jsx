@@ -45,7 +45,7 @@ export default function Index() {
           width: 200,
           marginVertical: 10,
         }}
-        onPress={() => router.navigate("/registerPages/emailAndPassword")}
+        onPress={() => router.navigate("/registerPages/registerUserName")}
       />
 
     </View>
