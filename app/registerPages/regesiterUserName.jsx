@@ -1,6 +1,6 @@
 import { Text, View, Dimensions } from "react-native";
 import { router, Link } from 'expo-router';
-import { Input, Button } from '@rneui/themed';
+import { Input, Button,  } from '@rneui/themed';
 import { useState } from 'react';
 
 
@@ -15,37 +15,42 @@ export default function RegisterUserName() {
     return(
         <View
         style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
+          flex: 1,
+          backgroundColor: '#fff',
+          paddingHorizontal: 30,
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ fontSize: 28, fontWeight: 'bold', marginBottom: 10 }}>
+            Let's Get Started!
+        </Text>
+  
+        <Text style={{ fontSize: 22, marginBottom: 30 }}>
+          What's Your Name?
+        </Text>
+  
+        <Input
+           placeholder='Enter your name'
+          value={userName.name}
+          inputContainerStyle={{
+            borderBottomWidth: 2,
+            borderBottomColor: '#bd513e',
           }}
-        >
-            <Text>Register User Name</Text>
-
-            <View style={{width: windowWidth * 0.8,}}>
-                
-                <Input 
-                name = 'name'
-                placeholder='User Name'
-                errorStyle={{ color: 'red' }}
-                errorMessage=''
-                onChangeText={(text) => setUserName({...userName , name: text})}
-                />
-            </View>
-
-            <Button
-                title="Next"
-                buttonStyle={{
-                    backgroundColor: 'rgb(189, 81, 62)',
-                    borderWidth: 2,
-                    borderColor: 'white',
-                    borderRadius: 5,
-                    width: windowWidth * 0.8,
-                    marginTop: 20,
-                  }}
-                onPress={() => router.push("/registerPages/personalDetails")}
-            />
-        </View>
-
+          inputStyle={{ fontSize: 18 }}
+          onChangeText={(text) => setUserName({ ...userName, name: text })}
+        />
+  
+        <Button
+           title="Next"
+          buttonStyle={{
+            backgroundColor: 'rgb(189, 81, 62)',
+            borderRadius: 10,
+            paddingVertical: 12,
+            marginTop: 40,
+          }}
+          titleStyle={{ fontSize: 18 }}
+           onPress={() => router.push("/registerPages/registerBD")}
+        />
+      </View>
     )
 }

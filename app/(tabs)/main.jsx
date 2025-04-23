@@ -1,6 +1,7 @@
-import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
 import { useState, useEffect } from 'react';
-import { Input, Button, ButtonGroup } from '@rneui/themed';
+import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+
+import { Input, Button, ButtonGroup, Avatar } from '@rneui/themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
@@ -126,16 +127,33 @@ export default function Main(props) {
                 </View>
               </TouchableWithoutFeedback>
             </View>
-          
           </TouchableWithoutFeedback>
         </Modal>  
+
+       
 
         <View style={{flexDirection: 'row', justifyContent: "center", gap: "55%", marginTop: 20, }}>
           <Text style={styles.title}>Dating App</Text>
           <FontAwesome size={30} name="sliders" style={{marginRight: 10}} onPress={openModal}/> 
         </View>
 
-        <View style={{ flex: 1,
+        <View style={{ alignItems: "center", marginTop: 20}}>
+          <Avatar
+            size={90}
+            rounded
+            source={{ uri: 'https://randomuser.me/api/portraits/women/57.jpg' }}
+            title="Bj"
+            containerStyle={{ backgroundColor: 'grey' }}
+          >
+          <Avatar.Accessory style={{backgroundColor:'rgba(218, 88, 55, 0.8)'}} size={30} />
+          </Avatar>
+        </View>
+
+        <View style={{flexDirection: 'row',  justifyContent: "center",}}>
+          <Text style={{ fontSize: 30, marginTop: 20}}>Dor</Text> 
+        </View>
+
+        <View style={{ flex: 0.6,
           justifyContent: "center",
           alignItems: "center",
         }}>
