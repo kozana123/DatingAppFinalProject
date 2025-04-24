@@ -1,27 +1,54 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back arrow icon
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome5, MaterialIcons, Ionicons, Entypo } from '@expo/vector-icons';
 
 const { width } = Dimensions.get("window");
 
-export default function BubbleInterests() {
+export default function BubbleInterests({ navigation }) {  // אני מניח שאתה משתמש ב-navigation
   const interests = [
-    { label: "Reading", icon: <FontAwesome5 name="book" size={24} color="white" /> },
-    { label: "Photography", icon: <MaterialIcons name="camera-alt" size={24} color="white" /> },
-    { label: "Gaming", icon: <Ionicons name="game-controller" size={24} color="white" /> },
-    { label: "Music", icon: <Ionicons name="musical-notes" size={24} color="white" /> },
-    { label: "Travel", icon: <FontAwesome5 name="plane" size={24} color="white" /> },
-    { label: "Painting", icon: <MaterialIcons name="palette" size={24} color="white" /> },
-    { label: "Politics", icon: <FontAwesome5 name="landmark" size={24} color="white" /> },
-    { label: "Charity", icon: <FontAwesome5 name="hands-helping" size={24} color="white" /> },
-    { label: "Cooking", icon: <Ionicons name="restaurant" size={24} color="white" /> },
-    { label: "Pets", icon: <FontAwesome5 name="dog" size={24} color="white" /> },
-    { label: "Sports", icon: <MaterialIcons name="sports-soccer" size={24} color="white" /> },
-    { label: "Fashion", icon: <MaterialIcons name="checkroom" size={24} color="white" /> },
-    { label: "Dancing", icon: <Ionicons name="body" size={24} color="white" /> },
-    { label: "Yoga", icon: <FontAwesome5 name="om" size={24} color="white" /> },
-    { label: "Movies", icon: <Entypo name="video" size={24} color="white" /> },
+    {
+      title: "🧠 Personality",
+      traits: [
+        { label: "Introvert", icon: "🙈" },
+        { label: "Extrovert", icon: "📢" },
+        { label: "Optimistic", icon: "😊" },
+        { label: "Realistic", icon: "🧠" },
+        { label: "Adventurous", icon: "🏞️" },
+        { label: "Romantic", icon: "❤️" },
+        { label: "Creative", icon: "🎨" },
+        { label: "Empathetic", icon: "🤝" },
+        { label: "Funny", icon: "😂" },
+        { label: "Shy", icon: "😔" },
+      ]
+    },
+    {
+      title: "🌿 Lifestyle",
+      traits: [
+        { label: "Early Riser", icon: "🌅" },
+        { label: "Night Owl", icon: "🌙" },
+        { label: "Fitness Lover", icon: "💪" },
+        { label: "Vegan", icon: "🌱" },
+        { label: "Pet Lover", icon: "🐾" },
+        { label: "Traveler", icon: "🌍" },
+        { label: "Bookworm", icon: "📚" },
+      ]
+    },
+    {
+      title: "🎨 Hobbies",
+      traits: [
+        { label: "Painting", icon: "🎨" },
+        { label: "Music", icon: "🎶" },
+        { label: "Photograph", icon: "📷" },
+        { label: "Dancing", icon: "💃" },
+        { label: "Cooking", icon: "🍳" },
+        { label: "Reading", icon: "📖" },
+        { label: "Gaming", icon: "🎮" },
+        { label: "Traveling", icon: "✈️" },
+        { label: "Yoga", icon: "🧘‍♀️" },
+        { label: "Sports", icon: "⚽" },
+      ]
+    },
   ];
 
   const [selected, setSelected] = useState([]);
@@ -34,40 +61,120 @@ export default function BubbleInterests() {
     );
   };
 
+  const handleContinue = () => {
+    Alert.alert("המשכתי עם הבחירות הבאות:", selected.join(", "));
+
+  };
+
   return (
-    <LinearGradient
-      colors={["#F7F3F2", "#8A2C2A"]}
-      style={{ flex: 1, paddingTop: 60 }}
-    >
+    <LinearGradient colors={["#F7F3F2", "#8A2C2A"]} style={{  paddingTop: 50 , paddingBottom: 40 }}>
+      {/* חץ חזור */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}  
+      >
+        <Ionicons name="arrow-back" size={30} color="#4B2C2A" />
+      </TouchableOpacity>
+
       <Text style={{ fontSize: 24, fontWeight: "bold", color: "#fff", margin: 20 }}>
         What are your interests?
       </Text>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', padding: 10 }}>
-        {interests.map((item, index) => {
-          const isSelected = selected.includes(item.label);
-          return (
-            <TouchableOpacity
-              key={index}
-              onPress={() => toggleInterest(item.label)}
-              style={{
-                backgroundColor: isSelected ? "#fff" : "#8A2C2A",
-                padding: 12,
-                margin: 8,
-                borderRadius: 14,
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: width / 3.2,
-                borderWidth: 2,
-                borderColor: "#fff"
-              }}
-            >
-              <View style={{ marginBottom: 6 }}>{item.icon}</View>
-              <Text style={{ color: isSelected ? "#8A2C2A" : "#fff", fontWeight: "600" }}>{item.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
+      <ScrollView >
+        {interests.map((category, index) => (
+          <View key={index} style={{ marginBottom: 30 }}>
+            <Text style={{ fontSize: 22, fontWeight: "bold", color: "#4B2C2A", textAlign: "center" }}>
+              {category.title}
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginTop: 10 }}>
+              {category.traits.map((item, index) => {
+                const isSelected = selected.includes(item.label);
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => toggleInterest(item.label)}
+                    style={[styles.button, isSelected && styles.selectedButton]}
+                  >
+                    <Text style={[styles.icon, isSelected && styles.selectedIcon]}>{item.icon}</Text>
+                    <Text style={[styles.text, isSelected && styles.selectedText]}>{item.label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <View style={{ borderBottomWidth: 1, borderBottomColor: "#4B2C2A", marginVertical: 20 }} />
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* כפתור המשך */}
+      <View style={{ alignItems: "center", marginBottom: 10 , marginTop: 30 }}>
+        <TouchableOpacity
+          onPress={handleContinue}
+          style={styles.continueButton}
+        >
+          <Text style={styles.continueText}>Continue</Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,  // שינוי מ-left ל-right
+    padding: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",  // רקע חצי שקוף
+    borderRadius: 50,  // עגלגל
+    elevation: 5,
+  },
+  button: {
+    backgroundColor: "#E2D2C1", // צבע בהיר ונעים יותר
+    paddingVertical: 6,        // גובה קטן יותר
+    paddingHorizontal: 10,     // מרווח קטן יותר
+    margin: 6,                // רווח קטן יותר בין הכפתורים
+    borderRadius: 12,         // עגלגלות קלה
+    alignItems: "center",
+    justifyContent: "center",
+    width: width / 5,         // גודל כפתור קטן יותר
+    height: 60,               // גובה קטן יותר
+    borderWidth: 0,           // ללא מסגרת שחורה
+    elevation: 3,             // הצללה קלה
+  },
+  selectedButton: {
+    backgroundColor: "#8A2C2A", // צבע רקע כשנבחר
+    elevation: 6,     // הצללה יותר בולטת כשהכפתור נבחר
+  },
+  icon: {
+    fontSize: 16,   // הקטנה של האימוג'י
+    color: "#4B2C2A", // צבע ברירת מחדל לאימוג'י
+  },
+  selectedIcon: {
+    color: "#fff", // צבע אימוג'י כשנבחר
+  },
+  text: {
+    color: "#4B2C2A",
+    fontWeight: "500", // הקטנה של הגודל
+    marginTop: 2,     // הקטנה של המרווח בין האייקון לטקסט
+    fontSize: 11,     // הקטנה של הגודל
+  },
+  selectedText: {
+    color: "#0a0908", // צבע טקסט כשנבחר
+  },
+  continueButton: {
+    backgroundColor: "#f2ebeb",
+    color: "#0a0908",
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 4,     // הצללה לכפתור המשך
+  },
+  continueText: {
+    color: "#0a0908",
+    fontSize: 16,    // הקטנה של גודל הטקסט
+    fontWeight: "bold",
+   
+  },
+});
