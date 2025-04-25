@@ -49,7 +49,7 @@ export default function RegisterUserName() {
             marginTop: 40,
           }}
           titleStyle={{ fontSize: 18 }}
-           onPress={() => router.push("/registerPages/registerBD")}
+           onPress={() => router.push("/registerPages/personalDetails")}
         />
       </View>
     )

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -46,7 +46,7 @@ export default function InterestsScreen() {
 
       <Text style={styles.subheader}>
         Tell others what you expect from online dating. 
-         You can always change your answer if you change your mind.
+        You can always change your answer if you change your mind.
       </Text>
 
       <View style={styles.options}>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingTop: 60,
+    paddingTop: Platform.OS === "ios" ? 60 : 40, 
     paddingHorizontal: 20,
   },
   backBtn: {
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   options: {
     flex: 1,
     gap: 35,
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: "#f2f2f2",

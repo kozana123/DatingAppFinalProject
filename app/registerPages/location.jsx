@@ -19,7 +19,7 @@ export default function Location() {
     >
       <Text>Location page</Text>
       
-      <Button title="Next" onPress={() => router.navigate("/registerPages/datingPreference")}/>
+      <Button title="Next" onPress={() => router.navigate("/registerPages/registerIntrest")}/>
 
     </View>
   );

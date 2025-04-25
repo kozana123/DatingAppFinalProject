@@ -1,3 +1,4 @@
+
 import { Text, View, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -31,15 +32,15 @@ export default function SexualPreferences() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        padding: 20,
+        padding: 15, // קטן את המרווח הכללי
         backgroundColor: "#fff",
       }}
     >
-      <Text style={{ fontSize: 28, fontWeight: "bold", marginBottom: 40 }}>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 30 }}>
         Sexual Preference
       </Text>
 
-      <Text style={{ fontSize: 20, marginBottom: 20 }}>
+      <Text style={{ fontSize: 18, marginBottom: 15 }}>
         How do you identify?
       </Text>
 
@@ -51,10 +52,10 @@ export default function SexualPreferences() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              marginBottom: 15,
-              width: "90%",
-              padding: 15,
-              borderRadius: 10,
+              marginBottom: 10, // הקטנת המרווח בין הפריטים
+              width: "80%", // הקטנתי את רוחב הכפתור
+              padding: 12, // הקטנתי את הפדינג
+              borderRadius: 8, // הקטנתי את הרדיוס
               borderWidth: 2,
               borderColor: preference === item ? "#bd513e" : "#ccc",
               backgroundColor: preference === item ? "#ffe8e5" : "#fff",
@@ -62,28 +63,28 @@ export default function SexualPreferences() {
           >
             <View
               style={{
-                height: 20,
-                width: 20,
-                borderRadius: 10,
+                height: 18,
+                width: 18,
+                borderRadius: 9,
                 borderWidth: 2,
                 borderColor: preference === item ? "#bd513e" : "#ccc",
                 alignItems: "center",
                 justifyContent: "center",
-                marginRight: 15,
+                marginRight: 12,
               }}
             >
               {preference === item && (
                 <View
                   style={{
-                    height: 10,
-                    width: 10,
-                    borderRadius: 5,
+                    height: 8,
+                    width: 8,
+                    borderRadius: 4,
                     backgroundColor: "#bd513e",
                   }}
                 />
               )}
             </View>
-            <Text style={{ fontSize: 18 }}>{item}</Text>
+            <Text style={{ fontSize: 16 }}>{item}</Text> {/* הקטנתי את גודל הטקסט */}
           </TouchableOpacity>
         ))}
       </View>
@@ -92,16 +93,17 @@ export default function SexualPreferences() {
         onPress={handleNext}
         style={{
           backgroundColor: "#bd513e",
-          paddingVertical: 15,
-          paddingHorizontal: 40,
-          borderRadius: 10,
-          marginTop: 30,
-          width: "90%",
+          paddingVertical: 12,
+          paddingHorizontal: 35,
+          borderRadius: 8,
+          marginTop: 25,
+          width: "80%", // הקטנתי את רוחב הכפתור
           alignItems: "center",
         }}
       >
-        <Text style={{ color: "white", fontSize: 18 }}>Next</Text>
+        <Text style={{ color: "white", fontSize: 16 }}>Next</Text> {/* הקטנתי את גודל הטקסט */}
       </TouchableOpacity>
     </View>
+
   );
 }

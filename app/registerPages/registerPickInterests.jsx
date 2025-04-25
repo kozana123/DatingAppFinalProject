@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the back arrow icon
 import { LinearGradient } from "expo-linear-gradient";
 
 const { width } = Dimensions.get("window");
 
-export default function BubbleInterests({ navigation }) {  // אני מניח שאתה משתמש ב-navigation
+export default function BubbleInterests() {
   const interests = [
     {
       title: "🧠 Personality",
@@ -39,7 +38,7 @@ export default function BubbleInterests({ navigation }) {  // אני מניח ש
       traits: [
         { label: "Painting", icon: "🎨" },
         { label: "Music", icon: "🎶" },
-        { label: "Photograph", icon: "📷" },
+        { label: "Photography", icon: "📷" },
         { label: "Dancing", icon: "💃" },
         { label: "Cooking", icon: "🍳" },
         { label: "Reading", icon: "📖" },
@@ -62,25 +61,18 @@ export default function BubbleInterests({ navigation }) {  // אני מניח ש
   };
 
   const handleContinue = () => {
+    // הצגת תוצאה או שמירה
     Alert.alert("המשכתי עם הבחירות הבאות:", selected.join(", "));
-
+    // כאן תוכל לשלוח את הנתונים לשרת או לעבור למסך הבא
   };
 
   return (
-    <LinearGradient colors={["#F7F3F2", "#8A2C2A"]} style={{  paddingTop: 50 , paddingBottom: 40 }}>
-      {/* חץ חזור */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}  
-      >
-        <Ionicons name="arrow-back" size={30} color="#4B2C2A" />
-      </TouchableOpacity>
-
+    <LinearGradient colors={["#F7F3F2", "#8A2C2A"]} style={{ flex: 1, paddingTop: 60 }}>
       <Text style={{ fontSize: 24, fontWeight: "bold", color: "#fff", margin: 20 }}>
         What are your interests?
       </Text>
 
-      <ScrollView >
+      <ScrollView>
         {interests.map((category, index) => (
           <View key={index} style={{ marginBottom: 30 }}>
             <Text style={{ fontSize: 22, fontWeight: "bold", color: "#4B2C2A", textAlign: "center" }}>
@@ -107,7 +99,7 @@ export default function BubbleInterests({ navigation }) {  // אני מניח ש
       </ScrollView>
 
       {/* כפתור המשך */}
-      <View style={{ alignItems: "center", marginBottom: 10 , marginTop: 30 }}>
+      <View style={{ alignItems: "center", marginBottom: 20 }}>
         <TouchableOpacity
           onPress={handleContinue}
           style={styles.continueButton}
@@ -120,15 +112,6 @@ export default function BubbleInterests({ navigation }) {  // אני מניח ש
 }
 
 const styles = StyleSheet.create({
-  backButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,  // שינוי מ-left ל-right
-    padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",  // רקע חצי שקוף
-    borderRadius: 50,  // עגלגל
-    elevation: 5,
-  },
   button: {
     backgroundColor: "#E2D2C1", // צבע בהיר ונעים יותר
     paddingVertical: 6,        // גובה קטן יותר
@@ -157,24 +140,22 @@ const styles = StyleSheet.create({
     color: "#4B2C2A",
     fontWeight: "500", // הקטנה של הגודל
     marginTop: 2,     // הקטנה של המרווח בין האייקון לטקסט
-    fontSize: 11,     // הקטנה של הגודל
+    fontSize: 12,     // הקטנה של הגודל
   },
   selectedText: {
-    color: "#0a0908", // צבע טקסט כשנבחר
+    color: "#fff", // צבע טקסט כשנבחר
   },
   continueButton: {
-    backgroundColor: "#f2ebeb",
-    color: "#0a0908",
+    backgroundColor: "#8A2C2A", 
     paddingVertical: 10,
     paddingHorizontal: 40,
-    borderRadius: 10,
+    borderRadius: 20,
     marginBottom: 10,
     elevation: 4,     // הצללה לכפתור המשך
   },
   continueText: {
-    color: "#0a0908",
+    color: "#fff",
     fontSize: 16,    // הקטנה של גודל הטקסט
     fontWeight: "bold",
-   
   },
 });
