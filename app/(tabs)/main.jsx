@@ -4,6 +4,7 @@ import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedbac
 import { Input, Button, ButtonGroup, Avatar } from '@rneui/themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { router } from 'expo-router';
 
 
 
@@ -137,7 +138,7 @@ export default function Main(props) {
           <FontAwesome size={30} name="sliders" style={{marginRight: 10}} onPress={openModal}/> 
         </View>
 
-        <View style={{ alignItems: "center", marginTop: 20}}>
+        <View style={{ alignItems: "center", marginTop: 20}} >
           <Avatar
             size={90}
             rounded
@@ -145,7 +146,7 @@ export default function Main(props) {
             title="Bj"
             containerStyle={{ backgroundColor: 'grey' }}
           >
-          <Avatar.Accessory style={{backgroundColor:'rgba(218, 88, 55, 0.8)'}} size={30} />
+          {/* <Avatar.Accessory style={{backgroundColor:'rgba(218, 88, 55, 0.8)'}} size={30} /> */}
           </Avatar>
         </View>
 
@@ -172,7 +173,7 @@ export default function Main(props) {
               marginBottom: 20
             }}
             titleStyle={{ fontWeight: 'bold', fontSize: 20 }}
-            onPress={() => router.navigate("/(tabs)/main")}  
+            
           />
         </View>
 

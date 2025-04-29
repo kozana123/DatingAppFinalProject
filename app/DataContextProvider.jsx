@@ -7,6 +7,8 @@ export const DataContext = createContext();
 
 export default function DataContextProvider(props) {
   const [users, setUsers] = useState([{ id: 1, name: 'avi', pass: '123' }]);
+  const [userImg, setUserImage] = useState({ image: null });
+
   let gotSms = false;
 
   const AddUser = (name, pass) => {
@@ -25,8 +27,13 @@ export default function DataContextProvider(props) {
     setUsers(newUsers);
   }
 
+
+  const UserImage = (image) => {
+    setUserImage(prev => ({ ...prev, image }));
+  };
+
   return (
-    <DataContext.Provider value={{ users, AddUser, RemoveUser, LoginUser, gotSms}}>
+    <DataContext.Provider value={{ users, AddUser, RemoveUser, LoginUser, gotSms , userImg, UserImage , setUserImage}}>
       {props.children}
     </DataContext.Provider>
   )

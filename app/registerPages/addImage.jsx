@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 export default function AddImage() {
   const [image, setImage] = useState(null);
+
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
@@ -92,6 +93,8 @@ export default function AddImage() {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -63,7 +64,7 @@ export default function BubbleInterests() {
   const handleContinue = () => {
     // הצגת תוצאה או שמירה
     Alert.alert("המשכתי עם הבחירות הבאות:", selected.join(", "));
-    // כאן תוכל לשלוח את הנתונים לשרת או לעבור למסך הבא
+    router.push("/registerPages/welcomePage");
   };
 
   return (

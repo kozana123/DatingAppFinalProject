@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Avatar, Button } from '@rneui/themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
 
 
 
@@ -26,6 +27,7 @@ export default function Main(props) {
             source={{ uri: 'https://randomuser.me/api/portraits/women/57.jpg' }}
             title="Bj"
             containerStyle={{ backgroundColor: 'grey' }}
+            onPress={() => router.navigate("/connectedPages/editProfile")}  
           >
           <Avatar.Accessory style={{backgroundColor:'rgba(218, 88, 55, 0.8)'}} size={30} />
           </Avatar>
