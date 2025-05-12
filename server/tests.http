@@ -1,0 +1,35 @@
+@host = http://localhost:5500/api/v1
+
+
+GET {{host}}/users
+###
+GET {{host}}/users/profile/Dor@example.com
+###
+POST {{host}}/users
+content-Type: application/json
+
+{   
+    "name": "Dor2",
+    "date": "14/09/1997",
+    "email": "Dor@example.com",
+    "password": "1234567"
+}
+###
+PUT {{host}}/users/Dor@example.com
+###
+
+GET {{host}}/upload/pic
+###
+GET {{host}}/upload/pic/Dor@example.com
+###
+
+POST {{host}}/users/login
+content-Type: application/json
+
+{
+    "email": "Dor@example.com",
+    "password": "1234567"
+}
+###
+DELETE {{host}}/users/Dor@example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRG9yMiIsImRhdGUiOiIxNC8wOS8xOTk3IiwiZW1haWwiOiJEb3JAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDYyOTQxMzh9.9uuxyH0lJR-5ozVCrYRFDuXYQZUMCEJ1qV3fAec5ZyY
