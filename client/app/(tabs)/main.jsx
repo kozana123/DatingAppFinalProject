@@ -173,7 +173,7 @@ export default function Main(props) {
               marginBottom: 20
             }}
             titleStyle={{ fontWeight: 'bold', fontSize: 20 }}
-            onPress={() => router.navigate("/client/app/videoChat.jsx")}
+            onPress={() => router.navigate("/videoChat")}
           />
         </View>
 
