@@ -1,0 +1,103 @@
+<!-- webclient.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebRTC Test Client</title>
+  <style>
+    video {
+      width: 300px;
+      margin: 10px;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <h2>WebRTC Test Client (Browser)</h2>
+  <p>Your Caller ID: <span id="callerId"></span></p>
+  <input id="remoteId" placeholder="Other user ID" />
+  <button onclick="startCall()">Start Call</button>
+
+  <h3>Local Video</h3>
+  <video id="localVideo" autoplay muted playsinline></video>
+
+  <h3>Remote Video</h3>
+  <video id="remoteVideo" autoplay playsinline></video>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+  const callerId = Math.floor(100000 + Math.random() * 900000).toString();
+  document.getElementById('callerId').textContent = callerId;
+
+  const socket = io('http://localhost:3500'); // Replace with your IP
+
+  const localVideo = document.getElementById('localVideo');
+  const remoteVideo = document.getElementById('remoteVideo');
+  const remoteIdInput = document.getElementById('remoteId');
+
+  let localStream;
+  const peer = new RTCPeerConnection({
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+  });
+
+  // Register with callerId
+  socket.on('connect', () => {
+    console.log('🌐 Web connected to socket.io as', callerId);
+    socket.emit('register', callerId);
+  });
+
+  peer.onicecandidate = event => {
+    if (event.candidate) {
+      socket.emit('ice-candidate', {
+        targetId: remoteIdInput.value,
+        candidate: event.candidate
+      });
+    }
+  };
+
+  peer.ontrack = event => {
+    remoteVideo.srcObject = event.streams[0];
+  };
+
+  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      localStream = stream;
+      localVideo.srcObject = stream;
+      stream.getTracks().forEach(track => peer.addTrack(track, stream));
+    });
+
+  socket.on('offer', async (offer) => {
+    await peer.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peer.createAnswer();
+    await peer.setLocalDescription(answer);
+    socket.emit('answer', {
+      targetId: remoteIdInput.value,
+      answer
+    });
+  });
+
+  socket.on('answer', async (answer) => {
+    await peer.setRemoteDescription(new RTCSessionDescription(answer));
+  });
+
+  socket.on('ice-candidate', async (candidate) => {
+    try {
+      await peer.addIceCandidate(new RTCIceCandidate(candidate));
+    } catch (e) {
+      console.error('Error adding received ice candidate', e);
+    }
+  });
+
+  function startCall() {
+    peer.createOffer().then(offer => {
+      peer.setLocalDescription(offer);
+      const remoteId = document.getElementById('remoteId').value;
+      console.log('📨 Sending offer to', remoteId);
+      socket.emit('offer', {
+        targetId: remoteId,
+        offer
+      });
+    });
+  }
+</script>
+</body>
+</html>

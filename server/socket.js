@@ -1,60 +1,56 @@
-import { Server  } from './socket'
+import { Server } from 'socket.io';
 
+let io = null;
 
-let IO;
-
-module.exports.initIO = (httpServer) => {
-  IO = new Server(httpServer);
-
-  IO.use((socket, next) => {
-    if (socket.handshake.query) {
-      let callerId = socket.handshake.query.callerId;
-      socket.user = callerId;
-      next();
+export function initIO(server) {
+  io = new Server(server, {
+    cors: {
+      origin: '*', // change if needed
+      methods: ['GET', 'POST']
     }
   });
 
-  IO.on("connection", (socket) => {
-    console.log(socket.user, "Connected");
-    socket.join(socket.user);
+  const users = new Map(); // Map<callerId, socketId>
 
-    socket.on("call", (data) => {
-      let calleeId = data.calleeId;
-      let rtcMessage = data.rtcMessage;
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
 
-      socket.to(calleeId).emit("newCall", {
-        callerId: socket.user,
-        rtcMessage: rtcMessage,
-      });
-    });
-
-    socket.on("answerCall", (data) => {
-      let callerId = data.callerId;
-      rtcMessage = data.rtcMessage;
-
-      socket.to(callerId).emit("callAnswered", {
-        callee: socket.user,
-        rtcMessage: rtcMessage,
-      });
-    });
-
-    socket.on("ICEcandidate", (data) => {
-      console.log("ICEcandidate data.calleeId", data.calleeId);
-      let calleeId = data.calleeId;
-      let rtcMessage = data.rtcMessage;
-
-      socket.to(calleeId).emit("ICEcandidate", {
-        sender: socket.user,
-        rtcMessage: rtcMessage,
-      });
-    });
+  socket.on('register', (callerId) => {
+    users.set(callerId, socket.id);
+    console.log(`User registered: ${callerId} -> ${socket.id}`);
   });
-};
 
-module.exports.getIO = () => {
-  if (!IO) {
-    throw Error("IO not initilized.");
-  } else {
-    return IO;
-  }
-};
+  socket.on('offer', ({ targetId, offer }) => {
+    const targetSocketId = users.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('offer', offer);
+    }
+    console.log(`User Offer: `);
+  });
+
+  socket.on('answer', ({ targetId, answer }) => {
+    const targetSocketId = users.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('answer', answer);
+    }
+  });
+
+  socket.on('ice-candidate', ({ targetId, candidate }) => {
+    const targetSocketId = users.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('ice-candidate', {candidate});
+    }
+  });
+
+  socket.on('disconnect', () => {
+    for (const [callerId, socketId] of users.entries()) {
+      if (socketId === socket.id) {
+        users.delete(callerId);
+        break;
+      }
+    }
+    console.log('Client disconnected:', socket.id);
+  });
+})
+
+}

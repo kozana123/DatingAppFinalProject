@@ -1,26 +1,40 @@
-import express from 'express'
-import cors from 'cors'
-import morgan from 'morgan'
+import path from 'path';
+import { fileURLToPath } from 'url';
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import { createServer } from 'http';
 
+import { initIO } from './socket.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import v1Router from './routers/v1.js';
 
-import {errorHandler} from './middlewares/errorHandler.js';
-import v1Router from './routers/v1.js'
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const PORT = 5500;
-const server = express();
+const app = express();
 
-server.use(cors())
-server.use(morgan('tiny'))
+// --- Middlewares ---
+app.use(cors());
+app.use(morgan('tiny'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-server.use(express.json());
-server.use(express.urlencoded())
+// --- Static file serving for the web client ---
+app.use('/', express.static(path.join(__dirname, 'static')));
 
-server.use('/api/v1', v1Router);
+// --- API routes ---
+app.use('/api/v1', v1Router);
 
-server.use(errorHandler);
+// --- Error handling ---
+app.use(errorHandler);
 
+// --- Create server and initialize Socket.IO ---
+const httpServer = createServer(app);
+const PORT = process.env.PORT || 3500;
+initIO(httpServer);
 
-server.listen(PORT, () => {
-    console.log(`Server run in: http://localhost:${PORT}`);
-    
-})
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🌐 Web client at      http://<your-ip>:${PORT}/webclient.html`);
+});
