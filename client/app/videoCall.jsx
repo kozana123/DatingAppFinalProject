@@ -77,6 +77,7 @@ export default function VideoCall() {
 
     peerConnection.current.onicecandidate = (event) => {
     if (event.candidate) {
+      console.log("📤 Sending ICE candidate:", event.candidate);
       socket.current.emit('ice-candidate', {
       targetId: otherUserId.current,
       candidate: event.candidate,
@@ -84,25 +85,36 @@ export default function VideoCall() {
       }
     };
 
-    peerConnection.onconnectionstatechange = () => {
-      console.log("Connection state:", peerConnection.connectionState);
-      if (peerConnection.connectionState === "connected") {
+    peerConnection.current.onconnectionstatechange = () => {
+      console.log("📡 Connection state:", peerConnection.current.connectionState);
+      if (peerConnection.current.connectionState === "connected") {
         console.log("✅ WebRTC connection established!");
       }
     };
 
-    peerConnection.ontrack = (event) => {
-      const remoteStream = event.streams[0];
-      remoteVideoElement.srcObject = remoteStream;
+    peerConnection.current.onnegotiationneeded = async () => {
+      try {
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+        socket.current.emit('offer', {
+          targetId: otherUserId.current,
+          offer,
+          senderId: callerId,
+        });
+      } catch (e) {
+        console.error("Negotiation error:", e);
+      }
     };
 
-    peerConnection.current.onaddstream = (event) => {
-      setRemoteStream(event.stream);
+    peerConnection.current.ontrack = (event) => {
+      const remoteStream = event.streams[0];
+      setRemoteStream(remoteStream);
     };
 
     mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
       setLocalStream(stream);
       peerConnection.current.addStream(stream);
+      stream.getTracks().forEach(track => peer.addTrack(track, stream));
     });
 
     

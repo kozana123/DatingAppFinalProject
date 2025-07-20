@@ -47,14 +47,14 @@
 
   peer.onicecandidate = event => {
     if (event.candidate) {
+      console.log("📤 ICE candidate found:", event.candidate);
       socket.emit('ice-candidate', {
         targetId: remoteIdInput.value,
-        candidate:{
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex
-        }
+        candidate: event.candidate
       });
+    }
+    else {
+    console.log("❄️ ICE candidate gathering complete (null)");
     }
   };
 
@@ -85,6 +85,7 @@
 
   socket.on('ice-candidate', async (candidate) => {
     try {
+      console.log("📥 Received ICE candidate:", candidate);
       await peer.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (e) {
       console.error('Error adding received ice candidate', e);
