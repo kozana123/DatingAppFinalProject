@@ -6,10 +6,11 @@ import {
   RTCView,
   RTCIceCandidate,
   mediaDevices,
+  RTCSessionDescription
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.9:3500'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.0.0.17:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -24,6 +25,7 @@ export default function VideoCall() {
 
   const pendingCandidates = useRef([]);
   const remoteDescSet = useRef(false);
+  const otherUserId = useRef(null);
 
   useEffect(() => {
     socket.current = io.connect(SIGNALING_SERVER_URL);
@@ -32,48 +34,55 @@ export default function VideoCall() {
     socket.current.emit('register', callerId);
     });
 
-    socket.current.on('offer', async (offer) => {
-    await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
-    remoteDescSet.current = true;
-    pendingCandidates.current.forEach(candidate => {
-    peerConnection.current.addIceCandidate(candidate);
-    });
-    pendingCandidates.current = [];
-    const answer = await peerConnection.current.createAnswer();
-    await peerConnection.current.setLocalDescription(answer);
-    socket.current.emit('answer', {
-        targetId: otherUserId.current,
-        answer,
-    });
+    socket.current.on('offer', async ({ offer, senderId }) => {
+      try {
+        await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
+        remoteDescSet.current = true;
+        otherUserId.current = senderId;
+        // Add any stored candidates
+        for (const candidate of pendingCandidates.current) {
+          await peerConnection.current.addIceCandidate(candidate);
+        }
+
+        pendingCandidates.current = [];
+
+        const answer = await peerConnection.current.createAnswer();
+        await peerConnection.current.setLocalDescription(answer);
+
+        socket.current.emit('answer', {
+          targetId: otherUserId.current,
+          answer,
+        });
+      } catch (e) {
+        console.error('Error handling offer:', e);
+      }
     });
 
     socket.current.on('answer', async (answer) => {
     await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
     });
 
-    socket.current.on('ice-candidate', async (candidate) => {
-    try {
-        const candidate = new RTCIceCandidate(candidate);
+    socket.current.on('ice-candidate', async (data) => {
+      try {
+        const candidate = new RTCIceCandidate(data.candidate);
 
         if (remoteDescSet.current) {
-        peerConnection.current.addIceCandidate(candidate).catch(err =>
-            console.error('❌ Failed to add ICE candidate:', err)
-        );
+          await peerConnection.current.addIceCandidate(candidate);
         } else {
-        pendingCandidates.current.push(candidate);
+          pendingCandidates.current.push(candidate); // store for later
         }
-    } catch (e) {
-        console.error('Error adding ice candidate:', e);
-    }
+      } catch (e) {
+        console.error('Error adding ICE candidate:', e);
+      }
     });
 
     peerConnection.current.onicecandidate = (event) => {
     if (event.candidate) {
-        socket.current.emit('ice-candidate', {
-        targetId: otherUserId.current,
-        candidate: event.candidate,
-        });
-    }
+      socket.current.emit('ice-candidate', {
+      targetId: otherUserId.current,
+      candidate: event.candidate,
+      });
+      }
     };
 
     peerConnection.current.onaddstream = (event) => {

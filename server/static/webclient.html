@@ -49,7 +49,11 @@
     if (event.candidate) {
       socket.emit('ice-candidate', {
         targetId: remoteIdInput.value,
-        candidate: event.candidate
+        candidate:{
+          candidate: event.candidate.candidate,
+          sdpMid: event.candidate.sdpMid,
+          sdpMLineIndex: event.candidate.sdpMLineIndex
+        }
       });
     }
   };
@@ -75,7 +79,7 @@
     });
   });
 
-  socket.on('answer', async (answer) => {
+  socket.on('answer', async ({answer}) => {
     await peer.setRemoteDescription(new RTCSessionDescription(answer));
   });
 
@@ -94,7 +98,8 @@
       console.log('📨 Sending offer to', remoteId);
       socket.emit('offer', {
         targetId: remoteId,
-        offer
+        offer: offer,
+        senderId: callerId,
       });
     });
   }
