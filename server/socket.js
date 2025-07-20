@@ -17,21 +17,27 @@ io.on('connection', (socket) => {
 
   socket.on('register', (callerId) => {
     users.set(callerId, socket.id);
+    console.log(`✅ users: ${users} with socket: ${socket.id}`);
     console.log(`User registered: ${callerId} -> ${socket.id}`);
   });
 
-  socket.on('offer', ({ targetId, offer }) => {
+  socket.on('offer', ({ targetId, offer, senderId }) => {
     const targetSocketId = users.get(targetId);
     if (targetSocketId) {
-      io.to(targetSocketId).emit('offer', offer);
+      console.log(`✅ Sent offer from ${socket.id} to ${targetSocketId}`);
+      io.to(targetSocketId).emit('offer', { offer, senderId: senderId });
     }
-    console.log(`User Offer: `);
   });
 
   socket.on('answer', ({ targetId, answer }) => {
     const targetSocketId = users.get(targetId);
+    console.log('📥 Incoming answer - looking up:', targetId, '=>', targetSocketId);
     if (targetSocketId) {
+      console.log(`✅ the answer: ${answer}`);
       io.to(targetSocketId).emit('answer', answer);
+    }
+    else {
+    console.log('❌ Could not find target socket for answer:', targetId);
     }
   });
 

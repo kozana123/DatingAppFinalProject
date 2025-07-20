@@ -10,7 +10,7 @@ import {
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.17:3500'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.57.40.205:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -43,11 +43,10 @@ export default function VideoCall() {
         for (const candidate of pendingCandidates.current) {
           await peerConnection.current.addIceCandidate(candidate);
         }
-
         pendingCandidates.current = [];
-
         const answer = await peerConnection.current.createAnswer();
         await peerConnection.current.setLocalDescription(answer);
+        console.log('the answer', answer, 'to :', otherUserId);
 
         socket.current.emit('answer', {
           targetId: otherUserId.current,
@@ -83,6 +82,18 @@ export default function VideoCall() {
       candidate: event.candidate,
       });
       }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+      console.log("Connection state:", peerConnection.connectionState);
+      if (peerConnection.connectionState === "connected") {
+        console.log("✅ WebRTC connection established!");
+      }
+    };
+
+    peerConnection.ontrack = (event) => {
+      const remoteStream = event.streams[0];
+      remoteVideoElement.srcObject = remoteStream;
     };
 
     peerConnection.current.onaddstream = (event) => {

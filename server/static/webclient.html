@@ -79,7 +79,7 @@
     });
   });
 
-  socket.on('answer', async ({answer}) => {
+  socket.on('answer', async (answer) => {    
     await peer.setRemoteDescription(new RTCSessionDescription(answer));
   });
 
