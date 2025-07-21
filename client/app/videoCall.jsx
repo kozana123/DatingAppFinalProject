@@ -1,6 +1,6 @@
 // VideoCall.js
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Button, Text } from 'react-native';
+import { View, Button, Text, TextInput } from 'react-native';
 import {
   RTCPeerConnection,
   RTCView,
@@ -16,6 +16,7 @@ const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
 export default function VideoCall() {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  const [targetIdInput, setTargetIdInput] = useState('');
 
   const [callerId] = useState(
   Math.floor(100000 + Math.random() * 900000).toString());
@@ -26,6 +27,7 @@ export default function VideoCall() {
   const pendingCandidates = useRef([]);
   const remoteDescSet = useRef(false);
   const otherUserId = useRef(null);
+
 
   useEffect(() => {
     socket.current = io.connect(SIGNALING_SERVER_URL);
@@ -51,7 +53,6 @@ export default function VideoCall() {
         pendingCandidates.current = [];
         const answer = await peerConnection.current.createAnswer();
         await peerConnection.current.setLocalDescription(answer);
-        console.log('the answer', answer, 'to :', otherUserId);
 
         socket.current.emit('answer', {
           targetId: otherUserId.current,
@@ -141,6 +142,21 @@ export default function VideoCall() {
             {callerId}
         </Text>
       <Text style={{ textAlign: 'center', marginTop: 40 }}>WebRTC Video Call</Text>
+
+      <TextInput
+        placeholder="Enter target user ID"
+        placeholderTextColor="#999"
+        style={{
+          height: 40,
+          borderColor: 'gray',
+          borderWidth: 1,
+          margin: 10,
+          paddingHorizontal: 10,
+          color: 'black'
+        }}
+        value={targetIdInput}
+        onChangeText={setTargetIdInput}
+      />
 
       {localStream && (
         <RTCView
