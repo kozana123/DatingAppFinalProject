@@ -1,6 +1,7 @@
 // VideoCall.js
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Button, Text, TextInput } from 'react-native';
+import InCallManager from 'react-native-incall-manager';
 import {
   RTCPeerConnection,
   RTCView,
@@ -16,7 +17,6 @@ const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
 export default function VideoCall() {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
-  const [targetIdInput, setTargetIdInput] = useState('');
 
   const [callerId] = useState(
   Math.floor(100000 + Math.random() * 900000).toString());
@@ -27,7 +27,7 @@ export default function VideoCall() {
   const pendingCandidates = useRef([]);
   const remoteDescSet = useRef(false);
   const otherUserId = useRef(null);
-
+  const [targetIdInput, setTargetIdInput] = useState('');
 
   useEffect(() => {
     socket.current = io.connect(SIGNALING_SERVER_URL);
@@ -53,6 +53,7 @@ export default function VideoCall() {
         pendingCandidates.current = [];
         const answer = await peerConnection.current.createAnswer();
         await peerConnection.current.setLocalDescription(answer);
+        console.log('the answer', answer, 'to :', otherUserId);
 
         socket.current.emit('answer', {
           targetId: otherUserId.current,
@@ -101,6 +102,12 @@ export default function VideoCall() {
     };
 
     peerConnection.current.onnegotiationneeded = async () => {
+
+      if (!otherUserId.current) {
+        console.warn("⚠️ Skipping negotiation: otherUserId not set yet.");
+        return;
+      }
+
       try {
         const offer = await peerConnection.current.createOffer();
         await peerConnection.current.setLocalDescription(offer);
@@ -114,26 +121,47 @@ export default function VideoCall() {
       }
     };
 
-    mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+    mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
       setLocalStream(stream);
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
       });
+      InCallManager.start({ media: 'video' });
+      setTimeout(() => {
+        InCallManager.setSpeakerphoneOn(true);
+        InCallManager.setForceSpeakerphoneOn(true); // extra force
+        console.warn('🔊 Speakerphone commands issued');
+      }, 1000);
+      
     });
 
     return () => {
       socket.current.disconnect();
+      // if (InCallManager && typeof InCallManager.stop === 'function') {
+      //   InCallManager.stop();
+      // }
     };
   }, []);
 
   const startCall = async () => {
+
+    if (!targetIdInput.trim()) {
+      console.warn("Please enter a target ID to call.");
+      return;
+    }
+
+    otherUserId.current = targetIdInput.trim();
+    console.warn("Please enter a Trying to start call.",!targetIdInput.trim());
+
     const offer = await peerConnection.current.createOffer();
     await peerConnection.current.setLocalDescription(offer);
+
     socket.current.emit('offer', {
-        targetId: otherUserId.current,
-        offer,
-        });
-    };  
+      targetId: otherUserId.current,
+      offer,
+      senderId: callerId,
+    });
+  }; 
 
   return (
     <View style={{ flex: 1 }}>
