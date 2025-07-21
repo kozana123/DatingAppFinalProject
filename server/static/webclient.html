@@ -47,19 +47,24 @@
 
   peer.onicecandidate = event => {
     if (event.candidate) {
+      console.log("📤 ICE candidate found:", event.candidate);
       socket.emit('ice-candidate', {
         targetId: remoteIdInput.value,
-        candidate:{
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex
-        }
+        candidate: event.candidate
       });
+    }
+    else {
+    console.log("❄️ ICE candidate gathering complete (null)");
     }
   };
 
   peer.ontrack = event => {
-    remoteVideo.srcObject = event.streams[0];
+    console.log("👀 Got remote track", event.streams);
+    if (event.streams[0]) {
+      remoteVideo.srcObject = event.streams[0];
+    } else {
+      console.warn("No remote stream found");
+    }
   };
 
   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -83,13 +88,20 @@
     await peer.setRemoteDescription(new RTCSessionDescription(answer));
   });
 
-  socket.on('ice-candidate', async (candidate) => {
+  socket.on('ice-candidate', async (data) => {
     try {
-      await peer.addIceCandidate(new RTCIceCandidate(candidate));
+      console.log("📥 Received ICE candidate:", data);
+
+      const candidate = new RTCIceCandidate(data.candidate); // must include all fields
+      await peer.addIceCandidate(candidate);
     } catch (e) {
       console.error('Error adding received ice candidate', e);
     }
   });
+
+  peer.onconnectionstatechange = () => {
+    console.log("Connection state:", peer.connectionState);
+  };
 
   function startCall() {
     peer.createOffer().then(offer => {

@@ -10,7 +10,7 @@ import {
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
 
-const SIGNALING_SERVER_URL = 'http://10.57.40.205:3500'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.0.0.20:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -33,6 +33,11 @@ export default function VideoCall() {
     socket.current.on('connect', () => {
     socket.current.emit('register', callerId);
     });
+
+    peerConnection.current.ontrack = (event) => {
+      const remoteStream = event.streams[0];
+      setRemoteStream(remoteStream);
+    };
 
     socket.current.on('offer', async ({ offer, senderId }) => {
       try {
@@ -76,36 +81,44 @@ export default function VideoCall() {
     });
 
     peerConnection.current.onicecandidate = (event) => {
-    if (event.candidate) {
-      socket.current.emit('ice-candidate', {
-      targetId: otherUserId.current,
-      candidate: event.candidate,
-      });
+      if (event.candidate && otherUserId.current) {
+        console.log("📤 Sending ICE candidate:", event.candidate);
+        socket.current.emit('ice-candidate', {
+          targetId: otherUserId.current,
+          candidate: event.candidate,
+        });
+      } else if (!otherUserId.current) {
+        console.warn("⚠️ ICE candidate generated before targetId was known. Skipping.");
       }
     };
 
-    peerConnection.onconnectionstatechange = () => {
-      console.log("Connection state:", peerConnection.connectionState);
-      if (peerConnection.connectionState === "connected") {
+    peerConnection.current.onconnectionstatechange = () => {
+      console.log("📡 Connection state:", peerConnection.current.connectionState);
+      if (peerConnection.current.connectionState === "connected") {
         console.log("✅ WebRTC connection established!");
       }
     };
 
-    peerConnection.ontrack = (event) => {
-      const remoteStream = event.streams[0];
-      remoteVideoElement.srcObject = remoteStream;
-    };
-
-    peerConnection.current.onaddstream = (event) => {
-      setRemoteStream(event.stream);
+    peerConnection.current.onnegotiationneeded = async () => {
+      try {
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+        socket.current.emit('offer', {
+          targetId: otherUserId.current,
+          offer,
+          senderId: callerId,
+        });
+      } catch (e) {
+        console.error("Negotiation error:", e);
+      }
     };
 
     mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
       setLocalStream(stream);
-      peerConnection.current.addStream(stream);
+      stream.getTracks().forEach(track => {
+        peerConnection.current.addTrack(track, stream);
+      });
     });
-
-    
 
     return () => {
       socket.current.disconnect();
