@@ -43,6 +43,7 @@ io.on('connection', (socket) => {
 
   socket.on('ice-candidate', ({ targetId, candidate }) => {
     const targetSocketId = users.get(targetId);
+    console.log('📥 Sending Ice Candidate:', '=>', targetSocketId, "With: ", candidate);
     if (targetSocketId) {
       io.to(targetSocketId).emit('ice-candidate', {candidate});
     }
