@@ -248,4 +248,3 @@ const styles = StyleSheet.create({
   },
 });
 
-//http://localhost:3500/webclient.html
