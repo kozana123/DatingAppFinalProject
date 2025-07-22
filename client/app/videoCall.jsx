@@ -247,4 +247,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+<<<<<<< Updated upstream
 //http://localhost:3500/webclient.html
+=======
+//http://localhost:3500/webclient.html
+>>>>>>> Stashed changes

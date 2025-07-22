@@ -17,8 +17,19 @@ io.on('connection', (socket) => {
 
   socket.on('register', (callerId) => {
     users.set(callerId, socket.id);
-    console.log(`✅ users: ${users} with socket: ${socket.id}`);
     console.log(`User registered: ${callerId} -> ${socket.id}`);
+    console.log(`Amount of users: ${users.size}`);
+
+     if (users.size >= 2) {
+    const [initiatorId, initiatorSocketId] = [...users.entries()][0];
+    const [targetId, targetSocketId] = [...users.entries()][1];
+
+    console.log(`🚀 Triggering offer from ${initiatorSocketId} to ${targetId}`);
+    io.to(initiatorSocketId).emit('initiate-offer', {
+      targetId: targetId,
+      senderId: initiatorId
+    });
+  }
   });
 
   socket.on('offer', ({ targetId, offer, senderId }) => {
