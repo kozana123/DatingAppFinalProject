@@ -74,6 +74,22 @@
       stream.getTracks().forEach(track => peer.addTrack(track, stream));
     });
 
+    socket.on('initiate-offer', ({ targetId, senderId }) => {
+    console.log("offer Activate");
+    
+    peer.createOffer().then(offer => {
+      peer.setLocalDescription(offer);
+      const remoteId = document.getElementById('remoteId').value;
+      console.log('📨 Sending offer to', remoteId);
+      socket.emit('offer', {
+        targetId: targetId,
+        offer: offer,
+        senderId: senderId,
+      });
+    });
+  });
+
+
   socket.on('offer', async (offer) => {
     await peer.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await peer.createAnswer();
@@ -99,6 +115,7 @@
     }
   });
 
+  
   peer.onconnectionstatechange = () => {
     console.log("Connection state:", peer.connectionState);
   };
