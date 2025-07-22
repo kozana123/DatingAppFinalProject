@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,191 +7,208 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+  ImageBackground,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useFonts } from "expo-font";
 
-const { width, height } = Dimensions.get('window');
-const CONTAINER_WIDTH = 440;
-const CONTAINER_HEIGHT = 956;
+const { width, height } = Dimensions.get("window");
 
 export default function Index() {
+  const router = useRouter();
+  const [fontsLoaded] = useFonts({
+    "Prompt-Thin": require("../assets/fonts/Prompt-Thin.ttf"),
+    "Prompt-SemiBold": require("../assets/fonts/Prompt-SemiBold.ttf"),
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
-    <View style={styles.outerWrapper}>
-      <View style={styles.containerWrapper}>
-        <SafeAreaView style={styles.container}>
-          {/* רקע גרדיאנט */}
-          <LinearGradient
-            colors={['white', '#572F2D', '#B13A3E']}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
+    <ImageBackground
+      source={require("../assets/images/design.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.container}>
+            <View style={styles.logoCircle}>
+              <View style={styles.headLeft} />
+              <View style={styles.headRight} />
+              <Image
+                source={require("../assets/images/logo.png")}
+                style={styles.logoImage}
+                resizeMode="contain"
+              />
+            </View>
 
-          {/* עיגול שקוף עליון */}
-          <View style={styles.transparentCircleTop} />
+            <Text style={styles.appName}>Luvio</Text>
 
-          {/* עיגול לוגו */}
-          <View style={styles.logoCircle}>
-            <Image
-              source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1828/1828419.png' }}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
+            <Text style={styles.headline}>
+              Connect
+              People{"\n"}
+              Easily & Quickly
+            </Text>
 
-          {/* שם האפליקציה */}
-          <Text style={styles.appName}>Luvio</Text>
+            <Text style={styles.description}>
+              Join us to discover your ideal partner and ignite the sparks of
+              romance in your journey.
+            </Text>
 
-          {/* כותרת */}
-          <Text style={styles.headline}>
-            Connect{'\n'}
-            People{'\n'}
-            Easily &{'\n'}
-            Quickly
-          </Text>
-
-          {/* תיאור */}
-          <Text style={styles.description}>
-            Join us to discover your ideal partner and ignite the sparks of romance in your journey.
-          </Text>
-
-          {/* כפתור Sign In */}
-          <TouchableOpacity style={styles.signInButton} onPress={() => console.log('Sign In')}>
-            <Text style={styles.signInText}>Sign In</Text>
-          </TouchableOpacity>
-
-          {/* טקסט תחתון */}
-          <View style={styles.footerContainer}>
-            <Text style={styles.footerText}>Don’t have an account? </Text>
-            <TouchableOpacity onPress={() => console.log('Sign Up')}>
-              <Text style={styles.footerLink}>sign up</Text>
+       
+            <View style={styles.footerContainer}>
+            <TouchableOpacity
+              style={styles.signInButton}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
+
+              <Text style={styles.footerText}>Don’t have an account? </Text>
+              <Text style={styles.footerLink}>sign up</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push("registerPages/regesiterUserName")
+                }
+              >
+               
+              </TouchableOpacity>
+            </View>
           </View>
         </SafeAreaView>
-      </View>
-    </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  outerWrapper: {
+  backgroundImage: {
     flex: 1,
-    backgroundColor: '#000000', // רקע כהה כדי להדגיש את המסך המצומצם
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    height: "100%",
   },
-  containerWrapper: {
-    width: CONTAINER_WIDTH,
-    height: CONTAINER_HEIGHT,
-    borderRadius: 44,
-    overflow: 'hidden',
-    backgroundColor: 'transparent',
+  gradientOverlay: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 40,
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  transparentCircleTop: {
-    position: 'absolute',
-    top: 50,
-    left: 120,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(255,255,255,0.11)',
-    shadowColor: '#FFF',
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 2 },
-    zIndex: 0,
+    alignItems: "center",
+    paddingHorizontal: 20,
+    justifyContent: "space-around",
   },
   logoCircle: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#3B2E3B',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 8,
-    zIndex: 10,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "#9b59b6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    position: "relative",
+  },
+  headLeft: {
+    width: 30,
+    height: 30,
+    backgroundColor: "#ffffff",
+    borderRadius: 100,
+    position: "absolute",
+    top: 27,
+    left: 30,
+  },
+  headRight: {
+    width: 25,
+    height: 25,
+    backgroundColor: "#ff69b4",
+    borderRadius: 100,
+    position: "absolute",
+    top: 32,
+    right: 38,
   },
   logoImage: {
-    width: '60%',
-    height: '60%',
+    width: "180%",
+    height: "180%",
   },
   appName: {
-    marginTop: 12,
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#fff',
-    fontFamily: 'Poppins',
-    writingDirection: 'rtl',
+    fontSize: 30,
+    color: "#ffe6ff",
+    fontFamily: "Prompt-Thin",
+    marginBottom: 10,
   },
   headline: {
-    marginTop: 40,
-    fontSize: 57,
-    fontWeight: '600',
-    color: '#F2F5F0',
-    fontFamily: 'Inter',
-    textAlign: 'right',
-    lineHeight: 66,
-    writingDirection: 'rtl',
-    width: '100%',
-  },
+    fontSize: 30,
+    color: "#f8d7ff",
+    fontFamily: "Prompt-SemiBold",
+    lineHeight: 38,
+    marginBottom: 15,
+    textAlign: "left",         // מיישר את הטקסט לשמאל
+    direction:"ltr"   // מיישר את כל ה־Text לשמאל במסך
+  },  
   description: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#F2F5F0',
-    fontFamily: 'Poppins',
+    fontSize: 14,
+    color: "#ffd1ff",
+    fontFamily: "Prompt-Thin",
     lineHeight: 22,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    width: '100%',
+    textAlign: "center",
+    marginBottom: 20,
   },
   signInButton: {
-    marginTop: 40,
-    backgroundColor: '#F2F5F0',
-    height: 55,
-    width: 286,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#BD1414',
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "250",
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10, // יותר מרווח מתחת לכפתור
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderWidth: 2,
+    borderColor: "#cc6699",
   },
+  
   signInText: {
-    color: '#28221D',
-    fontSize: 25,
-    fontWeight: '700',
-    fontFamily: 'Poppins',
+    color: "#4a0033",
+    fontSize: 18,
+    fontFamily: "Prompt-Thin",
   },
+  
   footerContainer: {
-    marginTop: 40,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: "center",
+    marginTop: 20,
   },
+  
+  signUpContainer: {
+    flexDirection: "row", // שורה אחת לטקסט וכפתור
+    alignItems: "center",
+    marginTop: 8,
+  },
+  
   footerText: {
-    fontSize: 17,
-    color: '#F2F5F0',
-    fontFamily: 'Poppins',
-    writingDirection: 'rtl',
+    fontSize: 16,
+    color: "#ffe6ff",
+    fontFamily: "Prompt-Thin",
   },
+  
   footerLink: {
-    fontSize: 17,
-    color: '#F2F5F0',
-    fontFamily: 'Poppins',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
-    writingDirection: 'rtl',
-    marginLeft: 5,
+    fontSize: 16,
+    color: "#ffffff",
+    fontFamily: "Prompt-Thin",
+    textDecorationLine: "underline",
+    marginLeft: 4,
   },
+  
 });
