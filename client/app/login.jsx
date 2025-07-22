@@ -11,12 +11,15 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useRouter } from "expo-router";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   return (
+    
     <ImageBackground
       source={require("../assets/images/design.png")}
       style={styles.backgroundImage}
@@ -30,7 +33,7 @@ export default function Login() {
       >
         <SafeAreaView style={styles.container}>
           <Text style={styles.title}>Welcome Back!</Text>
-          <Text style={styles.subtitle}>welcome back we missed you</Text>
+          <Text style={styles.subtitle}>Nice to see you again, we missed you</Text>
 
           <View style={styles.inputLabelContainer}>
             <Text style={styles.inputLabel}>Username</Text>
@@ -83,8 +86,9 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.signInButton} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.signInButton} activeOpacity={0.85} onPress={() => router.navigate("/(tabs)/main")}>
             <Text style={styles.signInText}>Sign in</Text>
+         
           </TouchableOpacity>
 
           <View style={styles.dividerContainer}>
@@ -134,13 +138,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   title: {
-    fontSize: 36,
+    fontSize: 26,
     fontWeight: "700",
     color: "#ffe6ff",
     marginBottom: 6,
     fontFamily: "Prompt-SemiBold",
     letterSpacing: 1,
-    textAlign: "left",
+    textAlign: "center",
+   
   },
   subtitle: {
     fontSize: 16,
@@ -148,10 +153,13 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     fontFamily: "Prompt-Thin",
     textAlign: "left",
+    direction: "ltr",
   },
   inputLabelContainer: {
     width: "100%",
     marginBottom: 18,
+    direction: "ltr",
+    alignItems: "flex-start", // אם את רוצה את Forgot Password בצד שמאל
   },
   inputLabel: {
     color: "#f8d7ff",
@@ -185,23 +193,27 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   forgotPassword: {
-    alignSelf: "flex-end",
     marginTop: 4,
+    alignSelf: "flex-end",
+    marginRight: 4,
   },
   forgotPasswordText: {
     color: "#f8d7ff",
     fontSize: 13,
     fontFamily: "Prompt-Thin",
+    direction: "ltr",
+  
   },
   signInButton: {
-    width: "100%",
-    borderRadius: 40,
-    marginTop: 18,
-    marginBottom: 18,
-    paddingVertical: 16,
-    backgroundColor: "#fff",
+    width: 250, // מספר, לא מחרוזת!
+    borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center", // מרכז את הכפתור
+    marginTop: 18,
+    marginBottom: 18,
+    paddingVertical: 6,
+    backgroundColor: "#fff",
   },
   signInText: {
     fontSize: 20,
