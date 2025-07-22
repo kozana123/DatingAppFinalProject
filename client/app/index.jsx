@@ -51,8 +51,7 @@ export default function Index() {
             <Text style={styles.appName}>Luvio</Text>
 
             <Text style={styles.headline}>
-              Connect
-              People{"\n"}
+              Connect People{"\n"}
               Easily & Quickly
             </Text>
 
@@ -61,24 +60,25 @@ export default function Index() {
               romance in your journey.
             </Text>
 
-       
             <View style={styles.footerContainer}>
-            <TouchableOpacity
-              style={styles.signInButton}
-              onPress={() => router.push("/login")}
-            >
-              <Text style={styles.signInText}>Sign In</Text>
-            </TouchableOpacity>
-
-              <Text style={styles.footerText}>Don’t have an account? </Text>
-              <Text style={styles.footerLink}>sign up</Text>
               <TouchableOpacity
-                onPress={() =>
-                  router.push("registerPages/regesiterUserName")
-                }
+                style={styles.signInButton}
+                onPress={() => router.push("/login")}
               >
-               
+                <Text style={styles.signInText}>Sign In</Text>
               </TouchableOpacity>
+
+              <View style={{ alignItems: "center", marginTop: 10 }}>
+                <Text style={styles.footerText}>Don’t have an account?</Text>
+
+                <TouchableOpacity
+                  onPress={() => router.push("registerPages/regesiterUserName")}
+                  activeOpacity={0.7}
+                  style={{ marginTop: 5 }}
+                >
+                  <Text style={styles.footerLink}>sign up</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </SafeAreaView>
@@ -145,7 +145,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#ffe6ff",
     fontFamily: "Prompt-Thin",
-    marginBottom: 10,
+    marginBottom: 1,
+    marginTop: 0,
   },
   headline: {
     fontSize: 30,
@@ -153,9 +154,9 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-SemiBold",
     lineHeight: 38,
     marginBottom: 15,
-    textAlign: "left",         // מיישר את הטקסט לשמאל
-    direction:"ltr"   // מיישר את כל ה־Text לשמאל במסך
-  },  
+    textAlign: "left", // מיישר את הטקסט לשמאל
+    direction: "ltr", // מיישר את כל ה־Text לשמאל במסך
+  },
   description: {
     fontSize: 14,
     color: "#ffd1ff",
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10, // יותר מרווח מתחת לכפתור
+    marginBottom: 10,
     shadowColor: "#cc6699",
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -179,30 +180,30 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#cc6699",
   },
-  
+
   signInText: {
     color: "#4a0033",
     fontSize: 18,
     fontFamily: "Prompt-Thin",
   },
-  
+
   footerContainer: {
     alignItems: "center",
     marginTop: 20,
   },
-  
+
   signUpContainer: {
     flexDirection: "row", // שורה אחת לטקסט וכפתור
     alignItems: "center",
     marginTop: 8,
   },
-  
+
   footerText: {
     fontSize: 16,
     color: "#ffe6ff",
     fontFamily: "Prompt-Thin",
   },
-  
+
   footerLink: {
     fontSize: 16,
     color: "#ffffff",
@@ -210,5 +211,4 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     marginLeft: 4,
   },
-  
 });
