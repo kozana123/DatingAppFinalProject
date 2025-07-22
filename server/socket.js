@@ -55,9 +55,11 @@ io.on('connection', (socket) => {
   socket.on('ice-candidate', ({ targetId, candidate }) => {
     const targetSocketId = users.get(targetId);
     console.log('📥 Sending Ice Candidate:', '=>', targetSocketId, "With: ", candidate);
+    console.log(`Amount of users: ${users.size}`);
     if (targetSocketId) {
       io.to(targetSocketId).emit('ice-candidate', {candidate});
     }
+    
   });
 
   socket.on('disconnect', () => {

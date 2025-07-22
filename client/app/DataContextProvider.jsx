@@ -7,6 +7,8 @@ export const DataContext = createContext();
 
 export default function DataContextProvider(props) {
   const [users, setUsers] = useState([{ id: 1, name: 'avi', pass: '123' }]);
+  const [user, setUser] = useState([{}]);
+
   const [userImg, setUserImage] = useState({ image: null });
 
   let gotSms = false;
