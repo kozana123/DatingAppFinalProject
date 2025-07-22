@@ -1,6 +1,6 @@
 // VideoCall.js
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Button, Text, TextInput } from 'react-native';
+import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator  } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import {
   RTCPeerConnection,
@@ -11,7 +11,7 @@ import {
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
 
-const SIGNALING_SERVER_URL = 'http://192.168.68.104:3500'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.0.0.20:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -29,6 +29,9 @@ export default function VideoCall() {
   const otherUserId = useRef(null);
   const [targetIdInput, setTargetIdInput] = useState('');
 
+  const [connected, setConnected] = useState(false);
+
+
   useEffect(() => {
     socket.current = io.connect(SIGNALING_SERVER_URL);
 
@@ -39,6 +42,9 @@ export default function VideoCall() {
     peerConnection.current.ontrack = (event) => {
       const remoteStream = event.streams[0];
       setRemoteStream(remoteStream);
+      if (remoteStream) {
+        setConnected(true);
+      }
     };
 
     socket.current.on('offer', async ({ offer, senderId }) => {
@@ -126,21 +132,26 @@ export default function VideoCall() {
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
       });
-      InCallManager.start({ media: 'video' });
-      setTimeout(() => {
-        InCallManager.setSpeakerphoneOn(true);
-        InCallManager.setForceSpeakerphoneOn(true); // extra force
-        console.warn('🔊 Speakerphone commands issued');
-      }, 1000);
       
     });
 
     return () => {
       socket.current.disconnect();
-      // if (InCallManager && typeof InCallManager.stop === 'function') {
-      //   InCallManager.stop();
-      // }
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => {track.stop(); });
+      }
+
+      // Close peer connection
+      for (const id in peerConnection) {
+        const pc = peerConnection[id];
+        if (pc && typeof pc.close === "function") {
+          pc.close();
+        }
+        console.log("Closed!")
+      }
     };
+
   }, []);
 
   const startCall = async () => {
@@ -164,43 +175,76 @@ export default function VideoCall() {
   }; 
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={connected ? styles.connectedContainer : styles.searchingContainer}>
+    {connected ? (
+      <>
+        {/* Local stream full screen */}
+        {localStream && (
+          <RTCView
+            streamURL={localStream.toURL()}
+            style={styles.localVideo}
+            objectFit="cover"
+          />
+        )}
+        {/* Remote stream small in corner */}
+        {remoteStream && (
+          <RTCView
+            streamURL={remoteStream.toURL()}
+            style={styles.remoteVideo}
+            objectFit="cover"
+          />
+        )}
+      </>
+    ) : (
+      <View style={styles.searchingContent}>
+        <ActivityIndicator size="large" color="#ffffff" />
+        <Text style={styles.searchingText}>Searching for a match...</Text>
+      </View>
+    )}
+      {/* <Button title="Start Call" onPress={startCall} /> */}
 
-        <Text style={{fontSize: 32,color: '#000000',letterSpacing: 6,}}>
-            {callerId}
-        </Text>
-      <Text style={{ textAlign: 'center', marginTop: 40 }}>WebRTC Video Call</Text>
-
-      <TextInput
-        placeholder="Enter target user ID"
-        placeholderTextColor="#999"
-        style={{
-          height: 40,
-          borderColor: 'gray',
-          borderWidth: 1,
-          margin: 10,
-          paddingHorizontal: 10,
-          color: 'black'
-        }}
-        value={targetIdInput}
-        onChangeText={setTargetIdInput}
-      />
-
-      {localStream && (
-        <RTCView
-          streamURL={localStream.toURL()}
-          style={{ width: '100%', height: 200 }}
-        />
-      )}
-
-      {remoteStream && (
-        <RTCView
-          streamURL={remoteStream.toURL()}
-          style={{ width: '100%', height: 200, marginTop: 20 }}
-        />
-      )}
-
-      <Button title="Start Call" onPress={startCall} />
-    </View>
+  </View>
   );
 }
+
+const { width, height } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+  connectedContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  searchingContainer: {
+    flex: 1,
+    backgroundColor: '#1e1e2f',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  localVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width,
+    height,
+    zIndex: 0,
+  },
+  remoteVideo: {
+    position: 'absolute',
+    width: 120,
+    height: 180,
+    bottom: 20,
+    right: 20,
+    borderRadius: 10,
+    overflow: 'hidden',
+    zIndex: 1,
+  },
+  searchingContent: {
+    alignItems: 'center',
+  },
+  searchingText: {
+    marginTop: 20,
+    color: 'white',
+    fontSize: 18,
+  },
+});
+//http://localhost:3500/webclient.html
