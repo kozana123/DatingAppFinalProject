@@ -116,7 +116,7 @@ export default function AddImage() {
               disabled={!image}
               activeOpacity={0.8}
             >
-              <Text style={styles.nextButtonText}>Continue</Text>
+              <Text style={styles.nextButtonText}>Next</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>

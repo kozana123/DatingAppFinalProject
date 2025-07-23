@@ -12,6 +12,11 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
+import { Dimensions } from "react-native";
+
+
+const STAGE_PROGRESS = 100;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function LocationScreen() {
   const [currentLocation, setCurrentLocation] = useState(
@@ -20,7 +25,6 @@ export default function LocationScreen() {
   const [searchLocation, setSearchLocation] = useState("");
 
   const handleUseCurrentLocation = async () => {
-  
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access location was denied");
@@ -28,11 +32,9 @@ export default function LocationScreen() {
     }
 
     try {
-  
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      
       let address = await Location.reverseGeocodeAsync({
         latitude,
         longitude,
@@ -40,10 +42,14 @@ export default function LocationScreen() {
 
       if (address.length > 0) {
         const place = address[0];
-        const formattedAddress = `${place.name || ""} ${place.street || ""}, ${place.city || ""}, ${place.region || ""}, ${place.country || ""}`;
+        const formattedAddress = `${place.name || ""} ${place.street || ""}, ${
+          place.city || ""
+        }, ${place.region || ""}, ${place.country || ""}`;
         setCurrentLocation(formattedAddress);
       } else {
-        setCurrentLocation(`Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`);
+        setCurrentLocation(
+          `Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`
+        );
       }
     } catch (error) {
       alert("Error getting location: " + error.message);
@@ -66,7 +72,11 @@ export default function LocationScreen() {
       >
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.card}>
-            
+            <View style={styles.progressContainer}>
+              <View
+                style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
+              />
+            </View>
             {/* כותרת */}
             <Text style={styles.title}>Location</Text>
             <Text style={styles.subtitle}>
@@ -86,7 +96,6 @@ export default function LocationScreen() {
               </TouchableOpacity>
             </View>
 
-          
             <View style={styles.searchContainer}>
               <TextInput
                 placeholder="Search New Location"
@@ -108,10 +117,7 @@ export default function LocationScreen() {
               style={styles.continueButton}
               onPress={handleContinue}
             >
-     
-            
-                <Text style={styles.continueButtonText}>Continue</Text>
-       
+              <Text style={styles.continueButtonText}>Next</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -134,12 +140,26 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 60 : 30,
     paddingHorizontal: 25,
   },
+  progressContainer: {
+    height: 8,
+    width: "100%",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 30,
+    flexDirection: "row-reverse",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#ffffff",
+    borderRadius: 4,
+  },
   card: {
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
-    paddingVertical: 90,
-    paddingHorizontal: 18,
-    marginHorizontal: 8,
+    paddingVertical: 40, // היה 90 – עכשיו הרבה יותר מרווח ונעים
+    paddingHorizontal: 20,
+    marginHorizontal: 0, // היה 8 – נוריד לגמרי
     marginBottom: 20,
   },
 
@@ -150,7 +170,7 @@ const styles = StyleSheet.create({
     color: "#ffe6ff",
     textAlign: "center",
     marginBottom: 12,
-    
+
     direction: "ltr",
     fontFamily: "Prompt-Thin",
   },
@@ -217,8 +237,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 30,
     paddingHorizontal: 16,
-
-   
   },
   // gradient: {
   //   paddingVertical: 16,
