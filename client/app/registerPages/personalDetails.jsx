@@ -15,11 +15,18 @@ import { ButtonGroup } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { Calendar } from "react-native-calendars";
+import { useLocalSearchParams } from 'expo-router';
 
 const STAGE_PROGRESS = 40;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function PersonalDetails() {
+
+  const params = useLocalSearchParams();
+  const [newUser, setnewUser] = useState(params);
+  console.log(`Date page`, newUser);
+
+
   const [birthDate, setBirthDate] = useState(new Date(1990, 0, 1));
   const [selectedDate, setSelectedDate] = useState("1990-01-01");
   const [isCalendarVisible, setCalendarVisibility] = useState(false);
@@ -32,13 +39,22 @@ export default function PersonalDetails() {
     const [year, month, dayNum] = day.dateString.split("-");
     setBirthDate(new Date(year, month - 1, dayNum));
     setCalendarVisibility(false);
+    setnewUser({ ...newUser, birthDate: day.dateString})
+  };
+
+  const onGenderPress = (value) => {
+    setnewUser({ ...newUser, gender: genders[value]})
+    setGenderIndex(value)
   };
 
   const handleNext = () => {
-    if (birthDate && genderIndex !== null) {
-      router.push("/registerPages/registerPassEmail");
+    if (newUser.birthDate && newUser.gender) {
+      router.push({pathname:"/registerPages/registerPassEmail", params: newUser});
     } else {
-      alert("🛑 Please fill in all fields");
+      console.log("this run");
+      
+      router.push("/registerPages/registerPassEmail");
+      // alert("🛑 Please fill in all fields");
     }
   };
 
@@ -107,7 +123,7 @@ export default function PersonalDetails() {
                 <ButtonGroup
                   buttons={genders}
                   selectedIndex={genderIndex}
-                  onPress={setGenderIndex}
+                  onPress={onGenderPress}
                   containerStyle={styles.genderGroup}
                   buttonStyle={styles.genderButton}
                   selectedButtonStyle={styles.selectedGenderButton}

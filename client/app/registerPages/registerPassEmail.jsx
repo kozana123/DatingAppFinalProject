@@ -11,11 +11,18 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import { useLocalSearchParams } from 'expo-router';
+
 
 const STAGE_PROGRESS = 60; 
 
 
 export default function RegisterPage() {
+
+  const params = useLocalSearchParams();
+  const [newUser, setnewUser] = useState(params);
+  console.log(`Email page`, newUser);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,25 +33,25 @@ export default function RegisterPage() {
   };
 
   const handleNext = () => {
-    if (!email || !password || !confirmPassword) {
-      alert("Please fill all fields.");
-      return;
-    }
+    // if (!email || !password || !confirmPassword) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
 
-    if (!validateEmail(email)) {
-      alert("Invalid email format.");
-      return;
-    }
+    // if (!validateEmail(email)) {
+    //   alert("Invalid email format.");
+    //   return;
+    // }
 
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
-      return;
-    }
+    // if (password.length < 6) {
+    //   alert("Password must be at least 6 characters.");
+    //   return;
+    // }
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
+    // if (password !== confirmPassword) {
+    //   alert("Passwords do not match.");
+    //   return;
+    // }
 
     router.push("registerPages/addImage");
   };

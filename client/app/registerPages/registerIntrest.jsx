@@ -29,7 +29,7 @@ export default function InterestsScreen() {
 
   const handleNext = () => {
     if (selected !== null) {
-      router.navigate("/registerPages/registerProfileIntro");
+      router.navigate("/registerPages/registerSex");
     } else {
       alert("Please select an option.");
     }

@@ -13,6 +13,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Dimensions } from "react-native";
+import { router } from "expo-router";
+
 
 
 const STAGE_PROGRESS = 100;
@@ -57,7 +59,8 @@ export default function LocationScreen() {
   };
 
   const handleContinue = () => {
-    alert("Continue pressed");
+    router.push("registerPages/registerProfileIntro");
+    // alert("Continue pressed");
   };
 
   return (

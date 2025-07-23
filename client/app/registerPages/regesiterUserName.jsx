@@ -17,8 +17,12 @@ import { LinearGradient } from "expo-linear-gradient";
 const STAGE_PROGRESS = 20;
 
 export default function RegisterUserName() {
-  const [userName, setUserName] = useState({ name: "" });
+  // const [userName, setUserName] = useState({ name: "" });
   const router = useRouter();
+  const [newUser, setnewUser] = useState({name: ""});
+  console.log(`name page`, newUser.name);
+  
+
 
   return (
     <ImageBackground
@@ -44,10 +48,10 @@ export default function RegisterUserName() {
             <Input
               placeholder="Enter your name"
               placeholderTextColor="#e1bee7"
-              value={userName.name}
+              value={newUser.name}
               inputContainerStyle={styles.inputContainerStyle}
               inputStyle={styles.inputStyle}
-              onChangeText={(text) => setUserName({ ...userName, name: text })}
+              onChangeText={(text) => setnewUser({ ...newUser, name: text })}
               autoCapitalize="words"
               keyboardAppearance="dark"
             />
@@ -56,7 +60,7 @@ export default function RegisterUserName() {
               title="Next"
               buttonStyle={styles.buttonStyle}
               titleStyle={styles.buttonTitleStyle}
-              onPress={() => router.push("/registerPages/personalDetails")}
+              onPress={() => router.push({pathname:"/registerPages/personalDetails", params: newUser})}
             />
           </View>
         </SafeAreaView>

@@ -113,7 +113,7 @@ export default function AddImage() {
             <TouchableOpacity
               style={[styles.nextButton, !image && styles.nextButtonDisabled]}
               onPress={() => router.push("/registerPages/location")}
-              disabled={!image}
+              // disabled={!image}
               activeOpacity={0.8}
             >
               <Text style={styles.nextButtonText}>Next</Text>

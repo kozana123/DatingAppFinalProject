@@ -16,7 +16,7 @@ export default function ProfileIntro({ navigation }) {
       /> */}
 
       <View style={styles.button}>
-        <Button title="Let's Do It" color="#000" onPress={() => router.navigate("/registerPages/registerPickInterests")} />
+        <Button title="Let's Do It" color="#000" onPress={() => router.navigate("/registerPages/registerIntrest")} />
       </View>
 </LinearGradient>
   );
