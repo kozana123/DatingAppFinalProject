@@ -13,12 +13,18 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+
 
 const STAGE_PROGRESS = 80;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function AddImage() {
+
+  const params = useLocalSearchParams();
+  const [newUser, setnewUser] = useState(params);
+  console.log(`Image page`, newUser);
+
   const [image, setImage] = useState(null);
 
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
