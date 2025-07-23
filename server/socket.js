@@ -11,16 +11,55 @@ export function initIO(server) {
   });
 
   const users = new Map(); // Map<callerId, socketId>
+  const maleusers = new Map();
+  const femaleusers = new Map();  
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
+
+  socket.on('register-test', (callerId, user, preference) => {
+    switch(user.gender){
+      case "male":
+        maleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes});
+        break 
+
+      case "female":
+        femaleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes}); 
+        break
+    }
+    console.log(`User registered: ${callerId} -> ${socket.id}`);
+    console.log(`Amount of users: ${users.size}`);
+
+    const targeUser = null;
+    switch(preference.gender){
+      case "male":
+        targeUser = GetBestUser(maleusers ,preference.age, preference.distance, preference.likes)
+        break 
+      
+      case "female":
+        targeUser = GetBestUser(femaleusers ,preference.age, preference.distance, preference.likes) 
+        break
+    }
+
+    if (targeUser) {
+      const targetId = targeUser.callerId;
+      const initiatorId = callerId;
+      const initiatorSocketId = socket.id;
+
+      console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
+      io.to(initiatorSocketId).emit('initiate-offer', {
+        targetId: targetId,
+        senderId: initiatorId
+      });
+    }
+  });
 
   socket.on('register', (callerId) => {
     users.set(callerId, socket.id);
     console.log(`User registered: ${callerId} -> ${socket.id}`);
     console.log(`Amount of users: ${users.size}`);
 
-     if (users.size >= 2) {
+    if (users.size >= 2) {
     const [initiatorId, initiatorSocketId] = [...users.entries()][0];
     const [targetId, targetSocketId] = [...users.entries()][1];
 
@@ -72,5 +111,38 @@ io.on('connection', (socket) => {
     console.log('Client disconnected:', socket.id);
   });
 })
+
+function GetBestUser(userType, age, distance, preferenceLikes) {
+  let bestUser = null;
+
+  userType.forEach((entry, callerId) => {
+    const { socketId, user, likes } = entry;
+
+    // Check age and distance
+    if (user.age >= age.min && user.age <= age.max && user.distance <= distance) {
+      // Count common likes
+      let commonCount = 0;
+      const set1 = new Set(preferenceLikes);
+      const set2 = new Set(likes);
+
+      for (let item of set1) {
+        if (set2.has(item)) {
+          commonCount++;
+        }
+      }
+
+      // Update bestUser if this one is better
+      if (!bestUser || commonCount > bestUser.same) {
+        bestUser = {
+          callerId: callerId,
+          socketId: socketId,
+          user: user,
+          same: commonCount
+        };
+      }
+    }
+  });
+  return bestUser; // includes user, socketId, and callerId
+}
 
 }
