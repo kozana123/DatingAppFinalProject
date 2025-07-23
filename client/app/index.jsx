@@ -182,9 +182,11 @@ const styles = StyleSheet.create({
   },
 
   signInText: {
-    color: "#4a0033",
-    fontSize: 18,
-    fontFamily: "Prompt-Thin",
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#6a0dad",
+    fontFamily: "Prompt-SemiBold",
+    letterSpacing: 1,
   },
 
   footerContainer: {

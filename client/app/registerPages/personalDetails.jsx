@@ -1,141 +1,260 @@
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
-import { router } from 'expo-router';
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  Platform,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  Dimensions,
+  ScrollView,
+} from "react-native";
 import { ButtonGroup } from "@rneui/themed";
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { LinearGradient } from 'expo-linear-gradient';  // הוספנו את ה-LinearGradient
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { Calendar } from "react-native-calendars";
+
+const STAGE_PROGRESS = 40;
+const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function PersonalDetails() {
-  const [birthDate, setBirthDate] = useState(new Date(1980, 0, 1)); // ינואר 1, 1980
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [birthDate, setBirthDate] = useState(new Date(1990, 0, 1));
+  const [selectedDate, setSelectedDate] = useState("1990-01-01");
+  const [isCalendarVisible, setCalendarVisibility] = useState(false);
   const [genderIndex, setGenderIndex] = useState(null);
 
-  const genders = ["🌈 Other", "👩 Female", "👨 Male"];
+  const genders = ["Other", "Female", "Male"];
+
+  const onDayPress = (day) => {
+    setSelectedDate(day.dateString);
+    const [year, month, dayNum] = day.dateString.split("-");
+    setBirthDate(new Date(year, month - 1, dayNum));
+    setCalendarVisibility(false);
+  };
 
   const handleNext = () => {
     if (birthDate && genderIndex !== null) {
-      router.navigate("/registerPages/registerPassEmail");
+      router.push("/registerPages/registerPassEmail");
     } else {
       alert("🛑 Please fill in all fields");
     }
   };
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (date) => {
-    setBirthDate(date);
-    hideDatePicker();
-  };
-
   return (
-    <LinearGradient
-      colors={["#F7F3F2", "#8A2C2A"]} // הרקע הצבעוני
-      style={styles.container}
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <Text style={styles.title}>Enter Your Details</Text>
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          {/* Progress bar */}
+          <View style={styles.progressContainer}>
+            <View
+              style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
+            />
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>
-          Birth Date: {birthDate.toLocaleDateString()}
-        </Text>
-        <TouchableOpacity style={styles.dateButton} onPress={showDatePicker}>
-          <Text style={styles.dateButtonText}>📅 Select Birth Date</Text>
-        </TouchableOpacity>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardAvoidingView}
+          >
+            <ScrollView
+              contentContainerStyle={styles.scrollContainer}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.card}>
+                <Text style={styles.title}>Your Personal Info</Text>
 
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-        />
-      </View>
+                <Text style={styles.label}>Birth Date</Text>
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setCalendarVisibility((prev) => !prev)}
+                >
+                  <Text style={styles.dateButtonText}>
+                    {birthDate.toLocaleDateString("en-US")}
+                  </Text>
+                </TouchableOpacity>
 
-      <View style={styles.section}>
-        <Text style={styles.label}>Choose Your Gender:</Text>
-        <ButtonGroup
-          buttons={genders}
-          selectedIndex={genderIndex}
-          onPress={setGenderIndex}
-          containerStyle={styles.genderGroup}
-          buttonStyle={styles.genderButton}
-          selectedButtonStyle={styles.selectedGenderButton}
-          selectedTextStyle={{ fontWeight: "bold", color: "#fff" }}
-        />
-      </View>
+                {isCalendarVisible && (
+                  <View style={styles.calendarWrapper}>
+                    <Calendar
+                      current={selectedDate}
+                      onDayPress={onDayPress}
+                      markedDates={{
+                        [selectedDate]: {
+                          selected: true,
+                          selectedColor: "#cc66cc",
+                        },
+                      }}
+                      theme={{
+                        selectedDayBackgroundColor: "#cc66cc",
+                        todayTextColor: "#cc66cc",
+                        arrowColor: "#cc66cc",
+                      }}
+                      style={styles.calendar}
+                    />
+                  </View>
+                )}
 
-      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-        <Text style={styles.nextButtonText}> Next</Text>
-      </TouchableOpacity>
-    </LinearGradient>
+                <Text style={styles.label}>Gender</Text>
+                <ButtonGroup
+                  buttons={genders}
+                  selectedIndex={genderIndex}
+                  onPress={setGenderIndex}
+                  containerStyle={styles.genderGroup}
+                  buttonStyle={styles.genderButton}
+                  selectedButtonStyle={styles.selectedGenderButton}
+                  selectedTextStyle={styles.selectedText}
+                  textStyle={styles.genderText}
+                  innerBorderStyle={{ width: 1 }}
+                />
+
+                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                  <Text style={styles.nextButtonText}>Next</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 30,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 40,
-    color: "#000", // הצבע של הכותרת יהיה שחור
-  },
-  section: {
     width: "100%",
-    marginBottom: 70,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#000", // קו בין החלקים
+    height: "100%",
   },
-  label: {
-    fontSize: 18,
-    marginBottom: 15,
-    fontWeight: "bold",
-    color: "#000", // הצבע של כל הלייבלים יהיה שחור
+  gradientOverlay: {
+    flex: 1,
   },
-  dateButton: {
-    backgroundColor: "#f0dada",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 12,
+  safeArea: {
+    flex: 1,
+    paddingTop: Platform.OS === "ios" ? 60 : 30,
+  },
+  progressContainer: {
+    height: 8,
+    width: "80%",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 4,
+    alignSelf: "center",
+    marginBottom: 30,
+    flexDirection: "row-reverse",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#ffffff",
+    borderRadius: 4,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+  card: {
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
     marginBottom: 20,
   },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#ffe6ff",
+    marginBottom: 20,
+    fontFamily: "Prompt-Thin",
+    textAlign: "left",
+    direction: "ltr",
+  },
+  label: {
+    fontSize: 16,
+    color: "#fff",
+    marginBottom: 10,
+    fontFamily: "Prompt-Thin",
+    textAlign: "left",
+    direction: "ltr",
+  },
+  dateButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 16,
+    direction: "ltr",
+  },
   dateButtonText: {
-    fontSize: 18,
-    color: "#333", // צבע הטקסט בכפתור יהיה כהה
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "Prompt-Thin",
+    textAlign: "left",
+  },
+  calendarWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: "hidden",
+    direction: "ltr",
+  },
+  calendar: {
+    width: SCREEN_WIDTH * 0.85,
+    borderRadius: 12,
+    direction: "ltr",
   },
   genderGroup: {
-    marginVertical: 10,
-    width: "100%",
+    marginBottom: 30,
     borderRadius: 12,
+    backgroundColor: "transparent",
+    
   },
   genderButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    backgroundColor: "transparent",
+    paddingVertical: 2,
   },
   selectedGenderButton: {
-    backgroundColor: "#BD513E",
+    backgroundColor: "#cc66cc",
+    borderRadius: 12,
+  },
+  selectedText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontFamily: "Prompt-Thin",
+  },
+  genderText: {
+    color: "#eee",
+    fontSize: 14,
+    fontFamily: "Prompt-Thin",
+
   },
   nextButton: {
-    backgroundColor: "#BD513E",
-    paddingVertical: 17,
-    paddingHorizontal: 30,
-    borderRadius: 20,
-    elevation: 40,
-    marginTop: 100, // שיניתי את הערך כדי להוריד את הכפתור למטה
+    backgroundColor: "#fff",
+    paddingVertical: 4,
+    borderRadius: 30,
+    paddingHorizontal: 16,
+   
+  
+    width: "100%",
+    alignSelf: "center",
+    marginTop: 10,
   },
   nextButtonText: {
     fontSize: 20,
+    fontWeight: "600",
+    color: "#6a0dad",
+    fontFamily: "Prompt-SemiBold",
     textAlign: "center",
-    color: "#fff",
-    fontWeight: "bold",
   },
 });

@@ -1,148 +1,235 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
-import * as Location from 'expo-location';
-import { LinearGradient } from 'expo-linear-gradient';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+  SafeAreaView,
+  Platform,
+  ImageBackground,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 
 export default function LocationScreen() {
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState(
+    "Choose your current location or search for a new one"
+  );
+  const [searchLocation, setSearchLocation] = useState("");
 
-
-  const handleUseLocation = async () => {
-    setLoading(true);
-
+  const handleUseCurrentLocation = async () => {
+  
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'You need to allow location access to autofill.');
-      setLoading(false);
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
       return;
     }
 
     try {
-      let loc = await Location.getCurrentPositionAsync({});
-      let reverseGC = await Location.reverseGeocodeAsync(loc.coords);
+  
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
 
-      if (reverseGC && reverseGC.length > 0) {
-        setCity(reverseGC[0].city || '');
-        setCountry(reverseGC[0].country || '');
+      
+      let address = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      if (address.length > 0) {
+        const place = address[0];
+        const formattedAddress = `${place.name || ""} ${place.street || ""}, ${place.city || ""}, ${place.region || ""}, ${place.country || ""}`;
+        setCurrentLocation(formattedAddress);
       } else {
-        Alert.alert('Error', 'Could not determine location details.');
+        setCurrentLocation(`Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`);
       }
-    } catch (e) {
-      Alert.alert('Error', 'Failed to fetch location.');
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      alert("Error getting location: " + error.message);
     }
   };
 
-  const handleNext = () => {
-    if (!city || !country) {
-      Alert.alert('Missing info', 'Please fill in both city and country.');
-      return;
-    }
-
-    // ניתוב לעמוד הבא
-    router.navigate("/registerPages/registerSex");
+  const handleContinue = () => {
+    alert("Continue pressed");
   };
 
   return (
-    <LinearGradient
-      colors={["#F7F3F2", "#8A2C2A"]}
-      style={styles.container}
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <Text style={styles.title}>Where do you live?</Text>
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.card}>
+            
+            {/* כותרת */}
+            <Text style={styles.title}>Location</Text>
+            <Text style={styles.subtitle}>
+              Let the app locate you to provide best searched results around you
+            </Text>
 
-      <SimpleLineIcons name="location-pin" size={90} color="black" style={styles.icon} />
+            <Text style={styles.label}>Current Location</Text>
+            <View style={styles.currentLocationContainer}>
+              <Text style={styles.currentLocationText} numberOfLines={1}>
+                {currentLocation}
+              </Text>
+              <TouchableOpacity
+                style={styles.locationIcon}
+                onPress={handleUseCurrentLocation}
+              >
+                <MaterialIcons name="my-location" size={24} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
 
-      <TextInput
-        placeholder="Enter your city"
-        value={city}
-        onChangeText={setCity}
-        style={styles.input}
-        placeholderTextColor="#888"
-      />
-      <TextInput
-        placeholder="Enter your country"
-        value={country}
-        onChangeText={setCountry}
-        style={styles.input}
-        placeholderTextColor="#888"
-      />
+          
+            <View style={styles.searchContainer}>
+              <TextInput
+                placeholder="Search New Location"
+                placeholderTextColor="#ffffff"
+                style={styles.searchInput}
+                value={searchLocation}
+                onChangeText={setSearchLocation}
+              />
+              <MaterialIcons
+                name="search"
+                size={22}
+                color="#cc66cc"
+                style={styles.searchIcon}
+              />
+            </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#000" style={{ marginVertical: 20 }} />
-      ) : (
-        <TouchableOpacity style={styles.locationButton} onPress={handleUseLocation}>
-          <Text style={styles.locationButtonText}>📍 Find my location</Text>
-        </TouchableOpacity>
-      )}
-
-      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-        <Text style={styles.nextButtonText}>Next</Text>
-      </TouchableOpacity>
-    </LinearGradient>
+            {/* כפתור המשך */}
+            <TouchableOpacity
+              style={styles.continueButton}
+              onPress={handleContinue}
+            >
+     
+            
+                <Text style={styles.continueButtonText}>Continue</Text>
+       
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 30,
+    width: "100%",
+    height: "100%",
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#000",
-    textAlign: "center",
+  gradientOverlay: {
+    flex: 1,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 15,
-    borderRadius: 8,
-    fontSize: 16,
-    backgroundColor: "#fff",
-    color: "#000",
+  safeArea: {
+    flex: 1,
+    paddingTop: Platform.OS === "ios" ? 60 : 30,
+    paddingHorizontal: 25,
   },
-  locationButton: {
-    backgroundColor: "#f0dada",
-    paddingVertical: 15,
-    borderRadius: 12,
-    marginVertical: 30,
-    alignItems: "center",
-  },
-  locationButtonText: {
-    fontSize: 18,
-    color: "#333",
-  },
-  nextButton: {
-    backgroundColor: "#BD513E",
-    paddingVertical: 17,
+  card: {
+    backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
-    elevation: 40,
+    paddingVertical: 90,
+    paddingHorizontal: 18,
+    marginHorizontal: 8,
+    marginBottom: 20,
   },
-  nextButtonText: {
-    fontSize: 20,
+
+  title: {
+    marginTop: 20,
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#ffe6ff",
     textAlign: "center",
-    color: "#fff",
-    fontWeight: "bold",
+    marginBottom: 12,
+    
+    direction: "ltr",
+    fontFamily: "Prompt-Thin",
   },
-  icon: {
-    alignSelf: 'center',
+  subtitle: {
+    color: "#f0d9f5",
+    fontSize: 14,
+    textAlign: "center",
+    fontFamily: "Prompt-Thin",
     marginBottom: 40,
+    lineHeight: 22,
+  },
+  label: {
+    color: "#ffffff",
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: "left",
+    direction: "ltr",
+    fontFamily: "Prompt-Thin",
+  },
+  currentLocationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "#ffffff",
+    fontFamily: "Prompt-Thin",
+    borderWidth: 1,
+    borderRadius: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    marginBottom: 20,
+  },
+  currentLocationText: {
+    flex: 1,
+    color: "#ffffff",
+    fontSize: 12,
+    fontFamily: "Prompt-Thin",
+  },
+  locationIcon: {
+    color: "#ffffff",
+    marginLeft: 12,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: "#ffffff",
+    borderWidth: 1,
+    borderRadius: 40,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    marginBottom: 40,
+    fontFamily: "Prompt-Thin",
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 12,
+    color: "#fffffff",
+    fontFamily: "Prompt-Thin",
+  },
+  searchIcon: {
+    marginLeft: 12,
+    color: "#ffffff",
+  },
+  continueButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 4,
+    borderRadius: 30,
+    paddingHorizontal: 16,
+
+   
+  },
+  // gradient: {
+  //   paddingVertical: 16,
+  //   borderRadius: 30,
+  //   alignItems: "center",
+  // },
+  continueButtonText: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#6a0dad",
+    fontFamily: "Prompt-SemiBold",
+    textAlign: "center",
   },
 });

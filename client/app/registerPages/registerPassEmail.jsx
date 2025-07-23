@@ -1,11 +1,24 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  SafeAreaView,
+  Platform,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 
+const STAGE_PROGRESS = 60; 
+
+
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
@@ -37,82 +50,133 @@ export default function RegisterPage() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Create Your Account</Text>
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.gradientOverlay}
+      >
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+          </View>
 
-      <TextInput
-        placeholder="Email"
-        placeholderTextColor="#888"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        textContentType="emailAddress"
-      />
+          <View style={styles.container}>
+            <Text style={styles.title}>Create Your Account</Text>
 
-      <TextInput
-        placeholder="Password"
-        placeholderTextColor="#888"
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        textContentType="newPassword"
-      />
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="#d8b8e6"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              textContentType="emailAddress"
+            />
 
-      <TextInput
-        placeholder="Confirm Password"
-        placeholderTextColor="#888"
-        style={styles.input}
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        textContentType="password"
-      />
+            <TextInput
+              placeholder="Password"
+              placeholderTextColor="#d8b8e6"
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              textContentType="newPassword"
+            />
 
-      <TouchableOpacity style={styles.button} onPress={handleNext}>
-        <Text style={styles.buttonText}>Next</Text>
-      </TouchableOpacity>
-    </View>
+            <TextInput
+              placeholder="Confirm Password"
+              placeholderTextColor="#d8b8e6"
+              style={styles.input}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              textContentType="password"
+            />
+
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleNext}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
     flex: 1,
-    backgroundColor: "#fff", 
-    padding: 20,
-    justifyContent: "center",
+    width: "100%",
+    height: "100%",
   },
-  header: {
-    fontSize: 30,
-    fontWeight: "bold",
+  gradientOverlay: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+    justifyContent: "center",
+    paddingTop: Platform.OS === "ios" ? 60 : 30,
+  },
+  progressContainer: {
+    height: 8,
+    width: "80%",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 4,
+    alignSelf: "center",
     marginBottom: 30,
-    textAlign: "center",
-    color: "#bd513e",
+    flexDirection: "row-reverse",
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "#ffffff",
+    borderRadius: 4,
+  },
+  container: {
+    marginHorizontal: 20,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: 24,
+    padding: 24,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#ffe6ff",
+    marginBottom: 30,
+    fontFamily: "Prompt-SemiBold",
+    textAlign: "left",
+    direction:"ltr",
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 16,
-    color: "#000",
-    backgroundColor: "#fff",
-    marginBottom: 20,
-    textAlign: "left",
+    borderBottomWidth: 1.5,
+    borderBottomColor: "#cc66cc",
+    color: "#ffe6ff",
+    fontSize: 18,
+    paddingVertical: 10,
+    marginBottom: 30,
+    fontFamily: "Prompt-Thin",
   },
   button: {
-    backgroundColor: "#bd513e",
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 30,
+    paddingVertical: 4,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#6a0dad",
+    fontFamily: "Prompt-SemiBold",
   },
 });

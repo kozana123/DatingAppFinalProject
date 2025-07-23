@@ -101,12 +101,7 @@ export default function Login() {
             <TouchableOpacity style={styles.socialButton}>
               <FontAwesome name="google" size={24} color="#ea4335" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <FontAwesome name="apple" size={24} color="#000" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <FontAwesome name="facebook" size={24} color="#1877f3" />
-            </TouchableOpacity>
+           
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -244,12 +239,12 @@ const styles = StyleSheet.create({
   socialContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
   socialButton: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    borderRadius: 16,
-    padding: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.89)",
+    borderRadius: 36,
+    padding: 10,
     marginHorizontal: 8,
     borderWidth: 1,
     borderColor: "#cc66cc",
