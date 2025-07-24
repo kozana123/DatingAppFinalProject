@@ -115,7 +115,7 @@ export default function LocationScreen() {
               />
             </View>
 
-            {/* כפתור המשך */}
+            
             <TouchableOpacity
               style={styles.continueButton}
               onPress={handleContinue}
@@ -160,9 +160,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
-    paddingVertical: 40, // היה 90 – עכשיו הרבה יותר מרווח ונעים
+    paddingVertical: 40, 
     paddingHorizontal: 20,
-    marginHorizontal: 0, // היה 8 – נוריד לגמרי
+    marginHorizontal: 0, 
     marginBottom: 20,
   },
 

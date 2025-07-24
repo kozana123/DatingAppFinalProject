@@ -1,11 +1,25 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 export default function BubbleInterests() {
+  // 1. קבלת פרמטרים מהדף הקודם
+  const params = useLocalSearchParams();
+
+  // 2. שמירת המידע שקיבלנו + העניין הנבחר
+  const [userData, setUserData] = useState(params || {});
+
   const interests = [
     {
       title: "🧠 Personality",
@@ -20,7 +34,7 @@ export default function BubbleInterests() {
         { label: "Empathetic", icon: "🤝" },
         { label: "Funny", icon: "😂" },
         { label: "Shy", icon: "😔" },
-      ]
+      ],
     },
     {
       title: "🌿 Lifestyle",
@@ -32,7 +46,7 @@ export default function BubbleInterests() {
         { label: "Pet Lover", icon: "🐾" },
         { label: "Traveler", icon: "🌍" },
         { label: "Bookworm", icon: "📚" },
-      ]
+      ],
     },
     {
       title: "🎨 Hobbies",
@@ -47,12 +61,14 @@ export default function BubbleInterests() {
         { label: "Traveling", icon: "✈️" },
         { label: "Yoga", icon: "🧘‍♀️" },
         { label: "Sports", icon: "⚽" },
-      ]
+      ],
     },
   ];
 
+  // 3. שמירת המעניינים שנבחרו
   const [selected, setSelected] = useState([]);
 
+  // 4. טוגל בחירה של עניין
   const toggleInterest = (interest) => {
     setSelected((prev) =>
       prev.includes(interest)
@@ -61,30 +77,37 @@ export default function BubbleInterests() {
     );
   };
 
+  // 5. עדכון המידע עם המעניינים הנבחרים
+  useEffect(() => {
+    setUserData((prev) => ({ ...prev, interests: selected }));
+  }, [selected]);
+
+  // 6. כפתור המשך - שולח את כל המידע לדף הבא
   const handleContinue = () => {
-    // הצגת תוצאה או שמירה
-    Alert.alert("המשכתי עם הבחירות הבאות:", selected.join(", "));
-    router.push("/registerPages/welcomePage");
+    if (selected.length === 0) {
+      Alert.alert("Please select at least one interest to continue.");
+      return;
+    }
+    router.push({
+      pathname: "/registerPages/welcomePage",
+      params: userData,
+    });
   };
 
   return (
     <LinearGradient colors={["#F7F3F2", "#8A2C2A"]} style={{ flex: 1, paddingTop: 60 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", color: "#fff", margin: 20 }}>
-        What are your interests?
-      </Text>
+      <Text style={styles.title}>What are your interests?</Text>
 
       <ScrollView>
         {interests.map((category, index) => (
           <View key={index} style={{ marginBottom: 30 }}>
-            <Text style={{ fontSize: 22, fontWeight: "bold", color: "#4B2C2A", textAlign: "center" }}>
-              {category.title}
-            </Text>
-            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "center", marginTop: 10 }}>
-              {category.traits.map((item, index) => {
+            <Text style={styles.categoryTitle}>{category.title}</Text>
+            <View style={styles.traitsContainer}>
+              {category.traits.map((item, idx) => {
                 const isSelected = selected.includes(item.label);
                 return (
                   <TouchableOpacity
-                    key={index}
+                    key={idx}
                     onPress={() => toggleInterest(item.label)}
                     style={[styles.button, isSelected && styles.selectedButton]}
                   >
@@ -94,17 +117,13 @@ export default function BubbleInterests() {
                 );
               })}
             </View>
-            <View style={{ borderBottomWidth: 1, borderBottomColor: "#4B2C2A", marginVertical: 20 }} />
+            <View style={styles.divider} />
           </View>
         ))}
       </ScrollView>
 
-      {/* כפתור המשך */}
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <TouchableOpacity
-          onPress={handleContinue}
-          style={styles.continueButton}
-        >
+      <View style={styles.continueContainer}>
+        <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
           <Text style={styles.continueText}>Continue</Text>
         </TouchableOpacity>
       </View>
@@ -113,50 +132,77 @@ export default function BubbleInterests() {
 }
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    margin: 20,
+    fontFamily: "Prompt-Bold",
+  },
+  categoryTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#4B2C2A",
+    textAlign: "center",
+    fontFamily: "Prompt-Bold",
+  },
+  traitsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    marginTop: 10,
+  },
   button: {
-    backgroundColor: "#E2D2C1", // צבע בהיר ונעים יותר
-    paddingVertical: 6,        // גובה קטן יותר
-    paddingHorizontal: 10,     // מרווח קטן יותר
-    margin: 6,                // רווח קטן יותר בין הכפתורים
-    borderRadius: 12,         // עגלגלות קלה
+    backgroundColor: "#E2D2C1",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    margin: 6,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    width: width / 5,         // גודל כפתור קטן יותר
-    height: 60,               // גובה קטן יותר
-    borderWidth: 0,           // ללא מסגרת שחורה
-    elevation: 3,             // הצללה קלה
+    width: width / 5,
+    height: 60,
+    elevation: 3,
   },
   selectedButton: {
-    backgroundColor: "#8A2C2A", // צבע רקע כשנבחר
-    elevation: 6,     // הצללה יותר בולטת כשהכפתור נבחר
+    backgroundColor: "#8A2C2A",
+    elevation: 6,
   },
   icon: {
-    fontSize: 16,   // הקטנה של האימוג'י
-    color: "#4B2C2A", // צבע ברירת מחדל לאימוג'י
+    fontSize: 16,
+    color: "#4B2C2A",
   },
   selectedIcon: {
-    color: "#fff", // צבע אימוג'י כשנבחר
+    color: "#fff",
   },
   text: {
     color: "#4B2C2A",
-    fontWeight: "500", // הקטנה של הגודל
-    marginTop: 2,     // הקטנה של המרווח בין האייקון לטקסט
-    fontSize: 12,     // הקטנה של הגודל
+    fontWeight: "500",
+    marginTop: 2,
+    fontSize: 12,
   },
   selectedText: {
-    color: "#fff", // צבע טקסט כשנבחר
+    color: "#fff",
+  },
+  divider: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#4B2C2A",
+    marginVertical: 20,
+  },
+  continueContainer: {
+    alignItems: "center",
+    marginBottom: 20,
   },
   continueButton: {
-    backgroundColor: "#8A2C2A", 
+    backgroundColor: "#8A2C2A",
     paddingVertical: 10,
     paddingHorizontal: 40,
     borderRadius: 20,
-    marginBottom: 10,
-    elevation: 4,     // הצללה לכפתור המשך
+    elevation: 4,
   },
   continueText: {
     color: "#fff",
-    fontSize: 16,    // הקטנה של גודל הטקסט
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
