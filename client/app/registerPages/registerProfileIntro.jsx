@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,10 +9,81 @@ import {
   Platform,
   ImageBackground,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams} from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function ProfileIntro() {
+
+  const params = useLocalSearchParams();
+  const [newUser, setnewUser] = useState(params);
+  console.log(`Intro page`, newUser);
+
+  const apiUrl = "http://www.DatingServer.somee.com/api/users"
+
+  const register = async () => {
+    uploadImageToServer()
+    fetchRegisterToServer()
+    router.push("/registerPages/registerIntrest")
+  };
+
+  const uploadImageToServer = async () => {
+    formData.append("file", {
+      uri: newUser.image,
+    });
+
+    try {
+    const response = await fetch(apiUrl + "/uploadImage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      body: formData,
+    });
+
+      const imageUrl = await response.json();
+      setnewUser({...newUser, image: imageUrl})
+      console.log("Upload success:", data);
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  }
+
+  const fetchRegisterToServer = () => {
+
+    const data2Send = {
+      "userName": newUser.name,
+      "userEmail": newUser.email,
+      "userPassword": newUser.password,
+      "birthDate": newUser.birthDate,
+      "gender": newUser.gender,
+      "profileImage": newUser.image,
+      "city": newUser.address,
+      "latitude": newUser.latitude,
+      "longitude": newUser.longitude
+    }
+
+    fetch(apiUrl + "register", {
+      method: 'POST',
+      body: JSON.stringify(data2Send),
+      headers: new Headers({
+        'Content-type': 'application/json; charset=UTF-8', //very important to add the 'charset=UTF-8'!!!!
+        'Accept': 'application/json; charset=UTF-8',
+      })
+    })
+      .then(res => {
+        console.log('res=', res);
+        console.log('res.status=', res.status);
+
+        if (res.status === 200) {
+          console.log('all good');
+          return res.json()
+        }
+        else if (res.status === 204) {
+          console.log('Somthing went wrong');
+        }
+      })
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/design.png")}
@@ -50,7 +121,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={() => router.push("/registerPages/registerIntrest")}
+              onPress={register}
             >
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
@@ -176,4 +247,5 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
+  
 });

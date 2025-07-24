@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { Dimensions } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 
 
@@ -21,6 +21,11 @@ const STAGE_PROGRESS = 100;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function LocationScreen() {
+
+   const params = useLocalSearchParams();
+    const [newUser, setnewUser] = useState(params);
+    console.log(`Image page`, newUser);
+
   const [currentLocation, setCurrentLocation] = useState(
     "Choose your current location or search for a new one"
   );
@@ -43,23 +48,49 @@ export default function LocationScreen() {
       });
 
       if (address.length > 0) {
-        const place = address[0];
-        const formattedAddress = `${place.name || ""} ${place.street || ""}, ${
-          place.city || ""
-        }, ${place.region || ""}, ${place.country || ""}`;
+        const place = address[0];    
+        const formattedAddress = `${place.city || ""}`;
+
+        setnewUser({...newUser, latitude: latitude, longitude: longitude, address: formattedAddress})
         setCurrentLocation(formattedAddress);
-      } else {
-        setCurrentLocation(
-          `Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`
-        );
       }
-    } catch (error) {
+    }
+    catch (error) {
       alert("Error getting location: " + error.message);
     }
   };
 
+  const handleSearchLocation = async () => {
+    if (!searchLocation.trim()) {
+      alert("Please enter a city name.");
+      return;
+    }
+
+    try {
+      const results = await Location.geocodeAsync(searchLocation);
+      
+      if (results.length === 0) {
+        alert(`City "${searchLocation}" not found.`);
+        return;
+      }
+
+      const { latitude, longitude } = results[0];
+      const address = await Location.reverseGeocodeAsync({ latitude, longitude });
+
+      if (address.length > 0) {
+        const place = address[0];
+        const formattedAddress = `${place.city}`;
+        setnewUser({...newUser, latitude: latitude, longitude: longitude, address: formattedAddress})
+        setCurrentLocation(formattedAddress);
+      }
+    } catch (error) {
+      alert("Error searching for location: " + error.message);
+    }
+  };
+
   const handleContinue = () => {
-    router.push("registerPages/registerProfileIntro");
+    
+    router.push({pathname:"registerPages/registerProfileIntro", params: newUser});
     // alert("Continue pressed");
   };
 
@@ -108,12 +139,14 @@ export default function LocationScreen() {
                 value={searchLocation}
                 onChangeText={setSearchLocation}
               />
-              <MaterialIcons
-                name="search"
-                size={22}
-                color="#cc66cc"
-                style={styles.searchIcon}
-              />
+              <TouchableOpacity onPress={handleSearchLocation}>
+                <MaterialIcons
+                  name="search"
+                  size={22}
+                  color="#cc66cc"
+                  style={styles.searchIcon}
+                />
+              </TouchableOpacity>
             </View>
 
             

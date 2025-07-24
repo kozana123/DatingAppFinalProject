@@ -62,7 +62,7 @@ export default function AddImage() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setnewUser({...newUser, image: result.assets[0].uri})
     }
   };
 
@@ -75,7 +75,7 @@ export default function AddImage() {
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setnewUser({...newUser, image: result.assets[0].uri})
     }
   };
 
@@ -106,8 +106,8 @@ export default function AddImage() {
               onPress={handleImageChoice}
               activeOpacity={0.7}
             >
-              {image ? (
-                <Image source={{ uri: image }} style={styles.image} resizeMode="cover" />
+              {newUser.image ? (
+                <Image source={{ uri: newUser.image }} style={styles.image} resizeMode="cover" />
               ) : (
                 <View style={styles.placeholder}>
                   <Text style={styles.placeholderIcon}>⬆️</Text>
@@ -117,9 +117,9 @@ export default function AddImage() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.nextButton, !image && styles.nextButtonDisabled]}
-              onPress={() => router.push("/registerPages/location")}
-              // disabled={!image}
+              style={[styles.nextButton, !newUser.image && styles.nextButtonDisabled]}
+              onPress={() => router.push({pathname:"/registerPages/location", params: newUser})}
+              // disabled={!newUser.image}
               activeOpacity={0.8}
             >
               <Text style={styles.nextButtonText}>Next</Text>
