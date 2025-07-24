@@ -14,15 +14,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
-const CARD_SIZE = width / 4; // מתאים בדיוק ל-5 בעמודה עם רווח
+const CARD_SIZE = width / 4;
 
 export default function BubbleInterests() {
   const params = useLocalSearchParams();
   const [userPreference, setUserPreference] = useState(params || {});
   const [selected, setSelected] = useState([]);
-
-  console.log("🔵 Received params from previous screen:", params);
-
 
   const interests = [
     {
@@ -79,19 +76,48 @@ export default function BubbleInterests() {
 
   useEffect(() => {
     setUserPreference((prev) => ({ ...prev, interests: selected }));
-
-    console.log("🟢 userPreference:", { ...userPreference, interests: selected });
   }, [selected]);
-  
-  const handleContinue = () => {
+
+  const updateUserPreferences = async (prefs) => {
+    try {
+      const response = await fetch(`http://YOUR_SERVER_IP/api/userpreferences/${prefs.UserId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(prefs),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update preferences: ${errorText}`);
+      }
+      return true;
+    } catch (error) {
+      Alert.alert("Error", error.message);
+      return false;
+    }
+  };
+
+  const handleContinue = async () => {
     if (selected.length === 0) {
       Alert.alert("Please select at least one interest to continue.");
       return;
     }
-    router.push({
-      pathname: "/registerPages/welcomePage",
-      params: userPreference,
-    });
+
+    const prefsToSend = {
+      ...userPreference,
+      interests: selected.join(", "),
+    };
+
+    const success = await updateUserPreferences(prefsToSend);
+
+    if (success) {
+      router.push({
+        pathname: "/registerPages/welcomePage",
+        params: prefsToSend,
+      });
+    }
   };
 
   return (
@@ -146,118 +172,13 @@ export default function BubbleInterests() {
                 </View>
               </View>
             ))}
-              {/* כפתור מחוץ לכרטיסיה */}
-          <TouchableOpacity
-            onPress={handleContinue}
-            style={styles.continueButton}
-          >
-            <Text style={styles.continueText}>Let's Do It</Text>
-          </TouchableOpacity>
-          </View>
 
-        
+            <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
+              <Text style={styles.continueText}>Let's Do It</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </LinearGradient>
     </ImageBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  gradientOverlay: {
-    flex: 1,
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 60,
-    alignItems: "center",
-  },
-  container: {
-    marginHorizontal: 20,
-    backgroundColor: "rgba(0,0,0,0.25)",
-    borderRadius: 24,
-    padding: 24,
-    alignItems: "center",
-    width: "90%",
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 20,
-    color: "#ffe6ff",
-    fontFamily: "Prompt-SemiBold",
-    textAlign: "center",
-  },
-  categoryBlock: {
-    marginBottom: 24,
-    width: "100%",
-  },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-    textAlign: "center",
-    fontFamily: "Prompt-Bold",
-    marginBottom: 12,
-  },
-  traitsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  traitButton: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    width: CARD_SIZE,
-    height: CARD_SIZE,
-    margin: 6,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 4,
-  },
-  selectedTraitButton: {
-    backgroundColor: "#fff",
-  },
-  traitIcon: {
-    fontSize: 18,
-    color: "#fff",
-  },
-  selectedTraitIcon: {
-    color: "#6a0dad",
-  },
-  traitText: {
-    fontSize: 11,
-    color: "#fff",
-    fontFamily: "Prompt-Regular",
-    textAlign: "center",
-  },
-  selectedTraitText: {
-    color: "#6a0dad",
-    fontWeight: "700",
-  },
-  continueButton: {
-    backgroundColor: "#ffffff",
-    height: 50,
-    width: "300",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
-  },
-  continueText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#6a0dad",
-    fontFamily: "Prompt-Black",
-    letterSpacing: 1,
-  },
-});
