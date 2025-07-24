@@ -11,78 +11,55 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams} from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import axios from 'axios';
 
 export default function ProfileIntro() {
-
+  
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
   console.log(`Intro page`, newUser);
 
-  const apiUrl = "http://www.DatingServer.somee.com/api/users"
+  const apiUrl = "http://www.DatingServer.somee.com/api/users/register"
 
-  const register = async () => {
-    uploadImageToServer()
-    fetchRegisterToServer()
-    router.push("/registerPages/registerIntrest")
-  };
+  const registerUser = async () => {
+    const formData = new FormData();
+    console.log("Register Run");
 
-  const uploadImageToServer = async () => {
-    formData.append("file", {
+    // Append all text fields
+    formData.append('UserName', newUser.userName);
+    formData.append('UserEmail', newUser.userEmail);
+    formData.append('UserPassword', newUser.userPassword);
+    formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
+    formData.append('Gender', newUser.gender);
+    formData.append('City', newUser.city);
+    formData.append('Latitude', newUser.latitude.toString());
+    formData.append('Longitude', newUser.longitude.toString());
+
+    // Append the image
+    const uriParts = newUser.image.split('.');
+    const fileType = uriParts[uriParts.length - 1];
+
+    formData.append('ProfileImageFile', {
       uri: newUser.image,
+      name: `profile.${fileType}`,
+      type: `image/${fileType}`
     });
 
     try {
-    const response = await fetch(apiUrl + "/uploadImage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    });
+      const response = await axios.post(apiUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-      const imageUrl = await response.json();
-      setnewUser({...newUser, image: imageUrl})
-      console.log("Upload success:", data);
-    } catch (err) {
-      console.error("Upload failed:", err);
+      console.log('Registration successful:', response.data);
+      
+      router.push({pathname:"/registerPages/registerIntrest", params: response.data.userId})
+
+    } catch (error) {
+      console.error('Registration failed:', error.response?.data || error.message);
     }
-  }
-
-  const fetchRegisterToServer = () => {
-
-    const data2Send = {
-      "userName": newUser.name,
-      "userEmail": newUser.email,
-      "userPassword": newUser.password,
-      "birthDate": newUser.birthDate,
-      "gender": newUser.gender,
-      "profileImage": newUser.image,
-      "city": newUser.address,
-      "latitude": newUser.latitude,
-      "longitude": newUser.longitude
-    }
-
-    fetch(apiUrl + "register", {
-      method: 'POST',
-      body: JSON.stringify(data2Send),
-      headers: new Headers({
-        'Content-type': 'application/json; charset=UTF-8', //very important to add the 'charset=UTF-8'!!!!
-        'Accept': 'application/json; charset=UTF-8',
-      })
-    })
-      .then(res => {
-        console.log('res=', res);
-        console.log('res.status=', res.status);
-
-        if (res.status === 200) {
-          console.log('all good');
-          return res.json()
-        }
-        else if (res.status === 204) {
-          console.log('Somthing went wrong');
-        }
-      })
-  }
+  };
 
   return (
     <ImageBackground
@@ -121,7 +98,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={register}
+              onPress={registerUser}
             >
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
