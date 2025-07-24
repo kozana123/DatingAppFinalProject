@@ -74,12 +74,13 @@ export default function LocationScreen() {
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
-          <View style={styles.card}>
-            <View style={styles.progressContainer}>
+        <View style={styles.progressContainer}>
               <View
                 style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
               />
             </View>
+          <View style={styles.card}>
+         
             {/* כותרת */}
             <Text style={styles.title}>Location</Text>
             <Text style={styles.subtitle}>
@@ -142,6 +143,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === "ios" ? 60 : 30,
     paddingHorizontal: 25,
+    justifyContent: "center",     // מרכז אנכי
+    alignItems: "center", 
   },
   progressContainer: {
     height: 8,
@@ -236,10 +239,18 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   continueButton: {
-    backgroundColor: "#fff",
-    paddingVertical: 4,
-    borderRadius: 30,
-    paddingHorizontal: 16,
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "300",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderColor: "#cc6699",
   },
   // gradient: {
   //   paddingVertical: 16,
@@ -247,10 +258,10 @@ const styles = StyleSheet.create({
   //   alignItems: "center",
   // },
   continueButtonText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "800",
     color: "#6a0dad",
-    fontFamily: "Prompt-SemiBold",
-    textAlign: "center",
+    fontFamily: "Prompt-Black",
+    letterSpacing: 1,
   },
 });

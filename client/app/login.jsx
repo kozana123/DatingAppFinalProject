@@ -200,21 +200,25 @@ const styles = StyleSheet.create({
   
   },
   signInButton: {
-    width: 250, // מספר, לא מחרוזת!
-    borderRadius: 30,
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "300",
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    alignSelf: "center", // מרכז את הכפתור
-    marginTop: 18,
-    marginBottom: 18,
-    paddingVertical: 6,
-    backgroundColor: "#fff",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    
+    borderColor: "#cc6699",
   },
   signInText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "800",
     color: "#6a0dad",
-    fontFamily: "Prompt-SemiBold",
+    fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
   dividerContainer: {

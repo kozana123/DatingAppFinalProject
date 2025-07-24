@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
+import { BlurView } from "expo-blur";
 
 const { width } = Dimensions.get("window");
 
@@ -95,7 +96,10 @@ export default function BubbleInterests() {
   };
 
   return (
-    <LinearGradient colors={["#F7F3F2", "#8A2C2A"]} style={{ flex: 1, paddingTop: 60 }}>
+    <LinearGradient
+      colors={["#F7F3F2", "#8A2C2A"]}
+      style={{ flex: 1, paddingTop: 60 }}
+    >
       <Text style={styles.title}>What are your interests?</Text>
 
       <ScrollView>
@@ -111,8 +115,16 @@ export default function BubbleInterests() {
                     onPress={() => toggleInterest(item.label)}
                     style={[styles.button, isSelected && styles.selectedButton]}
                   >
-                    <Text style={[styles.icon, isSelected && styles.selectedIcon]}>{item.icon}</Text>
-                    <Text style={[styles.text, isSelected && styles.selectedText]}>{item.label}</Text>
+                    <Text
+                      style={[styles.icon, isSelected && styles.selectedIcon]}
+                    >
+                      {item.icon}
+                    </Text>
+                    <Text
+                      style={[styles.text, isSelected && styles.selectedText]}
+                    >
+                      {item.label}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
@@ -122,10 +134,16 @@ export default function BubbleInterests() {
         ))}
       </ScrollView>
 
-      <View style={styles.continueContainer}>
-        <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
-          <Text style={styles.continueText}>Continue</Text>
-        </TouchableOpacity>
+      <View style={styles.joinNowContainer}>
+        <BlurView intensity={40} tint="light" style={styles.joinNowBlur}>
+          <TouchableOpacity
+            style={styles.joinNowButton}
+            onPress={handleContinue}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.joinNowText}>Join now</Text>
+          </TouchableOpacity>
+        </BlurView>
       </View>
     </LinearGradient>
   );
@@ -204,5 +222,34 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  joinNowContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+    marginTop: 8,
+  },
+  joinNowBlur: {
+    width: 343,
+    padding: 16,
+    backgroundColor: "#F7F9FA",
+    borderRadius: 13,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  joinNowButton: {
+    width: 327,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  joinNowText: {
+    color: "#2AAC7A",
+    fontSize: 18,
+    fontWeight: "500",
+    lineHeight: 24,
+    letterSpacing: 0.38,
+    textAlign: "center",
+    fontFamily: "System", // או הפונט שלך אם יש
   },
 });

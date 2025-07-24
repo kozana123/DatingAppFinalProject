@@ -70,11 +70,7 @@ export default function PersonalDetails() {
       >
         <SafeAreaView style={styles.safeArea}>
           {/* Progress bar */}
-          <View style={styles.progressContainer}>
-            <View
-              style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
-            />
-          </View>
+        
 
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -85,6 +81,11 @@ export default function PersonalDetails() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
+                <View style={styles.progressContainer}>
+            <View
+              style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
+            />
+          </View>
               <View style={styles.card}>
                 <Text style={styles.title}>Your Personal Info</Text>
 
@@ -156,6 +157,8 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     paddingTop: Platform.OS === "ios" ? 60 : 30,
+    alignContent: "center",
+    justifyContent: "center",
   },
   progressContainer: {
     height: 8,
@@ -176,15 +179,15 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    justifyContent: "center", // הוספה חשובה
     paddingBottom: 40,
   },
+  
   card: {
-    backgroundColor: "rgba(0,0,0,0.25)",
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
     marginHorizontal: 20,
-    marginBottom: 20,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: 24,
+    padding: 24,
   },
   title: {
     fontSize: 24,
@@ -256,21 +259,24 @@ const styles = StyleSheet.create({
 
   },
   nextButton: {
-    backgroundColor: "#fff",
-    paddingVertical: 4,
-    borderRadius: 30,
-    paddingHorizontal: 16,
-   
-  
-    width: "100%",
-    alignSelf: "center",
-    marginTop: 10,
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "300",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderColor: "#cc6699",
   },
   nextButtonText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 16,
+    fontWeight: "800",
     color: "#6a0dad",
-    fontFamily: "Prompt-SemiBold",
-    textAlign: "center",
+    fontFamily: "Prompt-Black",
+    letterSpacing: 1,
   },
 });

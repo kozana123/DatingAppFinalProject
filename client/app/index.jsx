@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#9b59b6",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+   
     shadowOpacity: 0.6,
     shadowRadius: 15,
     shadowOffset: { width: 0, height: 8 },
@@ -142,18 +142,18 @@ const styles = StyleSheet.create({
     height: "180%",
   },
   appName: {
-    fontSize: 30,
+    fontWeight: "300",
+    fontSize: 40,
     color: "#ffe6ff",
     fontFamily: "Prompt-Thin",
-    marginBottom: 1,
-    marginTop: 0,
+    
   },
   headline: {
     fontSize: 30,
     color: "#f8d7ff",
     fontFamily: "Prompt-SemiBold",
     lineHeight: 38,
-    marginBottom: 15,
+    marginBottom: 0,
     textAlign: "left", // מיישר את הטקסט לשמאל
     direction: "ltr", // מיישר את כל ה־Text לשמאל במסך
   },
@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
   signInButton: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "250",
-    borderRadius: 30,
+    width: "300",
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
@@ -182,10 +182,10 @@ const styles = StyleSheet.create({
   },
 
   signInText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
     color: "#6a0dad",
-    fontFamily: "Prompt-SemiBold",
+    fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
 
