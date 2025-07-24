@@ -26,9 +26,9 @@ export default function ProfileIntro() {
     console.log("Register Run");
 
     // Append all text fields
-    formData.append('UserName', newUser.userName);
-    formData.append('UserEmail', newUser.userEmail);
-    formData.append('UserPassword', newUser.userPassword);
+    formData.append('UserName', newUser.name);
+    formData.append('UserEmail', newUser.email);
+    formData.append('UserPassword', newUser.password);
     formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
     formData.append('Gender', newUser.gender);
     formData.append('City', newUser.city);

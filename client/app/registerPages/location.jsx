@@ -51,7 +51,7 @@ export default function LocationScreen() {
         const place = address[0];    
         const formattedAddress = `${place.city || ""}`;
 
-        setnewUser({...newUser, latitude: latitude, longitude: longitude, address: formattedAddress})
+        setnewUser({...newUser, latitude: latitude, longitude: longitude, city: formattedAddress})
         setCurrentLocation(formattedAddress);
       }
     }
@@ -80,7 +80,7 @@ export default function LocationScreen() {
       if (address.length > 0) {
         const place = address[0];
         const formattedAddress = `${place.city}`;
-        setnewUser({...newUser, latitude: latitude, longitude: longitude, address: formattedAddress})
+        setnewUser({...newUser, latitude: latitude, longitude: longitude, city: formattedAddress})
         setCurrentLocation(formattedAddress);
       }
     } catch (error) {
