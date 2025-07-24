@@ -123,8 +123,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 20,
     color: "#ffe6ff",
-    fontFamily: "Prompt-Thin",
+    fontFamily: "Prompt-SemiBold",
     textAlign: "center",
+    
   },
   grayCard: {
     backgroundColor: "rgba(255,255,255,0.15)",
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     width: "80%",
-    backgroundColor: "rgba(243, 229, 245, 0.5)",
+    backgroundColor: "rgba(245, 245, 245, 0.77)",
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 10,
@@ -170,22 +171,30 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: "#4a148c",
-    fontFamily: "Prompt-Thin",
+    fontFamily: "Prompt-Black",
+    fontWeight: "400",
   
   },
   nextButton: {
     backgroundColor: "#ffffff",
-    paddingVertical: 14,
-    paddingHorizontal: 100,
+    height: 50,
+    width: "300",
     borderRadius: 20,
+    justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderColor: "#cc6699",
   },
-  nextButtonDisabled: {
-    backgroundColor: "rgba(255,255,255,0.7)",
-  },
+
   nextText: {
+    fontSize: 16,
+    fontWeight: "800",
     color: "#6a0dad",
-    fontWeight: "700",
-    fontFamily: "Prompt-SemiBold",
+    fontFamily: "Prompt-Black",
+    letterSpacing: 1,
   },
 });

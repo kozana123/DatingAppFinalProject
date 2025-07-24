@@ -7,19 +7,22 @@ import {
   Dimensions,
   StyleSheet,
   Alert,
+  ImageBackground,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import { BlurView } from "expo-blur";
 
 const { width } = Dimensions.get("window");
+const CARD_SIZE = width / 4; // מתאים בדיוק ל-5 בעמודה עם רווח
 
 export default function BubbleInterests() {
-  // 1. קבלת פרמטרים מהדף הקודם
   const params = useLocalSearchParams();
+  const [userPreference, setUserPreference] = useState(params || {});
+  const [selected, setSelected] = useState([]);
 
-  // 2. שמירת המידע שקיבלנו + העניין הנבחר
-  const [userData, setUserData] = useState(params || {});
+  console.log("🔵 Received params from previous screen:", params);
+
 
   const interests = [
     {
@@ -66,10 +69,6 @@ export default function BubbleInterests() {
     },
   ];
 
-  // 3. שמירת המעניינים שנבחרו
-  const [selected, setSelected] = useState([]);
-
-  // 4. טוגל בחירה של עניין
   const toggleInterest = (interest) => {
     setSelected((prev) =>
       prev.includes(interest)
@@ -78,12 +77,12 @@ export default function BubbleInterests() {
     );
   };
 
-  // 5. עדכון המידע עם המעניינים הנבחרים
   useEffect(() => {
-    setUserData((prev) => ({ ...prev, interests: selected }));
-  }, [selected]);
+    setUserPreference((prev) => ({ ...prev, interests: selected }));
 
-  // 6. כפתור המשך - שולח את כל המידע לדף הבא
+    console.log("🟢 userPreference:", { ...userPreference, interests: selected });
+  }, [selected]);
+  
   const handleContinue = () => {
     if (selected.length === 0) {
       Alert.alert("Please select at least one interest to continue.");
@@ -91,165 +90,174 @@ export default function BubbleInterests() {
     }
     router.push({
       pathname: "/registerPages/welcomePage",
-      params: userData,
+      params: userPreference,
     });
   };
 
   return (
-    <LinearGradient
-      colors={["#F7F3F2", "#8A2C2A"]}
-      style={{ flex: 1, paddingTop: 60 }}
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.background}
     >
-      <Text style={styles.title}>What are your interests?</Text>
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        style={styles.gradientOverlay}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <Text style={styles.header}>What are your interests?</Text>
 
-      <ScrollView>
-        {interests.map((category, index) => (
-          <View key={index} style={{ marginBottom: 30 }}>
-            <Text style={styles.categoryTitle}>{category.title}</Text>
-            <View style={styles.traitsContainer}>
-              {category.traits.map((item, idx) => {
-                const isSelected = selected.includes(item.label);
-                return (
-                  <TouchableOpacity
-                    key={idx}
-                    onPress={() => toggleInterest(item.label)}
-                    style={[styles.button, isSelected && styles.selectedButton]}
-                  >
-                    <Text
-                      style={[styles.icon, isSelected && styles.selectedIcon]}
-                    >
-                      {item.icon}
-                    </Text>
-                    <Text
-                      style={[styles.text, isSelected && styles.selectedText]}
-                    >
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <View style={styles.divider} />
-          </View>
-        ))}
-      </ScrollView>
-
-      <View style={styles.joinNowContainer}>
-        <BlurView intensity={40} tint="light" style={styles.joinNowBlur}>
+            {interests.map((category, index) => (
+              <View key={index} style={styles.categoryBlock}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <View style={styles.traitsContainer}>
+                  {category.traits.map((item, idx) => {
+                    const isSelected = selected.includes(item.label);
+                    return (
+                      <TouchableOpacity
+                        key={idx}
+                        onPress={() => toggleInterest(item.label)}
+                        style={[
+                          styles.traitButton,
+                          isSelected && styles.selectedTraitButton,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.traitIcon,
+                            isSelected && styles.selectedTraitIcon,
+                          ]}
+                        >
+                          {item.icon}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.traitText,
+                            isSelected && styles.selectedTraitText,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+              {/* כפתור מחוץ לכרטיסיה */}
           <TouchableOpacity
-            style={styles.joinNowButton}
             onPress={handleContinue}
-            activeOpacity={0.85}
+            style={styles.continueButton}
           >
-            <Text style={styles.joinNowText}>Join now</Text>
+            <Text style={styles.continueText}>Let's Do It</Text>
           </TouchableOpacity>
-        </BlurView>
-      </View>
-    </LinearGradient>
+          </View>
+
+        
+        </ScrollView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
+  background: {
+    flex: 1,
+  },
+  gradientOverlay: {
+    flex: 1,
+    paddingTop: Platform.OS === "ios" ? 60 : 30,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingBottom: 60,
+    alignItems: "center",
+  },
+  container: {
+    marginHorizontal: 20,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: 24,
+    padding: 24,
+    alignItems: "center",
+    width: "90%",
+  },
+  header: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    margin: 20,
-    fontFamily: "Prompt-Bold",
+    fontWeight: "600",
+    marginBottom: 20,
+    color: "#ffe6ff",
+    fontFamily: "Prompt-SemiBold",
+    textAlign: "center",
+  },
+  categoryBlock: {
+    marginBottom: 24,
+    width: "100%",
   },
   categoryTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#4B2C2A",
+    color: "#fff",
     textAlign: "center",
     fontFamily: "Prompt-Bold",
+    marginBottom: 12,
   },
   traitsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    marginTop: 10,
   },
-  button: {
-    backgroundColor: "#E2D2C1",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+  traitButton: {
+    backgroundColor: "rgba(255,255,255,0.15)",
+    width: CARD_SIZE,
+    height: CARD_SIZE,
     margin: 6,
     borderRadius: 12,
-    alignItems: "center",
     justifyContent: "center",
-    width: width / 5,
-    height: 60,
-    elevation: 3,
-  },
-  selectedButton: {
-    backgroundColor: "#8A2C2A",
-    elevation: 6,
-  },
-  icon: {
-    fontSize: 16,
-    color: "#4B2C2A",
-  },
-  selectedIcon: {
-    color: "#fff",
-  },
-  text: {
-    color: "#4B2C2A",
-    fontWeight: "500",
-    marginTop: 2,
-    fontSize: 12,
-  },
-  selectedText: {
-    color: "#fff",
-  },
-  divider: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#4B2C2A",
-    marginVertical: 20,
-  },
-  continueContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    padding: 4,
+  },
+  selectedTraitButton: {
+    backgroundColor: "#fff",
+  },
+  traitIcon: {
+    fontSize: 18,
+    color: "#fff",
+  },
+  selectedTraitIcon: {
+    color: "#6a0dad",
+  },
+  traitText: {
+    fontSize: 11,
+    color: "#fff",
+    fontFamily: "Prompt-Regular",
+    textAlign: "center",
+  },
+  selectedTraitText: {
+    color: "#6a0dad",
+    fontWeight: "700",
   },
   continueButton: {
-    backgroundColor: "#8A2C2A",
-    paddingVertical: 10,
-    paddingHorizontal: 40,
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "300",
     borderRadius: 20,
-    elevation: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderColor: "#cc6699",
   },
   continueText: {
-    color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
-  },
-  joinNowContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  joinNowBlur: {
-    width: 343,
-    padding: 16,
-    backgroundColor: "#F7F9FA",
-    borderRadius: 13,
-    overflow: "hidden",
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-  },
-  joinNowButton: {
-    width: 327,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  joinNowText: {
-    color: "#2AAC7A",
-    fontSize: 18,
-    fontWeight: "500",
-    lineHeight: 24,
-    letterSpacing: 0.38,
-    textAlign: "center",
-    fontFamily: "System", // או הפונט שלך אם יש
+    fontWeight: "800",
+    color: "#6a0dad",
+    fontFamily: "Prompt-Black",
+    letterSpacing: 1,
   },
 });
