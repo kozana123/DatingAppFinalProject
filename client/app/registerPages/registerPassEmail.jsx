@@ -33,27 +33,26 @@ export default function RegisterPage() {
   };
 
   const handleNext = () => {
-    // if (!email || !password || !confirmPassword) {
+    // if (!newUser.email || !newUser.password || confirmPassword == "") {
     //   alert("Please fill all fields.");
     //   return;
     // }
 
-    // if (!validateEmail(email)) {
+    // if (!validateEmail(newUser.email)) {
     //   alert("Invalid email format.");
     //   return;
     // }
 
-    // if (password.length < 6) {
+    // if (newUser.password.length < 6) {
     //   alert("Password must be at least 6 characters.");
     //   return;
     // }
 
-    // if (password !== confirmPassword) {
+    // if (newUser.password !== confirmPassword) {
     //   alert("Passwords do not match.");
     //   return;
     // }
-
-    router.push("registerPages/addImage");
+    router.push({pathname:"/registerPages/addImage", params: newUser})
   };
 
   return (
@@ -80,8 +79,7 @@ export default function RegisterPage() {
               placeholder="Email"
               placeholderTextColor="#d8b8e6"
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
+              onChangeText={(email) => setnewUser({ ...newUser, email: email})}
               keyboardType="email-address"
               autoCapitalize="none"
               textContentType="emailAddress"
@@ -91,8 +89,7 @@ export default function RegisterPage() {
               placeholder="Password"
               placeholderTextColor="#d8b8e6"
               style={styles.input}
-              value={password}
-              onChangeText={setPassword}
+              onChangeText={(password) => setnewUser({ ...newUser, password: password})}
               secureTextEntry
               textContentType="newPassword"
             />
@@ -101,7 +98,6 @@ export default function RegisterPage() {
               placeholder="Confirm Password"
               placeholderTextColor="#d8b8e6"
               style={styles.input}
-              value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
               textContentType="password"
