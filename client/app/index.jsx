@@ -39,10 +39,8 @@ export default function Index() {
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.container}>
             <View style={styles.logoCircle}>
-              <View style={styles.headLeft} />
-              <View style={styles.headRight} />
               <Image
-                source={require("../assets/images/logo.png")}
+                source={require("../assets/images/AppLogo.png")}
                 style={styles.logoImage}
                 resizeMode="contain"
               />
@@ -108,39 +106,20 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 160,
     height: 160,
-    borderRadius: 80,
-    backgroundColor: "#9b59b6",
+    borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
-   
     shadowOpacity: 0.6,
     shadowRadius: 15,
     shadowOffset: { width: 0, height: 8 },
     elevation: 12,
     position: "relative",
   },
-  headLeft: {
-    width: 30,
-    height: 30,
-    backgroundColor: "#ffffff",
-    borderRadius: 100,
-    position: "absolute",
-    top: 27,
-    left: 30,
+  logoImage: { 
+    width: 160,
+    height: 160,
   },
-  headRight: {
-    width: 25,
-    height: 25,
-    backgroundColor: "#ff69b4",
-    borderRadius: 100,
-    position: "absolute",
-    top: 32,
-    right: 38,
-  },
-  logoImage: {
-    width: "180%",
-    height: "180%",
-  },
+  
   appName: {
     fontWeight: "300",
     fontSize: 40,

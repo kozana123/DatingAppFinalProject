@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+import { View, Text, Modal, StyleSheet,TouchableOpacity, TouchableWithoutFeedback, ImageBackground, Image} from 'react-native';
 
 import { Input, Button, ButtonGroup, Avatar } from '@rneui/themed';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
 import { router } from 'expo-router';
-
-
-
+import { LinearGradient } from "expo-linear-gradient";
 
 
 export default function Main(props) {
@@ -39,12 +37,16 @@ export default function Main(props) {
 
 
   return (
-    <View
-      style={{
-        flex: 1 ,
-        // justifyContent: "center",
-        // alignItems: "center",
-      }}
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.backgroundImage}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={styles.gradientOverlay}
       >
         <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
@@ -131,16 +133,22 @@ export default function Main(props) {
           </TouchableWithoutFeedback>
         </Modal>  
 
-       
-
-        <View style={{flexDirection: 'row', justifyContent: "center", gap: "55%", marginTop: 20, }}>
-          <Text style={styles.title}>Dating App</Text>
-          <FontAwesome size={30} name="sliders" style={{marginRight: 10}} onPress={openModal}/> 
+        <View style={styles.header}>
+          <View style={styles.logoCircle}>
+            <Image
+              source={require("../../assets/images/AppLogo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.title}>Lovio</Text>
+           
+          <FontAwesome size={35} name="sliders" style={{justifyContent: "flex-end", marginLeft: "40%"}} color="rgba(254, 136, 212, 1)" onPress={openModal}/> 
         </View>
 
-        <View style={{ alignItems: "center", marginTop: 20}} >
+        <View style={{ alignItems: "center", marginTop: 40}} >
           <Avatar
-            size={90}
+            size={100}
             rounded
             source={{ uri: 'https://randomuser.me/api/portraits/women/57.jpg' }}
             title="Bj"
@@ -176,14 +184,37 @@ export default function Main(props) {
             onPress={() => router.navigate("/videoCall")}
           />
         </View>
-
-      
-      
-    </View>
+            
+      </LinearGradient>
+    </ImageBackground>
   )
 }
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    
+  },
+  gradientOverlay: {
+    flex: 1,
+  },
+   logoCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    position: "relative",
+    marginRight: 10,
+  },
+  logoImage: { 
+    width: 50,
+    height: 50,
+  },
   topModalContainer: {
     flex: 1,
     justifyContent: 'flex-start', // 👈 push content to top
@@ -195,6 +226,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(238, 144, 120, 0.9)',
     padding: 10,
   },
+  header:{
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 10,
+    marginLeft: 10,
+    alignItems: "center",
+    
+  },
   headerText: {
     alignItems: "center",
     justifyContent: "center",
@@ -203,8 +242,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   title: {
-    fontSize: 20,
-    color: 'rgb(0, 0, 0)',
+    fontSize: 38,
+    color: 'rgba(254, 136, 212, 1)',
+    fontWeight: 'bold',
   },
   distanceValue: {
     paddingLeft: 10,
