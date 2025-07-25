@@ -105,11 +105,9 @@ export default function LocationScreen() {
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
-        <View style={styles.progressContainer}>
-              <View
-                style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
-              />
-            </View>
+          <View style={styles.progressContainer}>
+              <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}/>
+          </View>
           <View style={styles.card}>
          
             {/* כותרת */}
@@ -174,19 +172,19 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
-    paddingHorizontal: 25,
+    // paddingTop: Platform.OS === "ios" ? 60 : 30,
+    // paddingHorizontal: 25,
     justifyContent: "center",     // מרכז אנכי
-    alignItems: "center", 
+    // alignItems: "center", 
   },
   progressContainer: {
     height: 8,
-    width: "100%",
+    width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
     alignSelf: "center",
     marginBottom: 30,
-    flexDirection: "row-reverse",
+    // flexDirection: "row-reverse",
   },
   progressBar: {
     height: "100%",
@@ -194,12 +192,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   card: {
+    marginHorizontal: 20,
     backgroundColor: "rgba(0,0,0,0.25)",
-    borderRadius: 20,
-    paddingVertical: 40, 
-    paddingHorizontal: 20,
-    marginHorizontal: 0, 
-    marginBottom: 20,
+    borderRadius: 24,
+    padding: 20,
   },
 
   title: {
@@ -274,7 +270,7 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "300",
+    // width: "300",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",

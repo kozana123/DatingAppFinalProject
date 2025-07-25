@@ -36,10 +36,11 @@ export default function RegisterUserName() {
         end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.progressContainer}>
+        <View style={styles.progressContainer}>
             <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
-          </View>
+        </View>
+        <SafeAreaView style={styles.safeArea}>
+          
 
           <View style={styles.container}>
             <Text style={styles.title}>Let's Get Started!</Text>
@@ -69,11 +70,12 @@ export default function RegisterUserName() {
   );
 }
 
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    width,
+    height,
   },
   gradientOverlay: {
     flex: 1,
@@ -81,28 +83,30 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
+    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   progressContainer: {
+    position: "absolute",
     height: 8,
     width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
     alignSelf: "center",
-    marginBottom: 30,
-    flexDirection: "row-reverse", // ← זה השינוי החשוב
+    marginTop: 30,
+    // marginBottom: 30,
+    // flexDirection: "row-reverse", // ← זה השינוי החשוב
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#ffffff",
     borderRadius: 4,
-    direction: "ltr",
+    // direction: "rtl",
   },
   container: {
     marginHorizontal: 20,
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 24,
-    padding: 24,
+    padding: 20,
   },
   title: {
     fontSize: 24,
@@ -132,7 +136,7 @@ const styles = StyleSheet.create({
   buttonStyle: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "300",
+    // height: height * 0.2,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",

@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
+    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   progressContainer: {
     height: 8,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: "center",
     marginBottom: 30,
-    flexDirection: "row-reverse",
+    // flexDirection: "row-reverse",
   },
   progressBar: {
     height: "100%",
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 24,
-    padding: 24,
+    padding: 20,
   },
   title: {
     fontSize: 22,
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "300",
+    // width: "300",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",

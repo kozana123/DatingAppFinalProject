@@ -98,7 +98,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={registerUser}
+              onPress={() => router.push("/registerPages/registerIntrest")}
             >
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
@@ -120,18 +120,14 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
-    paddingHorizontal: 25,
+    // paddingTop: Platform.OS === "ios" ? 60 : 30,
+    paddingHorizontal: 10,
     justifyContent: "center",
   alignItems: "center", 
   },
   card: {
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
     alignItems: "center",
     paddingVertical: 40,       // יותר מרווח אנכי
     paddingHorizontal: 20,     // כמו בשאר
@@ -141,7 +137,7 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     height: 8,
-    width: "80%",
+    // width: "100%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
     marginBottom: 30,
@@ -206,7 +202,7 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "300",
+    width: "80%",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
