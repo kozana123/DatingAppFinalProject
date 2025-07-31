@@ -80,6 +80,7 @@ export default function ProfileIntro() {
                 source={require("../../assets/images/logo.png")}
                 style={styles.logoImage}
                 resizeMode="contain"
+                size={20}
               />
               <View style={styles.headRight} />
             </View>

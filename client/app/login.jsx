@@ -19,7 +19,6 @@ export default function Login() {
   const router = useRouter();
 
   return (
-    
     <ImageBackground
       source={require("../assets/images/design.png")}
       style={styles.backgroundImage}
@@ -33,7 +32,9 @@ export default function Login() {
       >
         <SafeAreaView style={styles.container}>
           <Text style={styles.title}>Welcome Back!</Text>
-          <Text style={styles.subtitle}>Nice to see you again, we missed you</Text>
+          <Text style={styles.subtitle}>
+            Nice to see you again, we missed you
+          </Text>
 
           <View style={styles.inputLabelContainer}>
             <Text style={styles.inputLabel}>Username</Text>
@@ -86,9 +87,12 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.signInButton} activeOpacity={0.85} onPress={() => router.navigate("/(tabs)/main")}>
+          <TouchableOpacity
+            style={styles.signInButton}
+            activeOpacity={0.85}
+            onPress={() => router.navigate("/(tabs)/main")}
+          >
             <Text style={styles.signInText}>Sign in</Text>
-         
           </TouchableOpacity>
 
           <View style={styles.dividerContainer}>
@@ -101,7 +105,6 @@ export default function Login() {
             <TouchableOpacity style={styles.socialButton}>
               <FontAwesome name="google" size={24} color="#ea4335" />
             </TouchableOpacity>
-           
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -140,7 +143,6 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-SemiBold",
     letterSpacing: 1,
     textAlign: "center",
-   
   },
   subtitle: {
     fontSize: 16,
@@ -197,7 +199,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Prompt-Thin",
     direction: "ltr",
-  
   },
   signInButton: {
     backgroundColor: "#ffffff",
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
-    
+
     borderColor: "#cc6699",
   },
   signInText: {
@@ -256,3 +257,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
