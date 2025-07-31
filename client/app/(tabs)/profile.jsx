@@ -51,7 +51,7 @@ export default function ProfileScreen() {
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.header}>
-  <FontAwesome name="gear" size={28} color="white" />
+  {/* <FontAwesome name="gear" size={28} color="white" /> */}
 
   <Text style={[styles.title, { fontFamily: "Prompt-SemiBold" }]}>Profile</Text>
 
