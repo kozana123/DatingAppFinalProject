@@ -116,14 +116,14 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               <Text style={[styles.sliderLabel, { fontFamily: "Prompt-Thin" }]}>
-                Age Range: {ageRange[0]} - {ageRange[1]}
+                Age Range: {ageRange[1]} - {ageRange[0]}
               </Text>
               <MultiSlider
-                values={[ageRange[0], ageRange[1]]}
-                min={18}
-                max={70}
+                values={ageRange}
+                min={70}
+                max={18}
                 step={1}
-                onValuesChange={(values) => setAgeRange(values)}
+                onValuesChange={setAgeRange}
                 selectedStyle={{ backgroundColor: "#DA58B7" }}
                 markerStyle={{ backgroundColor: "#DA58B7" }}
                 containerStyle={{ marginHorizontal: 10 }}
