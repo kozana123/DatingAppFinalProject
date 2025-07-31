@@ -8,7 +8,7 @@ import {
   ImageBackground,
   SafeAreaView,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   Ionicons,
   FontAwesome5,
@@ -17,8 +17,13 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function InterestsScreen() {
+  const params = useLocalSearchParams();
   const [selected, setSelected] = useState(null);
-  const [userPreference, setUserPreference] = useState({});
+  const [userPreference, setUserPreference] = useState(params);
+  
+  console.log(`params:`, params);
+  console.log(`Intrest page:`, userPreference);
+
 
   useEffect(() => {
     console.log("Selected interest changed:", selected);

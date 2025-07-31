@@ -1,8 +1,0 @@
-{
-  "plugins": [
-    "expo-web-browser"
-  ],
-  "android": {
-    "package": "com.shanylus.datingappfinalproject"
-  }
-}
