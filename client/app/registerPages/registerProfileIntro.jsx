@@ -38,6 +38,8 @@ export default function ProfileIntro() {
     // Append the image
     const uriParts = newUser.image.split('.');
     const fileType = uriParts[uriParts.length - 1];
+    
+    
 
     formData.append('ProfileImageFile', {
       uri: newUser.image,
@@ -53,8 +55,9 @@ export default function ProfileIntro() {
       });
 
       console.log('Registration successful:', response.data);
+      const userId = {userId: response.data.userId}
       
-      router.push({pathname:"/registerPages/registerIntrest", params: response.data.userId})
+      router.push({pathname:"/registerPages/registerIntrest", params: userId})
 
     } catch (error) {
       console.error('Registration failed:', error.response?.data || error.message);
@@ -80,7 +83,6 @@ export default function ProfileIntro() {
                 source={require("../../assets/images/logo.png")}
                 style={styles.logoImage}
                 resizeMode="contain"
-                size={20}
               />
               <View style={styles.headRight} />
             </View>
@@ -99,8 +101,9 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={() => router.push("/registerPages/registerIntrest")}
+              onPress={registerUser}
             >
+              {/* () => router.push("/registerPages/registerIntrest") */}
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
           </View>

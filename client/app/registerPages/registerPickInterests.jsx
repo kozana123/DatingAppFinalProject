@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Alert,
   ImageBackground,
-  KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,7 +18,7 @@ const CARD_SIZE = width / 4;
 
 export default function BubbleInterests() {
   const params = useLocalSearchParams();
-  const [userPreference, setUserPreference] = useState(params || {});
+  const [userPreference, setUserPreference] = useState(params);
   const [selected, setSelected] = useState([]);
 
   const interests = [
@@ -75,26 +74,42 @@ export default function BubbleInterests() {
     );
   };
 
-  useEffect(() => {
-    setUserPreference((prev) => ({ ...prev, interests: selected }));
-  }, [selected]);
+  const apiUrl = "http://www.DatingServer.somee.com/api/userpreferences/userPreferences"
 
-  const updateUserPreferences = async (prefs) => {
+  const RegisterPreferences = async (prefs) => {
+    // console.log(userPreference);
+    console.log(userPreference);
+
+    const preferences = {
+      userId: userPreference.userId, // Replace with actual user ID
+      preferredPartner: userPreference.genderPreference ,
+      relationshipType: userPreference.interest,
+      heightPreferences: "",
+      religion: "",
+      isSmoker: false,
+      preferredDistanceKm: 30,
+      minAgePreference: 25,
+      maxAgePreference: 35,
+      interests: prefs,
+    };
+
     try {
-      const response = await fetch(`http://YOUR_SERVER_IP/api/userpreferences/${prefs.UserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(prefs),
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferences),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update preferences: ${errorText}`);
+      if (response.status === 204) {
+        console.log("Preferences updated successfully.");
+      } else {
+        const text = await response.text();
+        console.warn("POST failed:",response.status, text);
       }
-      return true;
     } catch (error) {
-      Alert.alert("Error", error.message);
-      return false;
+      console.error("Error sending preferences:", error);
     }
   };
 
@@ -103,18 +118,12 @@ export default function BubbleInterests() {
       Alert.alert("Please select at least one interest to continue.");
       return;
     }
+    const updatedPrefs = selected.join(",")
 
-    const prefsToSend = {
-      ...userPreference,
-      interests: selected.join(", "),
-    };
+    const success = await RegisterPreferences(updatedPrefs);
 
-    const success = await updateUserPreferences(prefsToSend);
     if (success) {
-      router.push({
-        pathname: "/registerPages/welcomePage",
-        params: prefsToSend,
-      });
+      // router.push({pathname: "/registerPages/welcomePage",params: prefsToSend,});
     }
   };
 
@@ -127,60 +136,55 @@ export default function BubbleInterests() {
         colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
         style={styles.gradientOverlay}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-        >
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={styles.container}>
-              <Text style={styles.header}>What are your interests?</Text>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <Text style={styles.header}>What are your interests?</Text>
 
-              {interests.map((category, index) => (
-                <View key={index} style={styles.categoryBlock}>
-                  <Text style={styles.categoryTitle}>{category.title}</Text>
-                  <View style={styles.traitsContainer}>
-                    {category.traits.map((item, idx) => {
-                      const isSelected = selected.includes(item.label);
-                      return (
-                        <TouchableOpacity
-                          key={idx}
-                          onPress={() => toggleInterest(item.label)}
+            {interests.map((category, index) => (
+              <View key={index} style={styles.categoryBlock}>
+                <Text style={styles.categoryTitle}>{category.title}</Text>
+                <View style={styles.traitsContainer}>
+                  {category.traits.map((item, idx) => {
+                    const isSelected = Array.isArray(selected) && selected.includes(item.label);
+                    return (
+                      <TouchableOpacity
+                        key={idx}
+                        onPress={() => toggleInterest(item.label)}
+                        style={[
+                          styles.traitButton,
+                          isSelected && styles.selectedTraitButton,
+                        ]}
+                      >
+                        <Text
                           style={[
-                            styles.traitButton,
-                            isSelected && styles.selectedTraitButton,
+                            styles.traitIcon,
+                            isSelected && styles.selectedTraitIcon,
                           ]}
                         >
-                          <Text
-                            style={[
-                              styles.traitIcon,
-                              isSelected && styles.selectedTraitIcon,
-                            ]}
-                          >
-                            {item.icon}
-                          </Text>
-                          <Text
-                            style={[
-                              styles.traitText,
-                              isSelected && styles.selectedTraitText,
-                            ]}
-                            numberOfLines={1}
-                            ellipsizeMode="tail"
-                          >
-                            {item.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                          {item.icon}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.traitText,
+                            isSelected && styles.selectedTraitText,
+                          ]}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              ))}
+              </View>
+            ))}
 
-              <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
-                <Text style={styles.continueText}>Let's Do It</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
+            <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
+              <Text style={styles.continueText}>Let's Do It</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </LinearGradient>
     </ImageBackground>
   );
@@ -189,42 +193,45 @@ export default function BubbleInterests() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: "cover",
   },
   gradientOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: Platform.OS === "android" ? 30 : 60,
-    paddingBottom: 30,
+    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
+    // paddingBottom: 60,
     alignItems: "center",
-    paddingBottom: 40,
   },
   container: {
-    width: "90%",
+    // marginHorizontal: 20,
+    margin: 20,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    borderRadius: 24,
+    // padding: 5,
     alignItems: "center",
+    // width: "90%",
   },
   header: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 30,
+    fontSize: 24,
+    fontWeight: "600",
+    marginBottom: 20,
+    color: "#ffe6ff",
+    fontFamily: "Prompt-SemiBold",
     textAlign: "center",
   },
   categoryBlock: {
+    marginBottom: 24,
     width: "100%",
-    marginBottom: 30,
   },
   categoryTitle: {
     fontSize: 20,
+    fontWeight: "bold",
     color: "#fff",
-    fontWeight: "600",
+    textAlign: "center",
+    fontFamily: "Prompt-Bold",
     marginBottom: 12,
-    marginLeft: 8,
   },
   traitsContainer: {
     flexDirection: "row",
@@ -232,55 +239,54 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   traitButton: {
+    backgroundColor: "rgba(255,255,255,0.15)",
     width: CARD_SIZE,
     height: CARD_SIZE,
-    borderRadius: CARD_SIZE / 2,
+    margin: 6,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    margin: 8,
-    borderWidth: 1,
-    borderColor: "white",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    padding: 10,
+    padding: 4,
   },
   selectedTraitButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    borderColor: "#fff",
+    backgroundColor: "#fff",
   },
   traitIcon: {
-    fontSize: 22,
+    fontSize: 18,
     color: "#fff",
   },
   selectedTraitIcon: {
-    fontWeight: "bold",
-    color: "#fff",
+    color: "#6a0dad",
   },
   traitText: {
+    fontSize: 11,
     color: "#fff",
-    fontSize: 12,
-    marginTop: 4,
+    fontFamily: "Prompt-Regular",
     textAlign: "center",
   },
   selectedTraitText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#6a0dad",
+    fontWeight: "700",
   },
   continueButton: {
-    backgroundColor: "#fff",
-    paddingVertical: 14,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-    alignSelf: "center",
-    marginTop: 30,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 5,
-    elevation: 6,
+    backgroundColor: "#ffffff",
+    height: 50,
+    width: "300",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    shadowColor: "#cc6699",
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    borderColor: "#cc6699",
   },
   continueText: {
-    color: "#6A0DAD",
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "800",
+    color: "#6a0dad",
+    fontFamily: "Prompt-Black",
+    letterSpacing: 1,
   },
 });
