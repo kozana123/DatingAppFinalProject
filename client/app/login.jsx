@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -12,11 +12,54 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
+import SHA256 from "crypto-js/sha256";
+import {DataContext} from "./DataContextProvider" 
+
 
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { setUser, setUserPref } = useContext(DataContext);
+
+  const  handleLogin = () =>{
+    if(userEmail == "" && password == ""){
+      router.navigate("/(tabs)/main")
+    }
+    else{
+      login()
+    }
+  }
+
+  const login = async () => {
+
+    const hashedPassword = SHA256(password).toString();
+    const response = await fetch(`http://www.DatingServer.somee.com/api/users/login?email=${userEmail}&password=${hashedPassword}`);
+    
+    if (response.status == 200) {
+      const user = await response.json();
+      setUser(user)
+      getPreferences(user.userId)
+      console.log("Logged in:", user);
+      router.navigate("/(tabs)/main")
+    } else {
+      console.warn("Login failed:", await response.text());
+    }
+  };
+
+  const getPreferences = async (id) => {
+
+    const response = await fetch(`http://www.DatingServer.somee.com/api/userpreferences/${id}`);
+    
+    if (response.status == 200) {
+      const userPref = await response.json();
+      setUserPref(userPref)
+      console.log("got pref:", userPref);
+    } else {
+      console.warn("failed geting pref:", await response.text());
+    }
+  };
+
 
   return (
     <ImageBackground
@@ -37,7 +80,7 @@ export default function Login() {
           </Text>
 
           <View style={styles.inputLabelContainer}>
-            <Text style={styles.inputLabel}>Username</Text>
+            <Text style={styles.inputLabel}>Email</Text>
             <View style={styles.inputContainer}>
               <FontAwesome
                 name="user"
@@ -47,10 +90,10 @@ export default function Login() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Username"
+                placeholder="Email"
                 placeholderTextColor="#e1bee7"
-                value={username}
-                onChangeText={setUsername}
+                value={userEmail}
+                onChangeText={setUserEmail}
                 autoCapitalize="none"
                 textAlign="left"
               />
@@ -74,6 +117,7 @@ export default function Login() {
                 onChangeText={setPassword}
                 secureTextEntry
                 textAlign="left"
+                autoCapitalize="none"
               />
               <FontAwesome
                 name="eye-slash"
@@ -90,7 +134,7 @@ export default function Login() {
           <TouchableOpacity
             style={styles.signInButton}
             activeOpacity={0.85}
-            onPress={() => router.navigate("/(tabs)/main")}
+            onPress={handleLogin}
           >
             <Text style={styles.signInText}>Sign in</Text>
           </TouchableOpacity>

@@ -12,6 +12,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useLocalSearchParams } from 'expo-router';
+import SHA256 from "crypto-js/sha256";
 
 
 const STAGE_PROGRESS = 60; 
@@ -52,7 +53,10 @@ export default function RegisterPage() {
     //   alert("Passwords do not match.");
     //   return;
     // }
-    router.push({pathname:"/registerPages/addImage", params: newUser})
+   
+    const hashedPassword = SHA256(newUser.password).toString();
+    const updatedUser = { ...newUser, password: hashedPassword };
+    router.push({pathname:"/registerPages/addImage", params: updatedUser})
   };
 
   return (
@@ -91,6 +95,7 @@ export default function RegisterPage() {
               style={styles.input}
               onChangeText={(password) => setnewUser({ ...newUser, password: password})}
               secureTextEntry
+              autoCapitalize="none"
               textContentType="newPassword"
             />
 
@@ -100,6 +105,7 @@ export default function RegisterPage() {
               style={styles.input}
               onChangeText={setConfirmPassword}
               secureTextEntry
+              autoCapitalize="none"
               textContentType="password"
             />
 

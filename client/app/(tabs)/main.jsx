@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -12,9 +12,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 const { width, height } = Dimensions.get("window");
+import {DataContext} from "../DataContextProvider" 
 
 export default function VideoCallStartScreen() {
   const navigation = useNavigation();
+  const { user, userPref } = useContext(DataContext);
+  console.log(user, userPref);
+  
 
   return (
     <ImageBackground
@@ -42,9 +46,7 @@ export default function VideoCallStartScreen() {
 
         {/* תמונת פרופיל */}
         <Image
-          source={{
-            uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-          }}
+          source={user && user.profileImage ? { uri: user.profileImage} :{uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}}
           style={styles.avatar}
         />
 

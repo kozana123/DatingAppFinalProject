@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
     const [initiatorId, initiatorSocketId] = [...users.entries()][0];
     const [targetId, targetSocketId] = [...users.entries()][1];
 
-    console.log(`🚀 Triggering offer from ${initiatorSocketId} to ${targetId}`);
+    console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
     io.to(initiatorSocketId).emit('initiate-offer', {
       targetId: targetId,
       senderId: initiatorId
@@ -73,6 +73,8 @@ io.on('connection', (socket) => {
 
   socket.on('offer', ({ targetId, offer, senderId }) => {
     const targetSocketId = users.get(targetId);
+    console.log("getting OFFER");
+    
     if (targetSocketId) {
       console.log(`✅ Sent offer from ${socket.id} to ${targetSocketId}`);
       io.to(targetSocketId).emit('offer', { offer, senderId: senderId });
