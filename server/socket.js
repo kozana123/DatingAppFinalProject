@@ -17,42 +17,42 @@ export function initIO(server) {
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  socket.on('register-test', (callerId, user, preference) => {
-    switch(user.gender){
-      case "male":
-        maleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes});
-        break 
+  // socket.on('register-test', (callerId, user, preference) => {
+  //   switch(user.gender){
+  //     case "male":
+  //       maleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes});
+  //       break 
 
-      case "female":
-        femaleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes}); 
-        break
-    }
-    console.log(`User registered: ${callerId} -> ${socket.id}`);
-    console.log(`Amount of users: ${users.size}`);
+  //     case "female":
+  //       femaleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes}); 
+  //       break
+  //   }
+  //   console.log(`User registered: ${callerId} -> ${socket.id}`);
+  //   console.log(`Amount of users: ${users.size}`);
 
-    const targeUser = null;
-    switch(preference.gender){
-      case "male":
-        targeUser = GetBestUser(maleusers ,preference.age, preference.distance, preference.likes)
-        break 
+  //   const targeUser = null;
+  //   switch(preference.gender){
+  //     case "male":
+  //       targeUser = GetBestUser(maleusers ,preference.age, preference.distance, preference.likes)
+  //       break 
       
-      case "female":
-        targeUser = GetBestUser(femaleusers ,preference.age, preference.distance, preference.likes) 
-        break
-    }
+  //     case "female":
+  //       targeUser = GetBestUser(femaleusers ,preference.age, preference.distance, preference.likes) 
+  //       break
+  //   }
 
-    if (targeUser) {
-      const targetId = targeUser.callerId;
-      const initiatorId = callerId;
-      const initiatorSocketId = socket.id;
+  //   if (targeUser) {
+  //     const targetId = targeUser.callerId;
+  //     const initiatorId = callerId;
+  //     const initiatorSocketId = socket.id;
 
-      console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
-      io.to(initiatorSocketId).emit('initiate-offer', {
-        targetId: targetId,
-        senderId: initiatorId
-      });
-    }
-  });
+  //     console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
+  //     io.to(initiatorSocketId).emit('initiate-offer', {
+  //       targetId: targetId,
+  //       senderId: initiatorId
+  //     });
+  //   }
+  // });
 
   socket.on('register', (callerId) => {
     users.set(callerId, socket.id);

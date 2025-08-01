@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 const { width, height } = Dimensions.get("window");
 
 export default function VideoCallStartScreen() {
@@ -53,13 +54,16 @@ export default function VideoCallStartScreen() {
           <Text style={styles.subtitle}>Tap to start your video chat</Text>
 
           {/* כפתור עגול עם אייקון מצלמה */}
-          <TouchableOpacity style={styles.roundButton}>
+          <TouchableOpacity style={styles.roundButton} onPress={() => router.navigate("/videoCall")}
+            >
             <Image
               source={{
                 uri: "https://cdn-icons-png.flaticon.com/512/727/727245.png",
               }}
               style={styles.cameraIcon}
+              
             />
+            
           </TouchableOpacity>
 
           <Text style={styles.startText}>Start</Text>

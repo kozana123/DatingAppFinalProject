@@ -101,7 +101,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={registerUser}
+              onPress={() => router.push("/registerPages/registerIntrest")}
             >
               {/* () => router.push("/registerPages/registerIntrest") */}
               <Text style={styles.continueButtonText}>Let's Do It</Text>
