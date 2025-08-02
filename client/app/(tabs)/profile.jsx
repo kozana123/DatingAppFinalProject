@@ -13,6 +13,7 @@ import {
   Alert,
   FlatList
 } from "react-native";
+
 import Slider from "@react-native-community/slider";
 import { Avatar } from "@rneui/themed";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -32,9 +33,15 @@ export default function ProfileScreen() {
 
   const [ageRange, setAgeRange] = useState([userPref.minAgePreference, userPref.maxAgePreference]);
   const [distance, setDistance] = useState(userPref.preferredDistanceKm);
+ 
   const [genderIndex, setGenderIndex] = useState(genders.indexOf(userPref.preferredPartner));
   console.log(userPref, user);
+
   
+  const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
+
+
   const [fontsLoaded] = useFonts({
     "Prompt-Thin": require("../../assets/fonts/Prompt-Thin.ttf"),
     "Prompt-SemiBold": require("../../assets/fonts/Prompt-SemiBold.ttf"),
@@ -44,9 +51,6 @@ export default function ProfileScreen() {
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" color="#DA58B7" style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />;
   }
-  
-  const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
 
   const handleImageChoice = () => {
     Alert.alert(
@@ -80,7 +84,7 @@ export default function ProfileScreen() {
     });
 
     if (!result.canceled) {
-      setnewUser({...newUser, image: result.assets[0].uri})
+      setUser({...user, profileImage: result.assets[0].uri})
     }
   };
 
@@ -93,14 +97,17 @@ export default function ProfileScreen() {
     });
 
     if (!result.canceled) {
-      setnewUser({...newUser, image: result.assets[0].uri})
+      setUser({...user, profileImage: result.assets[0].uri})
     }
   };
 
   const onGenderPress = (value) => {
     setGenderIndex(value)
-    setUserPref({...userPref, preferredPartner: genders[value]})
   };
+
+  const savePref = () =>{
+    setUserPref({...userPref, minAgePreference: ageRange[0], maxAgePreference: ageRange[1], preferredDistanceKm: distance,  preferredPartner: genders[genderIndex]})
+  }
 
   return (
     <ImageBackground
@@ -235,18 +242,14 @@ export default function ProfileScreen() {
               />
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={() => {
-                  alert("Your discovery has been updated.");
-                }}
+                onPress={savePref}
               >
                 <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Save</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.deleteBtn}
-              onPress={() => {
-                alert("Your account has been deleted.");
-              }}
+              onPress={() => alert("Your account has been deleted.")}
             >
               <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Delete Account 🗑️</Text>
             </TouchableOpacity>
