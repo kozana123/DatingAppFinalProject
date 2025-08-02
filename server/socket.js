@@ -11,48 +11,59 @@ export function initIO(server) {
   });
 
   const users = new Map(); // Map<callerId, socketId>
-  const maleusers = new Map();
-  const femaleusers = new Map();  
+  const maleUsers = new Map();
+  const femaleUsers = new Map();  
+  const otherUsers = new Map();  
+
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  // socket.on('register-test', (callerId, user, preference) => {
-  //   switch(user.gender){
-  //     case "male":
-  //       maleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes});
-  //       break 
+  socket.on('register-test', (callerId, userDetails) => {
+    switch(userDetails.gender){
+      case "male":
+        maleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails});
+        break 
 
-  //     case "female":
-  //       femaleusers.set(callerId, { socketId: socket.id, user: user, likes: preference.likes}); 
-  //       break
-  //   }
-  //   console.log(`User registered: ${callerId} -> ${socket.id}`);
-  //   console.log(`Amount of users: ${users.size}`);
+      case "female":
+        femaleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
+        break
 
-  //   const targeUser = null;
-  //   switch(preference.gender){
-  //     case "male":
-  //       targeUser = GetBestUser(maleusers ,preference.age, preference.distance, preference.likes)
-  //       break 
+      case "other":
+        femaleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
+        break
+    }
+
+    console.log(`User registered: ${callerId} -> ${socket.id}`);
+    console.log(`Amount of users: ${users.size}`);
+
+    const targeUser = null;
+    switch(userDetails.genderPref){
+      case "male":
+        targeUser = GetBestUser(maleUsers, userDetails)
+        break 
       
-  //     case "female":
-  //       targeUser = GetBestUser(femaleusers ,preference.age, preference.distance, preference.likes) 
-  //       break
-  //   }
+      case "female":
+        targeUser = GetBestUser(femaleUsers, userDetails) 
+        break
 
-  //   if (targeUser) {
-  //     const targetId = targeUser.callerId;
-  //     const initiatorId = callerId;
-  //     const initiatorSocketId = socket.id;
+      case "other":
+        targeUser = GetBestUser(otherUsers, userDetails) 
+        break
+    }
 
-  //     console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
-  //     io.to(initiatorSocketId).emit('initiate-offer', {
-  //       targetId: targetId,
-  //       senderId: initiatorId
-  //     });
-  //   }
-  // });
+    if (targeUser) {
+      const targetId = targeUser.callerId;
+      const initiatorId = callerId;
+      const initiatorSocketId = socket.id;
+
+      console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
+      io.to(initiatorSocketId).emit('initiate-offer', {
+        targetId: targetId,
+        senderId: initiatorId
+      });
+    }
+  });
 
   socket.on('register', (callerId) => {
     users.set(callerId, socket.id);
@@ -114,11 +125,11 @@ io.on('connection', (socket) => {
   });
 })
 
-function GetBestUser(userType, age, distance, preferenceLikes) {
+function GetBestUser(userType, userDetails) {
   let bestUser = null;
 
   userType.forEach((entry, callerId) => {
-    const { socketId, user, likes } = entry;
+    const { socketId, otherUserDetails } = entry;
 
     // Check age and distance
     if (user.age >= age.min && user.age <= age.max && user.distance <= distance) {

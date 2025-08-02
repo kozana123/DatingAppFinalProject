@@ -132,7 +132,6 @@ export default function PersonalDetails() {
                   textStyle={styles.genderText}
                   innerBorderStyle={{ width: 1 }}
                 />
-
                 <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
                   <Text style={styles.nextButtonText}>Next</Text>
                 </TouchableOpacity>
@@ -237,11 +236,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderRadius: 12,
     backgroundColor: "transparent",
-    
   },
+  
   genderButton: {
     backgroundColor: "transparent",
-    // paddingVertical: 2,
   },
   selectedGenderButton: {
     backgroundColor: "#cc66cc",

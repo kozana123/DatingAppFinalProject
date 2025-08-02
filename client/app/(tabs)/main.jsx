@@ -17,7 +17,9 @@ import {DataContext} from "../DataContextProvider"
 export default function VideoCallStartScreen() {
   const navigation = useNavigation();
   const { user, userPref } = useContext(DataContext);
-  console.log(user, userPref);
+  console.log("user pref:", userPref);
+  console.log("user:", user);
+
   
 
   return (
