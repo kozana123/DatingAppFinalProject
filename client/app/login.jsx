@@ -37,12 +37,25 @@ export default function Login() {
   const signInWithGoogle = async () => {
     try {
       await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signOut(); 
       const userInfo = await GoogleSignin.signIn();
-      console.log("User Info =>", userInfo);
+      console.log("Full userInfo:", userInfo);
+  
+      if (!userInfo || !userInfo.data || !userInfo.data.user) {
+        throw new Error("No user info returned from Google Sign-In");
+      }
+  
+      const user = userInfo.data.user;
+
+      setUser(user);
+      router.navigate("/(tabs)/main");
+  
     } catch (error) {
       console.error("Google Sign-In Error:", error);
     }
   };
+  
+  
   const handleLogin = () => {
     console.log("handleLogin");
 
