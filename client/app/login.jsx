@@ -179,12 +179,13 @@ export default function Login() {
               }}
               onPress={signInWithGoogle}
             >
-              <FontAwesome name="google" size={24} color="#ea4335" />
+            
               <Text
-                style={{ marginLeft: 12, color: "#000", fontWeight: "bold" }}
+                style={{ marginRight: 12, color: "#000", fontWeight: "bold" }}
               >
-                Sign in with Google
+                Sign in with Google 
               </Text>
+              <FontAwesome name="google" size={24} color="#ea4335" />
             </TouchableOpacity>
           </View>
         </SafeAreaView>

@@ -156,7 +156,7 @@ export default function ProfileScreen() {
               value = {user.userEmail}
               editable={false}
             />
-            <Text style={styles.label}>Hight:</Text>
+            <Text style={styles.label}>Hieght:</Text>
      
             <RNPickerSelect
               onValueChange={(value) => setUserPref({...userPref, heightPreferences: value})}
