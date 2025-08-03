@@ -21,10 +21,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setUser, setUserPref } = useContext(DataContext);
-
+  console.log(userEmail, password);
+  
   const  handleLogin = () =>{
+    console.log("handleLogin");
+
     if(userEmail == "" && password == ""){
-      router.navigate("/(tabs)/main")
+      
     }
     else{
       login()

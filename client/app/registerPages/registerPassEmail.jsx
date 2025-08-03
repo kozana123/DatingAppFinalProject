@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: "center",
     marginBottom: 30,
-    // flexDirection: "row-reverse",
   },
   progressBar: {
     height: "100%",

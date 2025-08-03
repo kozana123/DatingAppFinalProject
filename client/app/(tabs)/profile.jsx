@@ -11,7 +11,8 @@ import {
   ActivityIndicator,
   Image,
   Alert,
-  FlatList
+  FlatList,
+  Switch 
 } from "react-native";
 
 import Slider from "@react-native-community/slider";
@@ -25,22 +26,40 @@ import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import {DataContext} from "../DataContextProvider" 
 import { ButtonGroup } from "@rneui/themed";
+import RNPickerSelect from 'react-native-picker-select';
+import { I18nManager } from "react-native";
+
+if (I18nManager.isRTL) {
+  I18nManager.forceRTL(false);
+  // This requires a full app reload
+}
 
 
 export default function ProfileScreen() {
-  const { user, userPref, setUserPref, setUser } = useContext(DataContext);
+  const { user, userPref, setUserPref, setUser, handleImageChoice } = useContext(DataContext);
   const genders = ["Other", "Female", "Male"];
+
+  const religions = [
+  { label: "Atheist", value: "Atheist" },
+  { label: "Spiritual", value: "Spiritual" },
+  { label: "Jewish", value: "Jewish" },
+  { label: "Christian", value: "Christian" },
+  { label: "Muslim", value: "Muslim" },
+  { label: "Hindu", value: "Hindu" },
+  { label: "Buddhist", value: "Buddhist" },
+  { label: "Other", value: "Other" },
+];
+  const heightOptions = Array.from({ length: 131 }, (_, i) => ({
+    label: `${100 + i} cm`,
+    value: 100 + i,
+  }));
 
   const [ageRange, setAgeRange] = useState([userPref.minAgePreference, userPref.maxAgePreference]);
   const [distance, setDistance] = useState(userPref.preferredDistanceKm);
  
   const [genderIndex, setGenderIndex] = useState(genders.indexOf(userPref.preferredPartner));
-  console.log(userPref, user);
-
-  
-  const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
-  const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
-
+  console.log("user pref:", userPref);
+  console.log("user:", user);
 
   const [fontsLoaded] = useFonts({
     "Prompt-Thin": require("../../assets/fonts/Prompt-Thin.ttf"),
@@ -52,61 +71,27 @@ export default function ProfileScreen() {
     return <ActivityIndicator size="large" color="#DA58B7" style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />;
   }
 
-  const handleImageChoice = () => {
-    Alert.alert(
-      "Select Image",
-      "Choose image source",
-      [
-        {
-          text: "Camera",
-          onPress: takePhoto,
-        },
-        {
-          text: "Gallery",
-          onPress: pickImage,
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const pickImage = async () => {
-    if (!status?.granted) await requestPermission();
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setUser({...user, profileImage: result.assets[0].uri})
+  const getAge = (birthDateString) => {
+    const today = new Date();
+    const birthDate = new Date(birthDateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
     }
-  };
-
-  const takePhoto = async () => {
-    if (!cameraStatus?.granted) await requestCameraPermission();
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setUser({...user, profileImage: result.assets[0].uri})
-    }
+    return age;
   };
 
   const onGenderPress = (value) => {
     setGenderIndex(value)
   };
 
-  const savePref = () =>{
+  const saveSearchPref = () =>{
     setUserPref({...userPref, minAgePreference: ageRange[0], maxAgePreference: ageRange[1], preferredDistanceKm: distance,  preferredPartner: genders[genderIndex]})
+  }
+
+  const saveUser = () =>{
+    
   }
 
   return (
@@ -124,8 +109,7 @@ export default function ProfileScreen() {
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.header}>
-            {/* <FontAwesome name="gear" size={28} color="white" /> */}
-            <Text style={[styles.title, { fontFamily: "Prompt-SemiBold" }]}>Profile</Text>
+            {/* <Text style={styles.title}>Profile</Text> */}
 
             <View style={styles.logoContainer}>
               <Image
@@ -133,7 +117,7 @@ export default function ProfileScreen() {
                 style={styles.logoImage}
                 resizeMode="contain"
               />
-              <Text style={[styles.logo, { fontFamily: "Prompt-SemiBold" }]}>Luvio</Text>
+              <Text style={styles.logo}>Luvio</Text>
             </View>
           </View>
 
@@ -143,62 +127,88 @@ export default function ProfileScreen() {
               rounded
               source={user && user.profileImage ? { uri: user.profileImage} : {uri: "https://randomuser.me/api/portraits/women/57.jpg"}}
               onPress={handleImageChoice}
-              containerStyle={{ backgroundColor: "#ccc" }}
             >
               <Avatar.Accessory
                 size={26}
                 style={{ backgroundColor: "#DA58B7" }}
               />
             </Avatar>
-            <Text style={[styles.name, { fontFamily: "Prompt-Thin" }]}></Text>
+            <Text style={[styles.name, { fontFamily: "Prompt-Thin" }]}>{user.userName} {getAge(user.birthDate)}</Text>
           </View>
 
           <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>Account Settings</Text>
           <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-            {/* <TextInput style={[styles.input, { fontFamily: "Prompt-Thin" }]} value="John" placeholder="Name" /> */}
-            {/* <TextInput
-              style={[styles.input, { fontFamily: "Prompt-Thin" }]}
-              value="+91 9876543210"
-              placeholder="Phone Number"
-            /> */}
-            {/* <TextInput
-              style={[styles.input, { fontFamily: "Prompt-Thin" }]}
-              value="02-05-1999"
-              placeholder="Birthdate"
-            /> */}
-            <TextInput
-              style={[styles.input, { fontFamily: "Prompt-Thin" }]}
-              value = {user.userEmail}
-              placeholder="Email"
-            />
-            {/* <TouchableOpacity style={styles.option}>
-              <Text style={[styles.optionText, { fontFamily: "Prompt-Thin" }]}>My Current Location</Text>
-            </TouchableOpacity> */}
+
+            <Text style={styles.label}>Location:</Text>
             <TouchableOpacity
               style={styles.option}
-              onPress={() => {
-                alert("Your discovery has been updated.");
-              }}
+              onPress={() => {alert("Your discovery has been updated.");}}
             >
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                <Text style={[styles.deleteText, { fontFamily: "Prompt-Black"}]}>{user.city}</Text>
                 <MaterialIcons name="my-location" size={24} color="#6a0dad" />
-                <Text style={[styles.deleteText, { fontFamily: "Prompt-Black", textAlign: 'right' }]}>
-                  Location: {user.city}
-                </Text>
               </View>
             </TouchableOpacity>
+
+            <Text style={styles.label}>Email:</Text>
+            <TextInput
+              style={[styles.input, {color:"#9c9c9cff" }]}
+              value = {user.userEmail}
+              editable={false}
+            />
+            <Text style={styles.label}>Hight:</Text>
+     
+            <RNPickerSelect
+              onValueChange={(value) => setUserPref({...userPref, heightPreferences: value})}
+              items={heightOptions}
+              value={userPref.heightPreferences}
+              useNativeAndroidPickerStyle={false}
+              placeholder={{ label: 'Choose height', value: null }}
+              style={{
+                inputAndroid: styles.input,
+                placeholder: { color: '#000000ff' },
+              }}
+            />
+
+            
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10,}}>
+              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>Smoking:</Text>
+              <Switch
+                value={userPref.isSmoker}
+                onValueChange={(value) => setUserPref({...userPref, isSmoker: value})}
+                thumbColor={userPref.isSmoker ? "#DA58B7" : "#ccc"}
+                trackColor={{ true: "#f2add9", false: "#ccc" }}
+                style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.2 }], marginRight:20,}}
+              />
+            </View>
+
+            <Text style={styles.label}>Religion:</Text>
+     
+            <RNPickerSelect
+              onValueChange={(value) => setUserPref({...userPref, religion: value})}
+              items={religions}
+              value={userPref.religion}
+              useNativeAndroidPickerStyle={false}
+              placeholder={{ label: 'Choose Religion', value: null }}
+              style={{
+                inputAndroid: styles.input,
+                placeholder: { color: '#000000ff' },
+              }}
+            />
+
+            <TouchableOpacity
+              style={styles.deleteBtn}
+              onPress={saveUser}
+            >
+              <Text style={styles.deleteText}> Save</Text>
+            </TouchableOpacity>
+
           </View>
 
             <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>Discovery Settings</Text>
             <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-             
-              {/* <TouchableOpacity style={styles.option}>
-                <Text style={[styles.optionText, { fontFamily: "Prompt-Thin" }]}>Language: English</Text>
-              </TouchableOpacity> */}
-              {/* <TouchableOpacity style={styles.option}>
-                <Text style={[styles.optionText, { fontFamily: "Prompt-Thin" }]}>Looking for: Women</Text>
-              </TouchableOpacity> */}
-              <Text style={[styles.sliderLabel, { fontFamily: "Prompt-Thin" }]}>Gender</Text>
+          
+              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>Gender</Text>
                 <ButtonGroup
                   buttons={genders}
                   selectedIndex={genderIndex}
@@ -211,7 +221,7 @@ export default function ProfileScreen() {
                   innerBorderStyle={{ width: 1 }}
                 />
 
-              <Text style={[styles.sliderLabel, { fontFamily: "Prompt-Thin" }]}>
+              <Text style={styles.label}>
                 Age Range: {ageRange[0]} - {ageRange[1]}
               </Text>
               <MultiSlider
@@ -225,7 +235,7 @@ export default function ProfileScreen() {
                 containerStyle={{ marginHorizontal: 10 , direction: "ltr"}}
               />
 
-              <Text style={[styles.sliderLabel, { fontFamily: "Prompt-Thin" }]}>
+              <Text style={styles.label}>
                 Maximum Distance: {distance} km
               </Text>
               
@@ -242,16 +252,16 @@ export default function ProfileScreen() {
               />
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={savePref}
+                onPress={saveSearchPref}
               >
-                <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Save</Text>
+                <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.deleteBtn}
               onPress={() => alert("Your account has been deleted.")}
             >
-              <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Delete Account 🗑️</Text>
+              <Text style={styles.deleteText}> Delete Account 🗑️</Text>
             </TouchableOpacity>
           </ScrollView>
         </SafeAreaView>
@@ -285,15 +295,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     color: "white",
+    fontFamily: "Prompt-SemiBold"
   },
   logo: {
     fontSize: 22,
     fontWeight: "bold",
     color: "#DA58B7",
+    // fontFamily: "Prompt-SemiBold"
   },
   avatarContainer: {
     alignItems: "center",
-    marginVertical: 16,
   },
   name: {
     fontSize: 20,
@@ -306,7 +317,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginTop: 24,
     marginBottom: 8,
-    textAlign: "right",
   },
   inputBox: {
     backgroundColor: "rgba(255,255,255,0.2)",
@@ -315,12 +325,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffffff",
     padding: 10,
     borderRadius: 8,
     marginBottom: 12,
     textAlign: "left",
     direction: "ltr",
+    fontFamily: "Prompt-Thin",
+    fontSize: 14,
   },
   option: {
     backgroundColor: "#fff",
@@ -332,20 +344,19 @@ const styles = StyleSheet.create({
     textAlign: "right",
     color: "#333",
   },
-  sliderLabel: {
+  label: {
     fontSize: 16,
     color: "#fff",
-    marginTop: 12,
-    marginBottom: 4,
-    textAlign: "right",
+    marginBottom: 10,
+    fontFamily: "Prompt-Thin"
   },
   deleteBtn: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffffff",
     height: 50,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    marginVertical: 10,
     shadowColor: "#cc6699",
     shadowOpacity: 0.5,
     shadowRadius: 10,
@@ -357,6 +368,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#6a0dad",
     letterSpacing: 1,
+    // fontFamily: "Prompt-Black"
   },
 
   logoImage: {
@@ -367,7 +379,7 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "column",
+    // flexDirection: "column",
   },
   genderGroup: {
     marginBottom: 30,
