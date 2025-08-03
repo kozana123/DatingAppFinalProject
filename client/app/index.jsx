@@ -12,10 +12,18 @@ import {
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
+import { I18nManager } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
+if (I18nManager.isRTL) {
+I18nManager.forceRTL(false);
+// This requires a full app reload
+} 
+
 export default function Index() {
+
+
   const router = useRouter();
   const [fontsLoaded] = useFonts({
     "Prompt-Thin": require("../assets/fonts/Prompt-Thin.ttf"),

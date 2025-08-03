@@ -27,12 +27,10 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import {DataContext} from "../DataContextProvider" 
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from 'react-native-picker-select';
-import { I18nManager } from "react-native";
 
-if (I18nManager.isRTL) {
-  I18nManager.forceRTL(false);
-  // This requires a full app reload
-}
+import {updateUserSearch, updateUserDetails} from '../api';
+
+
 
 
 export default function ProfileScreen() {
@@ -84,15 +82,8 @@ export default function ProfileScreen() {
 
   const onGenderPress = (value) => {
     setGenderIndex(value)
+    setUserPref({...userPref, preferredPartner: genders[value]})
   };
-
-  const saveSearchPref = () =>{
-    setUserPref({...userPref, minAgePreference: ageRange[0], maxAgePreference: ageRange[1], preferredDistanceKm: distance,  preferredPartner: genders[genderIndex]})
-  }
-
-  const saveUser = () =>{
-    
-  }
 
   return (
     <ImageBackground
@@ -159,7 +150,7 @@ export default function ProfileScreen() {
             <Text style={styles.label}>Hieght:</Text>
      
             <RNPickerSelect
-              onValueChange={(value) => setUserPref({...userPref, heightPreferences: value})}
+              onValueChange={(value) => setUserPref({...userPref, heightPreferences: String(value)})}
               items={heightOptions}
               value={userPref.heightPreferences}
               useNativeAndroidPickerStyle={false}
@@ -198,7 +189,7 @@ export default function ProfileScreen() {
 
             <TouchableOpacity
               style={styles.deleteBtn}
-              onPress={saveUser}
+              onPress={() => updateUserDetails(userPref, user.userId)}
             >
               <Text style={styles.deleteText}> Save</Text>
             </TouchableOpacity>
@@ -222,21 +213,21 @@ export default function ProfileScreen() {
                 />
 
               <Text style={styles.label}>
-                Age Range: {ageRange[0]} - {ageRange[1]}
+                Age Range: {userPref.minAgePreference} - {userPref.maxAgePreference}
               </Text>
               <MultiSlider
-                values={ageRange}
+                values={[userPref.minAgePreference, userPref.maxAgePreference]}
                 max={70}
                 min={18}
                 step={1}
-                onValuesChange={setAgeRange}
+                onValuesChange={(val) => setUserPref({...userPref, minAgePreference: val[0], maxAgePreference: val[1]})}
                 selectedStyle={{ backgroundColor: "#DA58B7" }}
                 markerStyle={{ backgroundColor: "#DA58B7" }}
                 containerStyle={{ marginHorizontal: 10 , direction: "ltr"}}
               />
 
               <Text style={styles.label}>
-                Maximum Distance: {distance} km
+                Maximum Distance: {userPref.preferredDistanceKm} km
               </Text>
               
               <Slider
@@ -244,15 +235,15 @@ export default function ProfileScreen() {
                 minimumValue={1}
                 maximumValue={200}
                 step={1}
-                value={distance}
-                onValueChange={(val) => setDistance(val)}
+                value={userPref.preferredDistanceKm}
+                onValueChange={(val) => setUserPref({...userPref, preferredDistanceKm: val})}
                 minimumTrackTintColor="#DA58B7"
                 maximumTrackTintColor="#999"
                 thumbTintColor="#DA58B7"
               />
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={saveSearchPref}
+                onPress={() => updateUserSearch(userPref, user.userId)}
               >
                 <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>
