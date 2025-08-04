@@ -13,6 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useLocalSearchParams } from 'expo-router';
 import SHA256 from "crypto-js/sha256";
+import {checkEmailExists} from '../api';
 
 
 const STAGE_PROGRESS = 60; 
@@ -34,29 +35,32 @@ export default function RegisterPage() {
   };
 
   const handleNext = () => {
-    // if (!newUser.email || !newUser.password || confirmPassword == "") {
-    //   alert("Please fill all fields.");
-    //   return;
-    // }
+    if (!newUser.email || !newUser.password || confirmPassword == "") {
+      alert("Please fill all fields.");
+      return;
+    }
 
-    // if (!validateEmail(newUser.email)) {
-    //   alert("Invalid email format.");
-    //   return;
-    // }
+    if (!validateEmail(newUser.email)) {
+      alert("Invalid email format.");
+      return;
+    }
 
-    // if (newUser.password.length < 6) {
-    //   alert("Password must be at least 6 characters.");
-    //   return;
-    // }
+    if (newUser.password.length < 6) {
+      alert("Password must be at least 6 characters.");
+      return;
+    }
 
-    // if (newUser.password !== confirmPassword) {
-    //   alert("Passwords do not match.");
-    //   return;
-    // }
-   
-    const hashedPassword = SHA256(newUser.password).toString();
-    const updatedUser = { ...newUser, password: hashedPassword };
-    router.push({pathname:"/registerPages/addImage", params: updatedUser})
+    if (newUser.password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+    const pass = checkEmailExists(newUser.email)
+    
+    if(pass){
+      const hashedPassword = SHA256(newUser.password).toString();
+      const updatedUser = { ...newUser, password: hashedPassword };
+      router.push({pathname:"/registerPages/addImage", params: updatedUser})
+    }
   };
 
   return (

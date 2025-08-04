@@ -12,11 +12,13 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
+import {RegisterPreferences} from '../api';
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = width / 4;
 
 export default function BubbleInterests() {
+
   const params = useLocalSearchParams();
   const [userPreference, setUserPreference] = useState(params);
   const [selected, setSelected] = useState([]);
@@ -74,56 +76,56 @@ export default function BubbleInterests() {
     );
   };
 
-  const apiUrl = "http://www.DatingServer.somee.com/api/userpreferences/userPreferences"
+  // const apiUrl = "http://www.DatingServer.somee.com/api/userpreferences/userPreferences"
 
-  const RegisterPreferences = async (prefs) => {
-    // console.log(userPreference);
-    console.log(userPreference);
+  // const RegisterPreferences = async (prefs) => {
+  //   // console.log(userPreference);
+  //   console.log(userPreference);
 
-    const preferences = {
-      userId: userPreference.userId, // Replace with actual user ID
-      preferredPartner: userPreference.genderPreference ,
-      relationshipType: userPreference.interest,
-      heightPreferences: "",
-      religion: "",
-      isSmoker: false,
-      preferredDistanceKm: 30,
-      minAgePreference: 25,
-      maxAgePreference: 35,
-      interests: prefs,
-    };
+  //   const preferences = {
+  //     userId: userPreference.userId, // Replace with actual user ID
+  //     preferredPartner: userPreference.genderPreference ,
+  //     relationshipType: userPreference.interest,
+  //     heightPreferences: "",
+  //     religion: "",
+  //     isSmoker: false,
+  //     preferredDistanceKm: 30,
+  //     minAgePreference: 25,
+  //     maxAgePreference: 35,
+  //     interests: prefs,
+  //   };
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(preferences),
-      });
+  //   try {
+  //     const response = await fetch(apiUrl, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(preferences),
+  //     });
 
-      if (response.status === 204) {
-        console.log("Preferences updated successfully.");
-      } else {
-        const text = await response.text();
-        console.warn("POST failed:",response.status, text);
-      }
-    } catch (error) {
-      console.error("Error sending preferences:", error);
-    }
-  };
+  //     if (response.status === 204) {
+  //       console.log("Preferences updated successfully.");
+  //     } else {
+  //       const text = await response.text();
+  //       console.warn("POST failed:",response.status, text);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error sending preferences:", error);
+  //   }
+  // };
 
   const handleContinue = async () => {
-    if (selected.length === 0) {
-      Alert.alert("Please select at least one interest to continue.");
+    if (selected.length < 5) {
+      Alert.alert("Please select at least 5 interest to continue.");
       return;
     }
     const updatedPrefs = selected.join(",")
 
-    const success = await RegisterPreferences(updatedPrefs);
+    const success = await RegisterPreferences(updatedPrefs, userPreference);
 
     if (success) {
-      // router.push({pathname: "/registerPages/welcomePage",params: prefsToSend,});
+      router.push("/login");
     }
   };
 

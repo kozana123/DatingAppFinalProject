@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Platform,
+  Alert,
 } from "react-native";
 import { Input, Button } from "@rneui/themed";
 import { useRouter } from "expo-router";
@@ -17,12 +18,19 @@ import { LinearGradient } from "expo-linear-gradient";
 const STAGE_PROGRESS = 20;
 
 export default function RegisterUserName() {
-  // const [userName, setUserName] = useState({ name: "" });
+
   const router = useRouter();
   const [newUser, setnewUser] = useState({name: ""});
   console.log(`name page`, newUser.name);
   
-
+  const handleNext = () => {
+    if(newUser.name != ""){
+      router.push({pathname:"/registerPages/personalDetails", params: newUser})
+    }
+    else{
+      alert("Please fill your name")
+    }
+  }
 
   return (
     <ImageBackground
@@ -61,7 +69,7 @@ export default function RegisterUserName() {
               title="Next"
               buttonStyle={styles.buttonStyle}
               titleStyle={styles.buttonTitleStyle}
-              onPress={() => router.push({pathname:"/registerPages/personalDetails", params: newUser})}
+              onPress={handleNext}
             />
           </View>
         </SafeAreaView>

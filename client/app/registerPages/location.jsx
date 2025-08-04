@@ -42,10 +42,7 @@ export default function LocationScreen() {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
-      let address = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
+      let address = await Location.reverseGeocodeAsync({latitude, longitude,});
 
       if (address.length > 0) {
         const place = address[0];    
@@ -53,6 +50,7 @@ export default function LocationScreen() {
 
         setnewUser({...newUser, latitude: latitude, longitude: longitude, city: formattedAddress})
         setCurrentLocation(formattedAddress);
+        alert(`Found your location at: ${formattedAddress}`)
       }
     }
     catch (error) {
@@ -82,6 +80,7 @@ export default function LocationScreen() {
         const formattedAddress = `${place.city}`;
         setnewUser({...newUser, latitude: latitude, longitude: longitude, city: formattedAddress})
         setCurrentLocation(formattedAddress);
+        alert(`Found your location at:${formattedAddress}`)
       }
     } catch (error) {
       alert("Error searching for location: " + error.message);
