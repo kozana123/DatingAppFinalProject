@@ -48,19 +48,25 @@ export default function VideoCall() {
       }
     };
 
-    socket.current.on('initiate-offer', ({ targetId, senderId }) => {
+    socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
       console.log("offer Activate");
       console.log('📨 Sending offer From:',senderId, 'To:', targetId);
-      
-      peerConnection.current.createOffer().then(offer => {
-        peerConnection.current.setLocalDescription(offer);
-        // console.log('📨 Sending offer to', remoteId);
+
+      try {
+        otherUserId.current = targetId;
+        const offer = await peerConnection.current.createOffer();
+        await peerConnection.current.setLocalDescription(offer);
+
         socket.current.emit('offer', {
           targetId: targetId,
           offer: offer,
           senderId: senderId,
         });
-      });
+
+        console.log("📤 Sent offer successfully");
+      } catch (err) {
+        console.error("❌ Failed to send offer:", err);
+      }
     });
 
     socket.current.on('offer', async ({ offer, senderId }) => {
@@ -116,12 +122,12 @@ export default function VideoCall() {
       }
     };
 
-    peerConnection.current.onconnectionstatechange = () => {
-      console.log("📡 Connection state:", peerConnection.current.connectionState);
-      if (peerConnection.current.connectionState === "connected") {
-        console.log("✅ WebRTC connection established!");
-      }
-    };
+    // peerConnection.current.onconnectionstatechange = () => {
+    //   console.log("📡 Connection state:", peerConnection.current.connectionState);
+    //   if (peerConnection.current.connectionState === "connected") {
+    //     console.log("✅ WebRTC connection established!");
+    //   }
+    // };
 
     peerConnection.current.onnegotiationneeded = async () => {
 
@@ -159,36 +165,13 @@ export default function VideoCall() {
       }
 
       // Close peer connection
-      for (const id in peerConnection) {
-        const pc = peerConnection[id];
-        if (pc && typeof pc.close === "function") {
-          pc.close();
-        }
-        console.log("Closed!")
+      if (peerConnection.current) {
+        peerConnection.current.close();
+        peerConnection.current = null;
       }
     };
 
   }, []);
-
-  const startCall = async () => {
-
-    if (!targetIdInput.trim()) {
-      console.warn("Please enter a target ID to call.");
-      return;
-    }
-
-    otherUserId.current = targetIdInput.trim();
-    console.warn("Please enter a Trying to start call.",!targetIdInput.trim());
-
-    const offer = await peerConnection.current.createOffer();
-    await peerConnection.current.setLocalDescription(offer);
-
-    socket.current.emit('offer', {
-      targetId: otherUserId.current,
-      offer,
-      senderId: callerId,
-    });
-  }; 
 
   return (
     <View style={connected ? styles.connectedContainer : styles.searchingContainer}>

@@ -4,6 +4,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import { updateProfileImage } from "./api";
 
 
 
@@ -52,6 +53,7 @@ export default function DataContextProvider(props) {
 
     if (!result.canceled) {
       setUser({...user, profileImage: result.assets[0].uri})
+      updateProfileImage(user.userId, result.assets[0].uri)
     }
   };
 
