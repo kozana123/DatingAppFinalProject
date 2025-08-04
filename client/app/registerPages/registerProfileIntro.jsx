@@ -12,7 +12,7 @@ import {
 import { router, useLocalSearchParams} from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from 'axios';
-import {registerUser} from '../api';
+import {registerUser} from '../../android/libs/api';
 
 export default function ProfileIntro() {
   

@@ -129,6 +129,7 @@ export const updateUserSearch = async (userPref, userId) => {
     if (res.status === 204) {
       console.log("updateUserSearch updated successfully");
     } else {
+      console.log(await res.text());
       const text = await res.text();
       console.warn("Update failed:", text);
     }
@@ -140,7 +141,7 @@ export const updateUserSearch = async (userPref, userId) => {
 
 export const updateUserDetails = async (userPref, userId) => {
   try {
-    console.log("updateUserDetails");
+    
     const res = await fetch(`${apiPreferencesUrl}editUserDetails/${userId}`, {
       method: 'PUT',
       headers: {
@@ -203,6 +204,33 @@ export const updateProfileImage = async (userId, imageUri) => {
     }
   } catch (err) {
     console.error('❌ Error updating image:', err);
+  }
+};
+
+export const updateUserLocation = async (userId, city, latitude, longitude) => {
+  try {
+    const response = await fetch(`${apiUsersUrl}updateLocation/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        city,
+        latitude,
+        longitude,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ Location updated successfully:', data);
+      return data;
+    } else {
+      const errorText = await response.text();
+      console.warn('⚠️ Failed to update location:', errorText);
+    }
+  } catch (error) {
+    console.error('❌ Error updating user location:', error);
   }
 };
 //user pref: {"heightPreferences": "", "interests": "Introvert,Adventurous,Romantic,Traveler,Fitness Lover,Gaming,Cooking,Traveling", "isSmoker": false, "maxAgePreference": 35, "minAgePreference": 24, "preferredDistanceKm": 103, "preferredPartner": "Other", "relationshipType": "love", "religion": "", "userId": 9}

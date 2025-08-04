@@ -33,11 +33,11 @@ import RNPickerSelect from "react-native-picker-select";
 import { updateUserSearch, updateUserDetails } from "../api";
 
 export default function ProfileScreen() {
-  const { user, userPref, setUserPref, setUser, handleImageChoice } =
-    useContext(DataContext);
-  const [modalVisibleRelationship, setModalVisibleRelationship] =
-    useState(false);
+  const { user, userPref, setUserPref, setUser, handleImageChoice, handleSearchLocation, handleUseCurrentLocation } = useContext(DataContext);
+  const [modalVisibleRelationship, setModalVisibleRelationship] = useState(false);
   const [modalVisibleInterests, setModalVisibleInterests] = useState(false);
+  const [modalVisibleLocation, setModalVisibleLocation] = useState(false);
+
   const genders = ["Other", "Female", "Male"];
 
   const religions = [
@@ -145,15 +145,14 @@ export default function ProfileScreen() {
     value: 100 + i,
   }));
 
-  const [ageRange, setAgeRange] = useState([
-    userPref.minAgePreference,
-    userPref.maxAgePreference,
-  ]);
+  const [ageRange, setAgeRange] = useState([userPref.minAgePreference, userPref.maxAgePreference,]);
   const [distance, setDistance] = useState(userPref.preferredDistanceKm);
-
+  const [location, setLocation] = useState("");
+  
   const [genderIndex, setGenderIndex] = useState(
     genders.indexOf(userPref.preferredPartner)
   );
+
   console.log("user pref:", userPref);
   console.log("user:", user);
 
@@ -215,18 +214,12 @@ export default function ProfileScreen() {
                 <Text style={styles.logo}>Luvio</Text>
               </View>
             </View>
-            ,
+            
             <View style={styles.avatarContainer}>
               <Avatar
                 size={120}
                 rounded
-                source={
-                  user && user.profileImage
-                    ? { uri: user.profileImage }
-                    : {
-                        uri: "https://randomuser.me/api/portraits/women/57.jpg",
-                      }
-                }
+                source={ { uri: user.profileImage }}
                 onPress={handleImageChoice}
               >
                 <Avatar.Accessory
@@ -241,32 +234,57 @@ export default function ProfileScreen() {
                 </Text>
               </Text>
             </View>
+
             <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
               Account Settings
             </Text>
+
             <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
               <Text style={styles.label}>Location:</Text>
-              <TouchableOpacity
-                style={styles.option}
-                onPress={() => {
-                  alert("Your discovery has been updated.");
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}
-                  >
+              <TouchableOpacity style={styles.option} onPress={() => { setModalVisibleLocation(!modalVisibleLocation)}}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",}}>
+                  <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}>
                     {user.city}
                   </Text>
                   <MaterialIcons name="my-location" size={24} color="#6a0dad" />
                 </View>
               </TouchableOpacity>
+              <Modal
+                visible={modalVisibleLocation}
+                transparent={true}
+                onRequestClose={() => setModalVisibleLocation(!modalVisibleLocation)}
+              >
+                <View style={styles.modalBackground}>
+                  <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>Set Location</Text>
+                    <TouchableOpacity style={styles.optionLocation} onPress={handleUseCurrentLocation}>
+                      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",}}>
+                        <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Find My Location </Text>
+                        <MaterialIcons name="my-location" size={24} color="#6a0dad" />
+                      </View>
+                    </TouchableOpacity>
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",backgroundColor: "#e7e7e7ff", borderRadius: 8,padding: 12, marginBottom: 12,}}>
+                        <TextInput
+                          value={location}
+                          style={{ color: "#6a0dad" , width: "90%"}}
+                          placeholder="Search City"
+                          placeholderTextColor="#6a0dad7e"
+                          onChangeText={setLocation}
+                        />
+                          <TouchableOpacity onPress={() => {handleSearchLocation(location)}}>
+                            <MaterialIcons name="search" size={22} color="#6a0dad" />
+                          </TouchableOpacity>
+                      </View>
+                    
+                    <TouchableOpacity
+                      style={styles.saveBtn}
+                      onPress={() => setModalVisibleLocation(!modalVisibleLocation)}
+                    >
+                      <Text style={styles.saveBtnText}>Finish</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
 
               <Text style={styles.label}>Email:</Text>
               <TextInput
@@ -416,9 +434,9 @@ export default function ProfileScreen() {
               </View>
 
               <View style={styles.selectedInterestsContainer}>
-                {tempSelectedInterests.length === 0 ? (
+                {tempSelectedInterests.length < 5 ? (
                   <Text style={styles.placeholderText}>
-                    No interests selected
+                    Need atlist 5
                   </Text>
                 ) : (
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -434,7 +452,7 @@ export default function ProfileScreen() {
                 visible={modalVisibleInterests}
                 transparent={true}
                 animationType="slide"
-                onRequestClose={onCloseModal}
+                onRequestClose={() => setModalVisibleInterests(!modalVisibleInterests)}
               >
                 <View style={styles.modalBackground}>
                   <View style={styles.modalContainer}>
@@ -635,10 +653,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
   },
-  optionText: {
-    textAlign: "right",
-    color: "#333",
-  },
   label: {
     fontSize: 16,
     color: "#fff",
@@ -825,5 +839,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  optionLocation: {
+    backgroundColor: "#f5d8f8ff",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: "#000", // הצללה עדינה
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // הצללה באנדרואיד
   },
 });

@@ -179,4 +179,5 @@ dependencies {
         implementation jscFlavor
     }
     implementation project(':react-native-incall-manager')
+    // implementation 'com.google.android.gms:play-services-auth:20.7.0' // or latest
 }

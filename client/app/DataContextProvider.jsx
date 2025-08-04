@@ -4,7 +4,8 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { updateProfileImage } from "./api";
+import { updateProfileImage, updateUserLocation } from "./api";
+import * as Location from "expo-location";
 
 
 
@@ -70,8 +71,67 @@ export default function DataContextProvider(props) {
     }
   };
 
+  const handleUseCurrentLocation = async () => {
+    
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access location was denied");
+      return;
+    }
+    
+    
+    try {
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+      let address = await Location.reverseGeocodeAsync({latitude, longitude,});
+
+      if (address.length > 0) {
+        const place = address[0];    
+        const formattedAddress = `${place.city || ""}`;
+
+        setUser({...user, latitude: latitude, longitude: longitude, city: formattedAddress})
+        alert(`Found your location at: ${formattedAddress}`)
+        updateUserLocation(user.userId, formattedAddress, latitude, longitude)
+      }
+    }
+    catch (error) {
+      alert("Error getting location: " + error.message);
+    }
+  };
+
+  const handleSearchLocation = async (cityName) => {
+    if (!cityName.trim()) {
+      alert("Please enter a city name.");
+      return;
+    }
+    console.log("location search");
+
+    try {
+      const results = await Location.geocodeAsync(cityName);
+      
+      if (results.length === 0) {
+        alert(`City "${cityName}" not found.`);
+        return;
+      }
+
+      const { latitude, longitude } = results[0];
+      const address = await Location.reverseGeocodeAsync({ latitude, longitude });
+
+      if (address.length > 0) {
+        const place = address[0];
+        const formattedAddress = `${place.city}`;
+        setUser({...user, latitude: latitude, longitude: longitude, city: formattedAddress})
+        alert(`Found your location at:${formattedAddress}`)
+        updateUserLocation(user.userId, formattedAddress, latitude, longitude)
+      }
+    } catch (error) {
+      alert("Error searching for location: " + error.message);
+    }
+  };
+
   return (
-    <DataContext.Provider value={{ setUser, setUserPref, handleImageChoice, user, userPref}}>
+    <DataContext.Provider value={{ setUser, setUserPref, handleImageChoice, handleSearchLocation, handleUseCurrentLocation, user, userPref}}>
       {props.children}
     </DataContext.Provider>
   )

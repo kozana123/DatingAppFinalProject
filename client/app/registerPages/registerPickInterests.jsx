@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
-import {RegisterPreferences} from '../api';
+import {RegisterPreferences} from '../../android/libs/api';
 
 const { width } = Dimensions.get("window");
 const CARD_SIZE = width / 4;

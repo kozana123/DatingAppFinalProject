@@ -55,7 +55,7 @@ export default function RegisterPage() {
       return;
     }
     const pass = checkEmailExists(newUser.email)
-    
+
     if(pass){
       const hashedPassword = SHA256(newUser.password).toString();
       const updatedUser = { ...newUser, password: hashedPassword };

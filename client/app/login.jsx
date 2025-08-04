@@ -18,6 +18,7 @@ import SHA256 from "crypto-js/sha256";
 import { DataContext } from "./DataContextProvider";
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 export default function Login() {
   const [userEmail, setUserEmail] = useState("");
@@ -30,7 +31,7 @@ export default function Login() {
     GoogleSignin.configure({
       webClientId:
         "719538565443-ctovkc0i4kmt19n7l4pm7mqvhnshcnnr.apps.googleusercontent.com",
-      offlineAccess: true,
+      offlineAccess: false,
     });
   }, []);
 
@@ -45,10 +46,11 @@ export default function Login() {
         throw new Error("No user info returned from Google Sign-In");
       }
   
-      const user = userInfo.data.user;
-
-      setUser(user);
-      router.navigate("/(tabs)/main");
+      const { user } = userInfo;
+      console.log(user.email);
+      
+      // setUser(user);
+      // router.navigate("/(tabs)/main");
   
     } catch (error) {
       console.error("Google Sign-In Error:", error);
