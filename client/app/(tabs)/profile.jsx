@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -35,7 +35,9 @@ import { updateUserSearch, updateUserDetails } from "../api";
 export default function ProfileScreen() {
   const { user, userPref, setUserPref, setUser, handleImageChoice } =
     useContext(DataContext);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleRelationship, setModalVisibleRelationship] =
+    useState(false);
+  const [modalVisibleInterests, setModalVisibleInterests] = useState(false);
   const genders = ["Other", "Female", "Male"];
 
   const religions = [
@@ -49,7 +51,7 @@ export default function ProfileScreen() {
     { label: "Other", value: "Other" },
   ];
 
-  const interestOptions = [
+  const RelaOptions = [
     {
       key: "love",
       icon: <Ionicons name="heart" size={30} color="#555" />,
@@ -69,10 +71,75 @@ export default function ProfileScreen() {
       subtitle: "Just want to have some fun...",
     },
   ];
-  const selectedItem = interestOptions.find(
-    (item) => item.key === userPref.relationshipType
-  );
 
+
+  const interestsData = [
+    {
+      title: "🧠 Personality",
+      traits: [
+        { label: "Introvert", icon: "🙈" },
+        { label: "Extrovert", icon: "📢" },
+        { label: "Optimistic", icon: "😊" },
+        { label: "Realistic", icon: "🧠" },
+        { label: "Adventurous", icon: "🏞️" },
+        { label: "Romantic", icon: "❤️" },
+        { label: "Creative", icon: "🎨" },
+        { label: "Empathetic", icon: "🤝" },
+        { label: "Funny", icon: "😂" },
+        { label: "Shy", icon: "😔" },
+      ],
+    },
+    {
+      title: "🌿 Lifestyle",
+      traits: [
+        { label: "Early Riser", icon: "🌅" },
+        { label: "Night Owl", icon: "🌙" },
+        { label: "Fitness Lover", icon: "💪" },
+        { label: "Vegan", icon: "🌱" },
+        { label: "Pet Lover", icon: "🐾" },
+        { label: "Traveler", icon: "🌍" },
+        { label: "Bookworm", icon: "📚" },
+      ],
+    },
+    {
+      title: "🎨 Hobbies",
+      traits: [
+        { label: "Painting", icon: "🎨" },
+        { label: "Music", icon: "🎶" },
+        { label: "Photography", icon: "📷" },
+        { label: "Dancing", icon: "💃" },
+        { label: "Cooking", icon: "🍳" },
+        { label: "Reading", icon: "📖" },
+        { label: "Gaming", icon: "🎮" },
+        { label: "Traveling", icon: "✈️" },
+        { label: "Yoga", icon: "🧘‍♀️" },
+        { label: "Sports", icon: "⚽" },
+      ],
+    },
+  ];
+
+  const selectedInterests = userPref?.interests
+    ? userPref.interests.split(",").map((s) => s.trim())
+    : [];
+
+  const [tempSelectedInterests, setTempSelectedInterests] =
+    useState(selectedInterests);
+
+  const toggleInterest = (interest) => {
+    if (tempSelectedInterests.includes(interest)) {
+      setTempSelectedInterests(
+        tempSelectedInterests.filter((i) => i !== interest)
+      );
+    } else {
+      setTempSelectedInterests([...tempSelectedInterests, interest]);
+    }
+  };
+
+  const onCloseModal = () => {
+    const interestsString = tempSelectedInterests.join(", ");
+    setUserPref({ ...userPref, interests: interestsString });
+    setModalVisibleInterests(false);
+  };
   const heightOptions = Array.from({ length: 131 }, (_, i) => ({
     label: `${100 + i} cm`,
     value: 100 + i,
@@ -264,13 +331,13 @@ export default function ProfileScreen() {
                 }}
               />
 
-              <Text style={styles.label}>Interest:</Text>
+              <Text style={styles.label}>Relationship Type:</Text>
               <TouchableOpacity
-                onPress={() => setModalVisible(true)}
+                onPress={() => setModalVisibleRelationship(true)}
                 style={styles.selectorContainer}
               >
                 {(() => {
-                  const selectedItem = interestOptions.find(
+                  const selectedItem = RelaOptions.find(
                     (item) => item.key === userPref.relationshipType
                   );
                   return selectedItem ? (
@@ -281,22 +348,26 @@ export default function ProfileScreen() {
                       </Text>
                     </View>
                   ) : (
-                    <Text style={styles.placeholderText}>Choose interest</Text>
+                    <Text style={styles.placeholderText}>
+                      Choose Relationship Type:
+                    </Text>
                   );
                 })()}
               </TouchableOpacity>
 
               <Modal
-                visible={modalVisible}
+                visible={modalVisibleRelationship}
                 transparent={true}
                 animationType="slide"
-                onRequestClose={() => setModalVisible(false)}
+                onRequestClose={() => setModalVisibleRelationship(false)}
               >
                 <View style={styles.modalBackground}>
                   <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Choose your interest</Text>
+                    <Text style={styles.modalTitle}>
+                      Choose your relationship
+                    </Text>
                     <FlatList
-                      data={interestOptions}
+                      data={RelaOptions}
                       keyExtractor={(item) => item.key}
                       renderItem={({ item }) => (
                         <TouchableOpacity
@@ -310,7 +381,7 @@ export default function ProfileScreen() {
                               ...userPref,
                               relationshipType: item.key,
                             });
-                            setModalVisible(false);
+                            setModalVisibleRelationship(false);
                           }}
                         >
                           <View style={{ marginRight: 12 }}>{item.icon}</View>
@@ -323,6 +394,84 @@ export default function ProfileScreen() {
                         </TouchableOpacity>
                       )}
                     />
+                  </View>
+                </View>
+              </Modal>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}
+              >
+                <Text style={styles.label}>Selected Interests:</Text>
+                <TouchableOpacity
+                  onPress={() => setModalVisibleInterests(true)}
+                  style={{ marginTop: 1 }}
+                >
+                  
+                  <FontAwesome name="pencil" size={20} color="#ffffff" marginLeft={10} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.selectedInterestsContainer}>
+                {tempSelectedInterests.length === 0 ? (
+                  <Text style={styles.placeholderText}>
+                    No interests selected
+                  </Text>
+                ) : (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {tempSelectedInterests.map((interest) => (
+                      <View key={interest} style={styles.interestBox}>
+                        <Text style={styles.interestText}>{interest}</Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
+              </View>
+              <Modal
+                visible={modalVisibleInterests}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={onCloseModal}
+              >
+                <View style={styles.modalBackground}>
+                  <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>Choose Interests</Text>
+
+                    <FlatList
+                      style={{ maxHeight: 300 }}
+                      data={interestsData.flatMap(
+                        (category) => category.traits
+                      )}
+                      keyExtractor={(item) => item.label}
+                      renderItem={({ item }) => {
+                        const selected = tempSelectedInterests.includes(
+                          item.label
+                        );
+                        return (
+                          <TouchableOpacity
+                            style={[
+                              styles.traitButton,
+                              selected && styles.traitButtonSelected,
+                            ]}
+                            onPress={() => toggleInterest(item.label)}
+                          >
+                            <Text style={styles.traitText}>
+                              {item.icon} {item.label}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      }}
+                    />
+
+                    <TouchableOpacity
+                      style={styles.saveBtn}
+                      onPress={onCloseModal}
+                    >
+                      <Text style={styles.saveBtnText}>Save</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </Modal>
@@ -569,7 +718,6 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
   },
 
-  
   placeholderText: {
     fontSize: 16,
     color: "#aaa",
@@ -619,5 +767,63 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
     fontFamily: "Prompt-Thin",
+  },
+
+  selectedInterestsContainer: {
+    flexDirection: "row",
+    marginVertical: 10,
+  },
+  interestBox: {
+    backgroundColor: "#ffff",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+  },
+  interestText: {
+    color: "black",
+    fontWeight: "600",
+    fontSize: 14,
+    fontFamily: "Prompt-Thin",
+  },
+  placeholderText: {
+    color: "#aaa",
+    fontStyle: "italic",
+  },
+
+  traitButton: {
+    padding: 10,
+    marginVertical: 4,
+    marginHorizontal: 8,
+    borderRadius: 15,
+    backgroundColor: "#eee",
+    alignItems: "center",
+  
+  },
+  traitButtonSelected: {
+    backgroundColor: "#DA58B7",
+  },
+  traitText: {
+    fontSize: 16,
+      fontFamily:"Prompt-Black"
+  },
+
+  saveBtn: {
+    backgroundColor: "#DA58B7", 
+    paddingVertical: 12, 
+    paddingHorizontal: 25, 
+    borderRadius: 25,
+    alignItems: "center", 
+    marginTop: 15, 
+    shadowColor: "#000", // הצללה עדינה
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // הצללה באנדרואיד
+  },
+  saveBtnText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
