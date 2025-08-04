@@ -15,6 +15,11 @@ import { Input, Button } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
+import {
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
+
 const STAGE_PROGRESS = 20;
 
 export default function RegisterUserName() {
@@ -33,6 +38,7 @@ export default function RegisterUserName() {
   }
 
   return (
+    
     <ImageBackground
       source={require("../../assets/images/design.png")}
       style={styles.backgroundImage}
@@ -95,20 +101,18 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     position: "absolute",
+    top: 80, 
+    left: "10%", 
+    right: "10%", 
     height: 8,
-    width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    alignSelf: "center",
-    marginTop: 210,
-   
-    // flexDirection: "row-reverse", // ← זה השינוי החשוב
+    zIndex: 10, 
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ffffff", 
     borderRadius: 4,
-    // direction: "rtl",
   },
   container: {
     marginHorizontal: 20,
@@ -135,7 +139,8 @@ const styles = StyleSheet.create({
   
   inputContainerStyle: {
     borderBottomWidth: 1.5,
-    borderBottomColor: "#cc66cc",
+
+     borderColor: "#cc66cc"
   },
   inputStyle: {
     fontSize: 18,

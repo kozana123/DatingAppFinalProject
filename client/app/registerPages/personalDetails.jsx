@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -10,21 +10,20 @@ import {
   SafeAreaView,
   Dimensions,
   ScrollView,
+  Alert,
 } from "react-native";
 import { ButtonGroup } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Calendar, CalendarList } from "react-native-calendars";
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from "expo-router";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const STAGE_PROGRESS = 40;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function PersonalDetails() {
-
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
-  console.log(`Date page`, newUser);
 
   const today = new Date();
   const eighteenYearsAgo = new Date(
@@ -32,34 +31,60 @@ export default function PersonalDetails() {
     today.getMonth(),
     today.getDate()
   );
-  const [birthDate, setBirthDate] = useState(eighteenYearsAgo);
-  const [selectedDate, setSelectedDate] = useState(eighteenYearsAgo.toISOString().split("T")[0]);
-  const [isCalendarVisible, setCalendarVisibility] = useState(false);
-  const [genderIndex, setGenderIndex] = useState(null);
-  console.log(eighteenYearsAgo);
-  
+
+  const initialBirthdate = newUser.birthDate
+    ? new Date(newUser.birthDate)
+    : eighteenYearsAgo;
+
+  const [birthDate, setBirthDate] = useState(new Date(2000, 0, 1));
+  const [showPicker, setShowPicker] = useState(false);
+
+  const [genderIndex, setGenderIndex] = useState(
+    newUser.gender ? ["Other", "Female", "Male"].indexOf(newUser.gender) : null
+  );
 
   const genders = ["Other", "Female", "Male"];
 
-  const onDayPress = (day) => {
-    setSelectedDate(day.dateString);
-    const [year, month, dayNum] = day.dateString.split("-");
-    setBirthDate(new Date(year, month - 1, dayNum));
-    setCalendarVisibility(false);
-    setnewUser({ ...newUser, birthDate: day.dateString})
+
+  const isAtLeast18 = (date) => {
+    const now = new Date();
+    const diff = now.getFullYear() - date.getFullYear();
+    if (diff > 18) return true;
+    if (diff === 18) {
+      if (
+        now.getMonth() > date.getMonth() ||
+        (now.getMonth() === date.getMonth() && now.getDate() >= date.getDate())
+      )
+        return true;
+    }
+    return false;
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setShowPicker(Platform.OS === "ios");
+    if (selectedDate) {
+      if (isAtLeast18(selectedDate)) {
+        setBirthDate(selectedDate);
+        setnewUser({ ...newUser, birthDate: selectedDate.toISOString() });
+      } else {
+        Alert.alert("Invalid Date", "You must be at least 18 years old.");
+      }
+    }
   };
 
   const onGenderPress = (value) => {
-    setnewUser({ ...newUser, gender: genders[value]})
-    setGenderIndex(value)
+    setnewUser({ ...newUser, gender: genders[value] });
+    setGenderIndex(value);
   };
 
   const handleNext = () => {
     if (newUser.birthDate && newUser.gender) {
-      router.push({pathname:"/registerPages/registerPassEmail", params: newUser});
+      router.push({
+        pathname: "/registerPages/registerPassEmail",
+        params: newUser,
+      });
     } else {
-      // router.push("/registerPages/registerPassEmail");
-      alert("🛑 Please fill in all fields");
+      Alert.alert("🛑 Please fill in all fields");
     }
   };
 
@@ -74,9 +99,6 @@ export default function PersonalDetails() {
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
-          {/* Progress bar */}
-        
-
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.keyboardAvoidingView}
@@ -86,44 +108,35 @@ export default function PersonalDetails() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-                <View style={styles.progressContainer}>
-            <View
-              style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
-            />
-          </View>
+              <View style={styles.progressContainer}>
+                <View
+                  style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
+                />
+              </View>
               <View style={styles.card}>
                 <Text style={styles.title}>Your Personal Info</Text>
 
                 <Text style={styles.label}>Birth Date</Text>
                 <TouchableOpacity
-                  style={styles.dateButton}
-                  onPress={() => setCalendarVisibility((prev) => !prev)}
+                  style={[
+                    styles.dateInput,
+                    showPicker && { borderColor: "#cc66cc" },
+                  ]}
+                  onPress={() => setShowPicker(true)}
                 >
-                  <Text style={styles.dateButtonText}>
-                    {birthDate.toLocaleDateString("en-US")}
+                  <Text style={styles.dateText}>
+                    {birthDate.toLocaleDateString()}
                   </Text>
                 </TouchableOpacity>
 
-                {isCalendarVisible && (
-                  <View style={styles.calendarWrapper}>
-                    <Calendar
-                      current={selectedDate}
-                      onDayPress={onDayPress}
-                      markedDates={{
-                        [selectedDate]: {
-                          selected: true,
-                          selectedColor: "#cc66cc",
-                        },
-                      }}
-                      maxDate={eighteenYearsAgo.toISOString().split("T")[0]}
-                      theme={{
-                        selectedDayBackgroundColor: "#cc66cc",
-                        todayTextColor: "#cc66cc",
-                        arrowColor: "#cc66cc",
-                      }}
-                      style={styles.calendar}
-                    />
-                  </View>
+                {showPicker && (
+                  <DateTimePicker
+                    value={birthDate}
+                    mode="date"
+                    display="spinner"
+                    maximumDate={eighteenYearsAgo}
+                    onChange={onDateChange}
+                  />
                 )}
 
                 <Text style={styles.label}>Gender</Text>
@@ -131,14 +144,17 @@ export default function PersonalDetails() {
                   buttons={genders}
                   selectedIndex={genderIndex}
                   onPress={onGenderPress}
-                  containerStyle={styles.genderGroup}
+                  containerStyle={[styles.genderGroup, styles.purpleBackground]}
                   buttonStyle={styles.genderButton}
                   selectedButtonStyle={styles.selectedGenderButton}
                   selectedTextStyle={styles.selectedText}
                   textStyle={styles.genderText}
                   innerBorderStyle={{ width: 1 }}
                 />
-                <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+                <TouchableOpacity
+                  style={styles.nextButton}
+                  onPress={handleNext}
+                >
                   <Text style={styles.nextButtonText}>Next</Text>
                 </TouchableOpacity>
               </View>
@@ -161,7 +177,6 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    // paddingTop: Platform.OS === "ios" ? 60 : 30,
     alignContent: "center",
     justifyContent: "center",
   },
@@ -172,7 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: "center",
     marginBottom: 30,
-    // flexDirection: "row-reverse",
+    
   },
   progressBar: {
     height: "100%",
@@ -184,15 +199,18 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center", // הוספה חשובה
+    justifyContent: "center",
     paddingBottom: 40,
   },
-  
   card: {
     marginHorizontal: 20,
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 24,
     padding: 20,
+  },
+  purpleBackground: {
+    
+    borderRadius: 12,
   },
   title: {
     fontSize: 24,
@@ -210,61 +228,53 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
     textAlign: "left",
     direction: "ltr",
+    
+   
   },
-  dateButton: {
-    backgroundColor: "#fff",
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#cc66cc",
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 10,
-    marginBottom: 16,
-    direction: "ltr",
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: "#333",
-    fontFamily: "Prompt-Thin",
-    textAlign: "left",
-  },
-  calendarWrapper: {
-    alignItems: "center",
-    justifyContent: "center",
     marginBottom: 20,
-    borderRadius: 12,
-    overflow: "hidden",
-    direction: "ltr",
+    backgroundColor: "transparent",
   },
-  calendar: {
-    width: SCREEN_WIDTH * 0.85,
-    borderRadius: 12,
-    direction: "ltr",
+  dateText: {
+    fontSize: 18,
+    color: "#fff",
+    fontFamily: "Prompt-Thin",
   },
   genderGroup: {
     marginBottom: 30,
     borderRadius: 12,
     backgroundColor: "transparent",
+     borderColor: "#cc66cc"
+    
   },
-  
   genderButton: {
     backgroundColor: "transparent",
+     borderColor: "#cc66cc",
   },
   selectedGenderButton: {
+     borderColor: "#cc66cc",
     backgroundColor: "#cc66cc",
   },
   selectedText: {
     color: "#fff",
     fontWeight: "bold",
     fontFamily: "Prompt-Thin",
+     borderColor: "#cc66cc"
   },
   genderText: {
     color: "#eee",
     fontSize: 14,
-    fontFamily: "Prompt-Thin",
-
+    fontFamily: "Prompt-Black",
+     borderColor: "#cc66cc"
   },
   nextButton: {
     backgroundColor: "#ffffff",
     height: 50,
-    // width: "300",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
