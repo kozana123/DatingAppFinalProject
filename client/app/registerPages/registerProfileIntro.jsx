@@ -12,6 +12,7 @@ import {
 import { router, useLocalSearchParams} from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from 'axios';
+import {registerUser} from '../api';
 
 export default function ProfileIntro() {
   
@@ -19,50 +20,50 @@ export default function ProfileIntro() {
   const [newUser, setnewUser] = useState(params);
   console.log(`Intro page`, newUser);
 
-  const apiUrl = "http://www.DatingServer.somee.com/api/users/register"
+  // const apiUrl = "http://www.DatingServer.somee.com/api/users/register"
 
-  const registerUser = async () => {
-    const formData = new FormData();
-    console.log("Register Run");
+  // const registerUser = async () => {
+  //   const formData = new FormData();
+  //   console.log("Register Run");
 
-    // Append all text fields
-    formData.append('UserName', newUser.name);
-    formData.append('UserEmail', newUser.email);
-    formData.append('UserPassword', newUser.password);
-    formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
-    formData.append('Gender', newUser.gender);
-    formData.append('City', newUser.city);
-    formData.append('Latitude', newUser.latitude.toString());
-    formData.append('Longitude', newUser.longitude.toString());
+  //   // Append all text fields
+  //   formData.append('UserName', newUser.name);
+  //   formData.append('UserEmail', newUser.email);
+  //   formData.append('UserPassword', newUser.password);
+  //   formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
+  //   formData.append('Gender', newUser.gender);
+  //   formData.append('City', newUser.city);
+  //   formData.append('Latitude', newUser.latitude.toString());
+  //   formData.append('Longitude', newUser.longitude.toString());
 
-    // Append the image
-    const uriParts = newUser.image.split('.');
-    const fileType = uriParts[uriParts.length - 1];
+  //   // Append the image
+  //   const uriParts = newUser.image.split('.');
+  //   const fileType = uriParts[uriParts.length - 1];
     
     
 
-    formData.append('ProfileImageFile', {
-      uri: newUser.image,
-      name: `profile.${fileType}`,
-      type: `image/${fileType}`
-    });
+  //   formData.append('ProfileImageFile', {
+  //     uri: newUser.image,
+  //     name: `profile.${fileType}`,
+  //     type: `image/${fileType}`
+  //   });
 
-    try {
-      const response = await axios.post(apiUrl, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+  //   try {
+  //     const response = await axios.post(apiUrl, formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //     });
 
-      console.log('Registration successful:', response.data);
-      const userId = {userId: response.data.userId}
+  //     console.log('Registration successful:', response.data);
+  //     const userId = {userId: response.data.userId}
       
-      router.push({pathname:"/registerPages/registerIntrest", params: userId})
+  //     router.push({pathname:"/registerPages/registerIntrest", params: userId})
 
-    } catch (error) {
-      console.error('Registration failed:', error.response?.data || error.message);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('Registration failed:', error.response?.data || error.message);
+  //   }
+  // };
 
   return (
     <ImageBackground
@@ -101,7 +102,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={registerUser}
+              onPress={() => registerUser(newUser)}
             >
               {/* () => router.push("/registerPages/registerIntrest") */}
               <Text style={styles.continueButtonText}>Let's Do It</Text>

@@ -1,6 +1,108 @@
-
+import { router } from "expo-router";
+import axios from 'axios';
 
 const apiPreferencesUrl = "http://www.DatingServer.somee.com/api/userpreferences/"
+const apiUsersUrl = "http://www.DatingServer.somee.com/api/users/"
+
+
+export const checkEmailExists = async (email) => {
+  try {
+    const res = await fetch(`${apiUsersUrl}check-email?email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+    console.log(res);
+    
+    if (data.exists) {
+      alert("Email already registered");
+    } else {
+      console.log("Email is available");
+      return !data.exists
+    }
+  } catch (err) {
+    console.error("Email check failed:", err);
+  }
+  
+};
+
+
+export const registerUser = async (newUser) => {
+  const formData = new FormData();
+  console.log("Register Run");
+
+  // Append all text fields
+  formData.append('UserName', newUser.name);
+  formData.append('UserEmail', newUser.email);
+  formData.append('UserPassword', newUser.password);
+  formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
+  formData.append('Gender', newUser.gender);
+  formData.append('City', newUser.city);
+  formData.append('Latitude', newUser.latitude.toString());
+  formData.append('Longitude', newUser.longitude.toString());
+
+  // Append the image
+  const uriParts = newUser.image.split('.');
+  const fileType = uriParts[uriParts.length - 1];
+  
+  
+
+  formData.append('ProfileImageFile', {
+    uri: newUser.image,
+    name: `profile.${fileType}`,
+    type: `image/${fileType}`
+  });
+
+  try {
+    const response = await axios.post(apiUsersUrl+"register", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    console.log('Registration successful:', response.data);
+    const userId = {userId: response.data.userId}
+    
+    router.push({pathname:"/registerPages/registerIntrest", params: userId})
+
+  } catch (error) {
+    console.error('Registration failed:', error.response?.data || error.message);
+  }
+};
+
+export const RegisterPreferences = async (prefs, userPreference) => {
+    console.log(userPreference);
+
+    const preferences = {
+      userId: userPreference.userId, // Replace with actual user ID
+      preferredPartner: userPreference.genderPreference ,
+      relationshipType: userPreference.interest,
+      heightPreferences: "",
+      religion: "",
+      isSmoker: false,
+      preferredDistanceKm: 30,
+      minAgePreference: 25,
+      maxAgePreference: 35,
+      interests: prefs,
+    };
+
+    try {
+      const response = await fetch(`${apiPreferencesUrl}userPreferences`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferences),
+      });
+
+      if (response.status === 204) {
+        console.log("Preferences updated successfully.");
+        router.push("/login")
+      } else {
+        const text = await response.text();
+        console.warn("POST failed:",response.status, text);
+      }
+    } catch (error) {
+      console.error("Error sending preferences:", error);
+    }
+  };
 
 export const updateUserSearch = async (userPref, userId) => {
   try {

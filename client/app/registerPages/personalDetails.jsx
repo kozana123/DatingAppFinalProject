@@ -14,7 +14,7 @@ import {
 import { ButtonGroup } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Calendar } from "react-native-calendars";
+import { Calendar, CalendarList } from "react-native-calendars";
 import { useLocalSearchParams } from 'expo-router';
 
 const STAGE_PROGRESS = 40;
@@ -26,11 +26,18 @@ export default function PersonalDetails() {
   const [newUser, setnewUser] = useState(params);
   console.log(`Date page`, newUser);
 
-
-  const [birthDate, setBirthDate] = useState(new Date(1990, 0, 1));
-  const [selectedDate, setSelectedDate] = useState("1990-01-01");
+  const today = new Date();
+  const eighteenYearsAgo = new Date(
+    today.getFullYear() - 18,
+    today.getMonth(),
+    today.getDate()
+  );
+  const [birthDate, setBirthDate] = useState(eighteenYearsAgo);
+  const [selectedDate, setSelectedDate] = useState(eighteenYearsAgo.toISOString().split("T")[0]);
   const [isCalendarVisible, setCalendarVisibility] = useState(false);
   const [genderIndex, setGenderIndex] = useState(null);
+  console.log(eighteenYearsAgo);
+  
 
   const genders = ["Other", "Female", "Male"];
 
@@ -51,10 +58,8 @@ export default function PersonalDetails() {
     if (newUser.birthDate && newUser.gender) {
       router.push({pathname:"/registerPages/registerPassEmail", params: newUser});
     } else {
-      console.log("this run");
-      
-      router.push("/registerPages/registerPassEmail");
-      // alert("🛑 Please fill in all fields");
+      // router.push("/registerPages/registerPassEmail");
+      alert("🛑 Please fill in all fields");
     }
   };
 
@@ -110,6 +115,7 @@ export default function PersonalDetails() {
                           selectedColor: "#cc66cc",
                         },
                       }}
+                      maxDate={eighteenYearsAgo.toISOString().split("T")[0]}
                       theme={{
                         selectedDayBackgroundColor: "#cc66cc",
                         todayTextColor: "#cc66cc",
