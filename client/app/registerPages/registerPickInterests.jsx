@@ -121,9 +121,10 @@ export default function BubbleInterests() {
     const updatedPrefs = selected.join(",")
 
     const success = await RegisterPreferences(updatedPrefs);
+    console.log(success == true? "Preferences sent successfully." : "Failed to send preferences.");
 
     if (success) {
-      // router.push({pathname: "/registerPages/welcomePage",params: prefsToSend,});
+      router.push({pathname: "/registerPages/welcomePage",params: prefsToSend,});
     }
   };
 

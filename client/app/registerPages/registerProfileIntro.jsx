@@ -76,7 +76,7 @@ export default function ProfileIntro() {
       >
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.card}>
-            {/* לוגו עם ראשים */}
+          
             <View style={styles.logoContainer}>
               <View style={styles.headLeft} />
               <Image
@@ -133,10 +133,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
     alignItems: "center",
-    paddingVertical: 40,       // יותר מרווח אנכי
-    paddingHorizontal: 20,     // כמו בשאר
-    width: "100%",             // תופס את כל הרוחב הנתון
-    maxWidth: 400,             // כדי שלא יתפרש יותר מדי במסכים רחבים
+    paddingVertical: 40,       
+    paddingHorizontal: 20,    
+    width: "100%",            
+    maxWidth: 400,             
     alignItems: "center",
   },
   progressContainer: {

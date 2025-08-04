@@ -11,9 +11,11 @@ import {
   ActivityIndicator,
   Image,
   Alert,
+  Modal,
   FlatList,
-  Switch 
+  Switch,
 } from "react-native";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import Slider from "@react-native-community/slider";
 import { Avatar } from "@rneui/themed";
@@ -24,38 +26,67 @@ import MultiSlider from "@ptomasroos/react-native-multi-slider";
 import { useFonts } from "expo-font";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
-import {DataContext} from "../DataContextProvider" 
+import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
-import RNPickerSelect from 'react-native-picker-select';
+import RNPickerSelect from "react-native-picker-select";
 
-import {updateUserSearch, updateUserDetails} from '../api';
-
-
-
+import { updateUserSearch, updateUserDetails } from "../api";
 
 export default function ProfileScreen() {
-  const { user, userPref, setUserPref, setUser, handleImageChoice } = useContext(DataContext);
+  const { user, userPref, setUserPref, setUser, handleImageChoice } =
+    useContext(DataContext);
+  const [modalVisible, setModalVisible] = useState(false);
   const genders = ["Other", "Female", "Male"];
 
   const religions = [
-  { label: "Atheist", value: "Atheist" },
-  { label: "Spiritual", value: "Spiritual" },
-  { label: "Jewish", value: "Jewish" },
-  { label: "Christian", value: "Christian" },
-  { label: "Muslim", value: "Muslim" },
-  { label: "Hindu", value: "Hindu" },
-  { label: "Buddhist", value: "Buddhist" },
-  { label: "Other", value: "Other" },
-];
+    { label: "Atheist", value: "Atheist" },
+    { label: "Spiritual", value: "Spiritual" },
+    { label: "Jewish", value: "Jewish" },
+    { label: "Christian", value: "Christian" },
+    { label: "Muslim", value: "Muslim" },
+    { label: "Hindu", value: "Hindu" },
+    { label: "Buddhist", value: "Buddhist" },
+    { label: "Other", value: "Other" },
+  ];
+
+  const interestOptions = [
+    {
+      key: "love",
+      icon: <Ionicons name="heart" size={30} color="#555" />,
+      title: "Find love",
+      subtitle: "I want to find a relationship.",
+    },
+    {
+      key: "chat",
+      icon: <MaterialCommunityIcons name="chat" size={30} color="#555" />,
+      title: "Just chatting",
+      subtitle: "Let’s start with chatting, then we’ll see.",
+    },
+    {
+      key: "casual",
+      icon: <FontAwesome5 name="glass-martini-alt" size={30} color="#555" />,
+      title: "Something casual",
+      subtitle: "Just want to have some fun...",
+    },
+  ];
+  const selectedItem = interestOptions.find(
+    (item) => item.key === userPref.relationshipType
+  );
+
   const heightOptions = Array.from({ length: 131 }, (_, i) => ({
     label: `${100 + i} cm`,
     value: 100 + i,
   }));
 
-  const [ageRange, setAgeRange] = useState([userPref.minAgePreference, userPref.maxAgePreference]);
+  const [ageRange, setAgeRange] = useState([
+    userPref.minAgePreference,
+    userPref.maxAgePreference,
+  ]);
   const [distance, setDistance] = useState(userPref.preferredDistanceKm);
- 
-  const [genderIndex, setGenderIndex] = useState(genders.indexOf(userPref.preferredPartner));
+
+  const [genderIndex, setGenderIndex] = useState(
+    genders.indexOf(userPref.preferredPartner)
+  );
   console.log("user pref:", userPref);
   console.log("user:", user);
 
@@ -66,7 +97,13 @@ export default function ProfileScreen() {
   });
 
   if (!fontsLoaded) {
-    return <ActivityIndicator size="large" color="#DA58B7" style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#DA58B7"
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      />
+    );
   }
 
   const getAge = (birthDateString) => {
@@ -81,8 +118,8 @@ export default function ProfileScreen() {
   };
 
   const onGenderPress = (value) => {
-    setGenderIndex(value)
-    setUserPref({...userPref, preferredPartner: genders[value]})
+    setGenderIndex(value);
+    setUserPref({ ...userPref, preferredPartner: genders[value] });
   };
 
   return (
@@ -99,144 +136,257 @@ export default function ProfileScreen() {
       >
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.header}>
-            {/* <Text style={styles.title}>Profile</Text> */}
+            <View style={styles.header}>
+              {/* <Text style={styles.title}>Profile</Text> */}
 
-            <View style={styles.logoContainer}>
-              <Image
-                source={require("../../assets/images/AppLogo.png")}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-              <Text style={styles.logo}>Luvio</Text>
-            </View>
-          </View>
-
-          <View style={styles.avatarContainer} >
-            <Avatar
-              size={120}
-              rounded
-              source={user && user.profileImage ? { uri: user.profileImage} : {uri: "https://randomuser.me/api/portraits/women/57.jpg"}}
-              onPress={handleImageChoice}
-            >
-              <Avatar.Accessory
-                size={26}
-                style={{ backgroundColor: "#DA58B7" }}
-              />
-            </Avatar>
-            <Text style={[styles.name, { fontFamily: "Prompt-Thin" }]}>{user.userName} {getAge(user.birthDate)}</Text>
-          </View>
-
-          <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>Account Settings</Text>
-          <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-
-            <Text style={styles.label}>Location:</Text>
-            <TouchableOpacity
-              style={styles.option}
-              onPress={() => {alert("Your discovery has been updated.");}}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Text style={[styles.deleteText, { fontFamily: "Prompt-Black"}]}>{user.city}</Text>
-                <MaterialIcons name="my-location" size={24} color="#6a0dad" />
-              </View>
-            </TouchableOpacity>
-
-            <Text style={styles.label}>Email:</Text>
-            <TextInput
-              style={[styles.input, {color:"#9c9c9cff" }]}
-              value = {user.userEmail}
-              editable={false}
-            />
-            <Text style={styles.label}>Hieght:</Text>
-     
-            <RNPickerSelect
-              onValueChange={(value) => setUserPref({...userPref, heightPreferences: String(value)})}
-              items={heightOptions}
-              value={userPref.heightPreferences}
-              useNativeAndroidPickerStyle={false}
-              placeholder={{ label: 'Choose height', value: null }}
-              style={{
-                inputAndroid: styles.input,
-                placeholder: { color: '#000000ff' },
-              }}
-            />
-
-            
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginVertical: 10,}}>
-              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>Smoking:</Text>
-              <Switch
-                value={userPref.isSmoker}
-                onValueChange={(value) => setUserPref({...userPref, isSmoker: value})}
-                thumbColor={userPref.isSmoker ? "#DA58B7" : "#ccc"}
-                trackColor={{ true: "#f2add9", false: "#ccc" }}
-                style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.2 }], marginRight:20,}}
-              />
-            </View>
-
-            <Text style={styles.label}>Religion:</Text>
-     
-            <RNPickerSelect
-              onValueChange={(value) => setUserPref({...userPref, religion: value})}
-              items={religions}
-              value={userPref.religion}
-              useNativeAndroidPickerStyle={false}
-              placeholder={{ label: 'Choose Religion', value: null }}
-              style={{
-                inputAndroid: styles.input,
-                placeholder: { color: '#000000ff' },
-              }}
-            />
-
-            <TouchableOpacity
-              style={styles.deleteBtn}
-              onPress={() => updateUserDetails(userPref, user.userId)}
-            >
-              <Text style={styles.deleteText}> Save</Text>
-            </TouchableOpacity>
-
-          </View>
-
-            <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>Discovery Settings</Text>
-            <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-          
-              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>Gender</Text>
-                <ButtonGroup
-                  buttons={genders}
-                  selectedIndex={genderIndex}
-                  onPress={onGenderPress}
-                  containerStyle={styles.genderGroup}
-                  buttonStyle={styles.genderButton}
-                  selectedButtonStyle={styles.selectedGenderButton}
-                  selectedTextStyle={styles.selectedText}
-                  textStyle={styles.genderText}
-                  innerBorderStyle={{ width: 1 }}
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require("../../assets/images/AppLogo.png")}
+                  style={styles.logoImage}
+                  resizeMode="contain"
                 />
+                <Text style={styles.logo}>Luvio</Text>
+              </View>
+            </View>
+            ,
+            <View style={styles.avatarContainer}>
+              <Avatar
+                size={120}
+                rounded
+                source={
+                  user && user.profileImage
+                    ? { uri: user.profileImage }
+                    : {
+                        uri: "https://randomuser.me/api/portraits/women/57.jpg",
+                      }
+                }
+                onPress={handleImageChoice}
+              >
+                <Avatar.Accessory
+                  size={26}
+                  style={{ backgroundColor: "#DA58B7" }}
+                />
+              </Avatar>
+              <Text style={[styles.name, { fontFamily: "Prompt-SemiBold" }]}>
+                {user.userName},{" "}
+                <Text style={[styles.birthDate, { fontFamily: "Prompt-Thin" }]}>
+                  {getAge(user.birthDate)}
+                </Text>
+              </Text>
+            </View>
+            <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
+              Account Settings
+            </Text>
+            <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
+              <Text style={styles.label}>Location:</Text>
+              <TouchableOpacity
+                style={styles.option}
+                onPress={() => {
+                  alert("Your discovery has been updated.");
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}
+                  >
+                    {user.city}
+                  </Text>
+                  <MaterialIcons name="my-location" size={24} color="#6a0dad" />
+                </View>
+              </TouchableOpacity>
+
+              <Text style={styles.label}>Email:</Text>
+              <TextInput
+                style={[styles.input, { color: "#9c9c9cff" }]}
+                value={user.userEmail}
+                editable={false}
+              />
+              <Text style={styles.label}>Hieght:</Text>
+
+              <RNPickerSelect
+                onValueChange={(value) =>
+                  setUserPref({ ...userPref, heightPreferences: String(value) })
+                }
+                items={heightOptions}
+                value={userPref.heightPreferences}
+                useNativeAndroidPickerStyle={false}
+                placeholder={{ label: "Choose height", value: null }}
+                style={{
+                  inputAndroid: styles.input,
+                  placeholder: { color: "#000000ff" },
+                }}
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginVertical: 10,
+                }}
+              >
+                <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
+                  Smoking:
+                </Text>
+                <Switch
+                  value={userPref.isSmoker}
+                  onValueChange={(value) =>
+                    setUserPref({ ...userPref, isSmoker: value })
+                  }
+                  thumbColor={userPref.isSmoker ? "#DA58B7" : "#ccc"}
+                  trackColor={{ true: "#f2add9", false: "#ccc" }}
+                  style={{
+                    transform: [{ scaleX: 1.3 }, { scaleY: 1.2 }],
+                    marginRight: 20,
+                  }}
+                />
+              </View>
+
+              <Text style={styles.label}>Religion:</Text>
+
+              <RNPickerSelect
+                onValueChange={(value) =>
+                  setUserPref({ ...userPref, religion: value })
+                }
+                items={religions}
+                value={userPref.religion}
+                useNativeAndroidPickerStyle={false}
+                placeholder={{ label: "Choose Religion", value: null }}
+                style={{
+                  inputAndroid: styles.input,
+                  placeholder: { color: "#000000ff" },
+                }}
+              />
+
+              <Text style={styles.label}>Interest:</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(true)}
+                style={styles.selectorContainer}
+              >
+                {(() => {
+                  const selectedItem = interestOptions.find(
+                    (item) => item.key === userPref.relationshipType
+                  );
+                  return selectedItem ? (
+                    <View style={styles.selectedItemContainer}>
+                      <View style={{ marginLeft: 8 }}>{selectedItem.icon}</View>
+                      <Text style={styles.selectedItemText}>
+                        {selectedItem.title}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.placeholderText}>Choose interest</Text>
+                  );
+                })()}
+              </TouchableOpacity>
+
+              <Modal
+                visible={modalVisible}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.modalBackground}>
+                  <View style={styles.modalContainer}>
+                    <Text style={styles.modalTitle}>Choose your interest</Text>
+                    <FlatList
+                      data={interestOptions}
+                      keyExtractor={(item) => item.key}
+                      renderItem={({ item }) => (
+                        <TouchableOpacity
+                          style={[
+                            styles.optionItem,
+                            item.key === userPref.relationshipType &&
+                              styles.optionItemSelected,
+                          ]}
+                          onPress={() => {
+                            setUserPref({
+                              ...userPref,
+                              relationshipType: item.key,
+                            });
+                            setModalVisible(false);
+                          }}
+                        >
+                          <View style={{ marginRight: 12 }}>{item.icon}</View>
+                          <View>
+                            <Text style={styles.optionTitle}>{item.title}</Text>
+                            <Text style={styles.optionSubtitle}>
+                              {item.subtitle}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      )}
+                    />
+                  </View>
+                </View>
+              </Modal>
+
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => updateUserDetails(userPref, user.userId)}
+              >
+                <Text style={styles.deleteText}> Save</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
+              Discovery Settings
+            </Text>
+            <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
+              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
+                Gender
+              </Text>
+              <ButtonGroup
+                buttons={genders}
+                selectedIndex={genderIndex}
+                onPress={onGenderPress}
+                containerStyle={styles.genderGroup}
+                buttonStyle={styles.genderButton}
+                selectedButtonStyle={styles.selectedGenderButton}
+                selectedTextStyle={styles.selectedText}
+                textStyle={styles.genderText}
+                innerBorderStyle={{ width: 1 }}
+              />
 
               <Text style={styles.label}>
-                Age Range: {userPref.minAgePreference} - {userPref.maxAgePreference}
+                Age Range: {userPref.minAgePreference} -{" "}
+                {userPref.maxAgePreference}
               </Text>
               <MultiSlider
                 values={[userPref.minAgePreference, userPref.maxAgePreference]}
                 max={70}
                 min={18}
                 step={1}
-                onValuesChange={(val) => setUserPref({...userPref, minAgePreference: val[0], maxAgePreference: val[1]})}
+                onValuesChange={(val) =>
+                  setUserPref({
+                    ...userPref,
+                    minAgePreference: val[0],
+                    maxAgePreference: val[1],
+                  })
+                }
                 selectedStyle={{ backgroundColor: "#DA58B7" }}
                 markerStyle={{ backgroundColor: "#DA58B7" }}
-                containerStyle={{ marginHorizontal: 10 , direction: "ltr"}}
+                containerStyle={{ marginHorizontal: 10, direction: "ltr" }}
               />
 
               <Text style={styles.label}>
                 Maximum Distance: {userPref.preferredDistanceKm} km
               </Text>
-              
+
               <Slider
-                style={{ width: "100%", height: 40}}
+                style={{ width: "100%", height: 40 }}
                 minimumValue={1}
                 maximumValue={200}
                 step={1}
                 value={userPref.preferredDistanceKm}
-                onValueChange={(val) => setUserPref({...userPref, preferredDistanceKm: val})}
+                onValueChange={(val) =>
+                  setUserPref({ ...userPref, preferredDistanceKm: val })
+                }
                 minimumTrackTintColor="#DA58B7"
                 maximumTrackTintColor="#999"
                 thumbTintColor="#DA58B7"
@@ -286,7 +436,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     color: "white",
-    fontFamily: "Prompt-SemiBold"
+    fontFamily: "Prompt-SemiBold",
   },
   logo: {
     fontSize: 22,
@@ -298,9 +448,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   name: {
-    fontSize: 20,
+    fontSize: 25,
     color: "white",
     marginTop: 8,
+  },
+  birthDate: {
+    fontSize: 20,
+    color: "white",
+    fontFamily: "Prompt-Thin",
   },
   sectionTitle: {
     fontSize: 18,
@@ -339,7 +494,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     marginBottom: 10,
-    fontFamily: "Prompt-Thin"
+    fontFamily: "Prompt-Thin",
   },
   deleteBtn: {
     backgroundColor: "#ffffffff",
@@ -376,7 +531,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderRadius: 12,
     backgroundColor: "transparent",
-    
   },
   genderButton: {
     backgroundColor: "transparent",
@@ -394,7 +548,76 @@ const styles = StyleSheet.create({
     color: "#eee",
     fontSize: 14,
     fontFamily: "Prompt-Thin",
-
   },
-    
+
+  selectorContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 16,
+  },
+  selectedItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  selectedItemText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "Prompt-Thin",
+  },
+
+  
+  placeholderText: {
+    fontSize: 16,
+    color: "#aaa",
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
+    width: "85%",
+    maxHeight: "70%",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 20,
+    textAlign: "center",
+    fontFamily: "Prompt-Black",
+  },
+  optionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  optionItemSelected: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    fontFamily: "Prompt-Thin",
+  },
+  optionTitle: {
+    fontSize: 16,
+    fontFamily: "Prompt-Black",
+  },
+  optionSubtitle: {
+    fontSize: 12,
+    color: "#666",
+    fontFamily: "Prompt-Thin",
+  },
 });

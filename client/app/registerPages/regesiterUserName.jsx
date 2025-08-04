@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
     alignSelf: "center",
-    marginTop: 30,
-    // marginBottom: 30,
+    marginTop: 210,
+   
     // flexDirection: "row-reverse", // ← זה השינוי החשוב
   },
   progressBar: {
@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     direction: "ltr",
   },
+  
   inputContainerStyle: {
     borderBottomWidth: 1.5,
     borderBottomColor: "#cc66cc",

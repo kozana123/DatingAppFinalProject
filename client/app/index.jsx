@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
 
   signUpContainer: {
-    flexDirection: "row", // שורה אחת לטקסט וכפתור
+    flexDirection: "row",
     alignItems: "center",
     marginTop: 8,
   },

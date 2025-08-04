@@ -6,18 +6,18 @@
     return (
       <Tabs
     screenOptions={{
-      tabBarActiveTintColor: "#F4C2C2", // Baby Pink
-      // צבע ורוד מודגש
-      tabBarInactiveTintColor: "#aaa", // אפור בהיר לטאבים לא פעילים
+      tabBarActiveTintColor: "#F4C2C2", 
+  
+      tabBarInactiveTintColor: "#aaa", 
       headerShown: false,
       tabBarStyle: {
-        backgroundColor: "rgba(58, 54, 54, 0.95)", // רקע כהה עם שקיפות
+        backgroundColor: "rgba(58, 54, 54, 0.95)", 
         position: "absolute",
         bottom: 16,
         left: 16,
         right: 16,
-        elevation: 5, // אנדרואיד צל
-        shadowColor: "#000", // iOS צל
+        elevation: 5, 
+        shadowColor: "#000", 
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,

@@ -1,18 +1,7 @@
 import { useState } from "react";
 import { createContext } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  SafeAreaView,
-  ActivityIndicator,
-  Image,
   Alert,
-  FlatList
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 
