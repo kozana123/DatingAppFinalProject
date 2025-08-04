@@ -169,4 +169,40 @@ export const updateUserDetails = async (userPref, userId) => {
     console.error("Error updating preferences:", err);
   }
 };
+
+export const updateProfileImage = async (userId, imageUri) => {
+  try {
+    const formData = new FormData();
+
+    // Extract the file name from the image URI
+    const fileName = imageUri.split('/').pop();
+    const fileType = fileName.split('.').pop();
+
+    formData.append('userId', userId); // Optional: if the backend needs it
+    formData.append('newImage', {
+      uri: imageUri,
+      type: `image/${fileType}`,
+      name: fileName,
+    });
+
+    const res = await fetch(`${apiUsersUrl}update-profile-image/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    });
+
+    if (res.ok) {
+      const result = await res.json();
+      console.log('✅ Image updated:', result);
+      return result;
+    } else {
+      const errText = await res.text();
+      console.warn('⚠️ Failed to update image:', errText);
+    }
+  } catch (err) {
+    console.error('❌ Error updating image:', err);
+  }
+};
 //user pref: {"heightPreferences": "", "interests": "Introvert,Adventurous,Romantic,Traveler,Fitness Lover,Gaming,Cooking,Traveling", "isSmoker": false, "maxAgePreference": 35, "minAgePreference": 24, "preferredDistanceKm": 103, "preferredPartner": "Other", "relationshipType": "love", "religion": "", "userId": 9}

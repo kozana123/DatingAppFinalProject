@@ -122,10 +122,10 @@ export default function BubbleInterests() {
     }
     const updatedPrefs = selected.join(",")
 
-    const success = await RegisterPreferences(updatedPrefs);
+    const success = await RegisterPreferences(updatedPrefs, userPreference);
 
     if (success) {
-      // router.push({pathname: "/registerPages/welcomePage",params: prefsToSend,});
+      router.push("/login");
     }
   };
 
