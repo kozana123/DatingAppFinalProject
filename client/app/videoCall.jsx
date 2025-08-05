@@ -52,15 +52,27 @@ export default function VideoCall() {
       console.log("offer Activate");
       console.log('📨 Sending offer From:',senderId, 'To:', targetId);
 
+     if (!localStream) {
+        console.warn("⏳ Waiting for local stream before creating offer...");
+        const waitForStream = () => new Promise((resolve) => {
+          const check = () => {
+            if (localStream) return resolve();
+            setTimeout(check, 100);
+          };
+          check();
+        });
+        await waitForStream();
+      }
+
       try {
         otherUserId.current = targetId;
         const offer = await peerConnection.current.createOffer();
         await peerConnection.current.setLocalDescription(offer);
 
         socket.current.emit('offer', {
-          targetId: targetId,
-          offer: offer,
-          senderId: senderId,
+          targetId,
+          offer,
+          senderId,
         });
 
         console.log("📤 Sent offer successfully");
