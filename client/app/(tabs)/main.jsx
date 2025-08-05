@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect, useRef} from "react";
 import {
   View,
   Text,
@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
+  Animated
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 const { width, height } = Dimensions.get("window");
 import {DataContext} from "../DataContextProvider" 
+import { Shadow } from 'react-native-shadow-2';
 
 export default function VideoCallStartScreen() {
   const navigation = useNavigation();
@@ -20,7 +22,28 @@ export default function VideoCallStartScreen() {
   console.log("user pref:", userPref);
   console.log("user:", user);
 
-  
+  const translateY = useRef(new Animated.Value(0)).current;
+   useEffect(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(translateY, {
+            toValue: -10,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }, []);
+
+  // const FloatingBubbleButton = ({ onPress }) => {
+
+   
+  // };
 
   return (
     <ImageBackground
@@ -65,26 +88,19 @@ export default function VideoCallStartScreen() {
           style={styles.avatar}
         />
 
-        {/* כרטיס */}
-        <View style={styles.card}>
-          <Text style={styles.title}>Ready to Connect</Text>
+         <Text style={styles.title}>Ready to Connect</Text>
           <Text style={styles.subtitle}>Tap to start your video chat</Text>
 
           {/* כפתור עגול עם אייקון מצלמה */}
-          <TouchableOpacity style={styles.roundButton} onPress={() => router.navigate("/videoCall")}
-            >
-            <Image
-              source={{
-                uri: "https://cdn-icons-png.flaticon.com/512/727/727245.png",
-              }}
-              style={styles.cameraIcon}
-              
-            />
-            
-          </TouchableOpacity>
-
-          <Text style={styles.startText}>Start</Text>
-        </View>
+          <View style={styles.container}>
+            <View style={styles.shadowEllipse} />
+            <Animated.View style={{ transform: [{ translateY }] }}>
+            {/* Bubble */}
+              <TouchableOpacity style={styles.bubble}  onPress={() => router.navigate("/videoCall")}>
+                <Text style={styles.bubbleText}>Start Call</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
       </LinearGradient>
     </ImageBackground>
   );
@@ -141,7 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "rgba(0,0,0,0.25)",
+    backgroundColor: "rgba(0, 0, 0, 0)",
     borderRadius: 24,
     padding: 30,
     alignItems: "center",
@@ -174,15 +190,36 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 5 },
   },
-  cameraIcon: {
-    width: 32,
-    height: 32,
-    tintColor: "#a02dab",
+  bubble: {
+    width: 170,
+    height: 170,
+    borderRadius: 100,
+    backgroundColor: 'rgba(180, 26, 103, 0.17)', // Transparent pink
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: "rgba(180, 26, 103, 0.29))",
   },
-  startText: {
-    color: "#fff",
-    fontSize: 14,
-    marginTop: 4,
-    fontFamily: "Prompt-Regular",
+  bubbleText: {
+    color: '#ffffffda',
+    fontSize: 20,
+    fontFamily: "Prompt-SemiBold",
+  },
+   shadowEllipse: {
+    position: 'absolute',
+    bottom: -30, // pushes it below the bubble
+    width: 100,
+    height: 50,
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 1,
+    elevation: 18,
+  },
+   container: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
 });
