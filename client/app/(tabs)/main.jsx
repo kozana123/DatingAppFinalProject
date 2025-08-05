@@ -29,13 +29,13 @@ export default function VideoCallStartScreen() {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.6)", "rgba(209,71,163,0.6)"]}
+        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
         style={styles.overlay}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       >
         <View style={styles.header}>
-          <View style = {{alignItems:"center", flexDirection: "column", paddingTop: 10,}}>
+          <View style = {{alignItems:"center", flexDirection: "column", paddingTop: 16,}}>
             <View style={styles.logoCircle}>
             <Image
               source={require("../../assets/images/AppLogo.png")}
@@ -47,6 +47,7 @@ export default function VideoCallStartScreen() {
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate("profile")}
+            style = {{paddingRight: 10}}
           >
             <Image
               source={{
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 30,
     alignItems: "center",
-    width: "100%",
+    width: "90%",
   },
   title: {
     fontSize: 26,

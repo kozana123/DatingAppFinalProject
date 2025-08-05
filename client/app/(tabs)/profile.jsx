@@ -587,10 +587,9 @@ const styles = StyleSheet.create({
   },
   gradientOverlay: {
     flex: 1,
-    // padding: 16,
   },
   container: {
-    paddingBottom: 0,
+    paddingBottom: 80,
     padding: 16,
 
   },
