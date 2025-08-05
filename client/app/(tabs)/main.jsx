@@ -14,7 +14,6 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 const { width, height } = Dimensions.get("window");
 import { DataContext } from "../DataContextProvider";
-import { Shadow } from "react-native-shadow-2";
 
 export default function VideoCallStartScreen() {
   const navigation = useNavigation();
@@ -39,10 +38,6 @@ export default function VideoCallStartScreen() {
       ])
     ).start();
   }, []);
-
-  // const FloatingBubbleButton = ({ onPress }) => {
-
-  // };
 
   return (
     <LinearGradient
@@ -102,7 +97,7 @@ export default function VideoCallStartScreen() {
               fontFamily: "Prompt-Thin",
             }}
           >
-            Hello👋{" "}
+            Hello{" "}
           </Text>
           <Text
             style={{
@@ -134,7 +129,7 @@ export default function VideoCallStartScreen() {
                 style={styles.bubble}
                 onPress={() => router.navigate("/videoCall")}
               >
-                <Text style={styles.bubbleText}>Start Call</Text>
+                <Text style={styles.bubbleText}>Start Chat</Text>
               </TouchableOpacity>
             </Animated.View>
           </View>
@@ -151,12 +146,11 @@ const styles = StyleSheet.create({
     backgroundColor: "hsla(0, 11.10%, 7.10%, 0.45)",
     alignItems: "center",
     paddingBottom: 1,
-    backgroundColor: "rgba(0,0,0,0.15)",
-    borderRadius: 29,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    borderBottomEndRadius: 29,
+    borderBottomStartRadius: 29,
+
+    height:"42%"
   },
 
   bottomSection: {
@@ -249,14 +243,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
   },
   bubble: {
-    width: 250,
-    height: 200,
-    borderRadius: 40,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    width: 170,
+    height: 170,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',// Transparent pink
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.15)",
+    borderWidth: 3,
+    borderColor: "rgba(180, 26, 103, 0.15)",
   },
   bubbleText: {
     color: "#ffffffda",

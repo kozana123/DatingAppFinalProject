@@ -33,30 +33,31 @@ export default function VideoCall() {
   const otherUserId = useRef(null);
   const [targetIdInput, setTargetIdInput] = useState('');
   const { user, userPref,} = useContext(DataContext);
-  const [isCallStarted, setIsCallStarted] = useState(false);  
   
 
   const [connected, setConnected] = useState(false);
   console.log("user pref:", userPref);
   console.log("user:", user);
 
-
+  const getAge = (birthDateString) => {
+      const today = new Date();
+      const birthDate = new Date(birthDateString);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    };
   useEffect(() => {
-    const userDetails = {userGender: user.gender, userPref: userPref, }
+    const userInterests = userPref.interests.split(",").map(s => s.trim())
+    console.log(userInterests);
+    
+    const userDetails = {userGender: user.gender, userAge: getAge(user.birthDate), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
     socket.current = io.connect(SIGNALING_SERVER_URL);
 
     socket.current.on('connect', () => {
-    socket.current.emit('register', callerId);
-    });
-
-    peerConnection.current.ontrack = (event) => {
-      const remoteStream = event.streams[0];
-      setRemoteStream(remoteStream);
-      if (remoteStream) {
-        setConnected(true);
-      }
-    };
-    // socket.current.emit('register-test', callerId);
+    // socket.current.emit('register', callerId);
     // });
 
     // peerConnection.current.ontrack = (event) => {
@@ -66,6 +67,16 @@ export default function VideoCall() {
     //     setConnected(true);
     //   }
     // };
+    socket.current.emit('register-test', callerId, userDetails);
+    });
+
+    peerConnection.current.ontrack = (event) => {
+      const remoteStream = event.streams[0];
+      setRemoteStream(remoteStream);
+      if (remoteStream) {
+        setConnected(true);
+      }
+    };
 
     mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
       setLocalStream(stream);
@@ -98,6 +109,7 @@ export default function VideoCall() {
 
     socket.current.on('offer', async ({ offer, senderId }) => {
       try {
+        console.log("📤 Got offer successfully");
         await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
         remoteDescSet.current = true;
         otherUserId.current = senderId;
@@ -125,6 +137,8 @@ export default function VideoCall() {
 
     socket.current.on('ice-candidate', async (data) => {
       try {
+        console.log("GOT ice-candidate---------------------");
+        
         const candidate = new RTCIceCandidate(data.candidate);
 
         if (remoteDescSet.current) {
@@ -139,7 +153,9 @@ export default function VideoCall() {
 
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate && otherUserId.current) {
-        console.log("📤 Sending ICE candidate:", event.candidate);
+        // console.log("📤 otherUserId:", otherUserId.current);
+        
+        console.log("📤 Sending ICE candidate");
         socket.current.emit('ice-candidate', {
           targetId: otherUserId.current,
           candidate: event.candidate,
@@ -149,21 +165,20 @@ export default function VideoCall() {
       }
     };
 
-    peerConnection.current.onconnectionstatechange = () => {
-      
-      const state = peerConnection.current.connectionState;
-      console.log("Peer connection state:", state);
+    // peerConnection.current.onconnectionstatechange = () => {
+    //   const state = peerConnection.current.connectionState;
+    //   console.log("Peer connection state:", state);
 
-      if (state === "connected") {
-        setIsCallStarted(true); // ✅ enable RTCView rendering now
-      }
+    //   if (state === "connected") {
+    //     setIsCallStarted(true); // ✅ enable RTCView rendering now
+    //   }
 
-      if (state === "disconnected" || state === "failed" || state === "closed") {
-        // Optionally clean up here
-        setIsCallStarted(false);
-        console.log("Peer disconnected or failed");
-      }
-    };
+    //   if (state === "disconnected" || state === "failed" || state === "closed") {
+    //     // Optionally clean up here
+    //     setIsCallStarted(false);
+    //     console.log("Peer disconnected or failed");
+    //   }
+    // };
 
     // peerConnection.current.onnegotiationneeded = async () => {
 
