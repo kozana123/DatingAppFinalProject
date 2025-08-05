@@ -34,17 +34,29 @@ export default function VideoCallStartScreen() {
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       >
-        <TouchableOpacity
-          style={styles.settingsBtn}
-          onPress={() => navigation.navigate("profile")}
-        >
-          <Image
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/3524/3524659.png",
-            }}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <View style = {{alignItems:"center", flexDirection: "column", paddingTop: 10,}}>
+            <View style={styles.logoCircle}>
+            <Image
+              source={require("../../assets/images/AppLogo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            </View>
+            <Text style={styles.logo}>Luvio</Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("profile")}
+          >
+            <Image
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/512/3524/3524659.png",
+              }}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        </View>
+        
 
         {/* תמונת פרופיל */}
         <Image
@@ -80,20 +92,39 @@ export default function VideoCallStartScreen() {
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width,
-    height,
   },
   overlay: {
     flex: 1,
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 60,
   },
-  settingsBtn: {
-    position: "absolute",
-    top: 40,
-    left: 20, // כאן הכפתור משמאל
-    zIndex: 10,
+  header: {
+    width:"100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",   
+    paddingHorizontal: 16,
+    // backgroundColor: "#DA58B7",
+  },
+  logo: {
+      fontSize: 22,
+      fontWeight: "bold",
+      color: "#DA58B7",
+  },
+  logoCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 100,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    position: "relative",
+  },
+  logoImage: { 
+    width: 40,
+    height: 40,
   },
   icon: {
     width: 26,

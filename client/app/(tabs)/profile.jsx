@@ -202,16 +202,17 @@ export default function ProfileScreen() {
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
-              {/* <Text style={styles.title}>Profile</Text> */}
-
-              <View style={styles.logoContainer}>
+              <View style = {{alignItems:"center"}}>
+                <View style={styles.logoCircle}>
                 <Image
                   source={require("../../assets/images/AppLogo.png")}
                   style={styles.logoImage}
                   resizeMode="contain"
                 />
+                </View>
                 <Text style={styles.logo}>Luvio</Text>
               </View>
+              
             </View>
             
             <View style={styles.avatarContainer}>
@@ -586,16 +587,18 @@ const styles = StyleSheet.create({
   },
   gradientOverlay: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
   },
   container: {
-    paddingBottom: 80,
+    paddingBottom: 0,
+    padding: 16,
+
   },
   header: {
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
+    // flexDirection: "row-reverse",
+    // justifyContent: "",
+    alignItems: "flex-start",
+    // marginBottom: 16,
   },
   title: {
     fontSize: 28,
@@ -604,12 +607,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "Prompt-SemiBold",
   },
-  logo: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#DA58B7",
-    // fontFamily: "Prompt-SemiBold"
-  },
+  
   avatarContainer: {
     alignItems: "center",
   },
@@ -678,16 +676,27 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     // fontFamily: "Prompt-Black"
   },
-
-  logoImage: {
+  logo: {
+      fontSize: 22,
+      fontWeight: "bold",
+      color: "#DA58B7",
+      // fontFamily: "Prompt-SemiBold"
+  },
+  logoCircle: {
     width: 40,
     height: 40,
-    marginBottom: 4,
-  },
-  logoContainer: {
-    alignItems: "center",
+    borderRadius: 100,
     justifyContent: "center",
-    // flexDirection: "column",
+    alignItems: "center",
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 12,
+    position: "relative",
+  },
+  logoImage: { 
+    width: 40,
+    height: 40,
   },
   genderGroup: {
     marginBottom: 30,
