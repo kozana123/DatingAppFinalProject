@@ -163,7 +163,9 @@ export const updateUserDetails = async (userPref, userId) => {
     if (res.status === 204) {
       console.log("updateUserDetails updated successfully");
     } else {
+      console.log(await res.text());
       const text = await res.text();
+      
       console.warn("Update failed:", text);
     }
   } catch (err) {
