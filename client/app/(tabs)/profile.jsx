@@ -217,7 +217,7 @@ export default function ProfileScreen() {
             
             <View style={styles.avatarContainer}>
               <Avatar
-                size={120}
+                size={140}
                 rounded
                 source={ { uri: user.profileImage }}
                 onPress={handleImageChoice}

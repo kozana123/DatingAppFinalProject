@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
   },
   bubble: {
-    width: 200,
-    height: 140,
+    width: 250,
+    height: 200,
     borderRadius: 40,
     backgroundColor: "rgba(255,255,255,0.15)",
     justifyContent: "center",
