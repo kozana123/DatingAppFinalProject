@@ -30,7 +30,7 @@ io.on('connection', (socket) => {
         break
 
       case "other":
-        femaleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
+        otherUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
         break
     }
 

@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Platform,
   Button,
+  Alert,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -33,51 +34,60 @@ export default function Login() {
   }, []);
 
   const signInWithGoogle = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      await GoogleSignin.signOut(); 
-      const userInfo = await GoogleSignin.signIn();
-      console.log("Full userInfo:", userInfo);
-  
-      if (!userInfo || !userInfo.data || !userInfo.data.user) {
-        throw new Error("No user info returned from Google Sign-In");
-      }
-  
-      const { user } = userInfo;
-      console.log(user.email);
-      
-      setUser(user);
-      router.navigate("/(tabs)/main");
-  
-    } catch (error) {
-      console.error("Google Sign-In Error:", error);
-    }
-  };
-  
-  const handleLogin = () => {
+    await GoogleSignin.hasPlayServices();
+    await GoogleSignin.signOut();
 
-    if (userEmail == "" && password == "") {
-    } else {
-      login();
-    }
-  };
+    const userInfo = await GoogleSignin.signIn();
+    console.log("Full userInfo:", userInfo);
 
-  const login = async () => {
-    const hashedPassword = SHA256(password).toString();
-    const response = await fetch(
-      `http://www.DatingServer.somee.com/api/users/login?email=${userEmail}&password=${hashedPassword}`
+    const user = userInfo.data.user;
+
+    if (!user || !user.email) {
+      throw new Error("No user info returned from Google Sign-In");
+    }
+
+    const email = user.email;
+    const password = "goolePass";
+    // const hashedPassword = SHA256(password).toString();
+
+    const checkResponse = await fetch(
+      `http://www.DatingServer.somee.com/api/users/login?email=${email}&password=${password}`
     );
+    if (checkResponse.status === 200) {
+      const existingUser = await checkResponse.json();
+      console.log("Image page", existingUser);
 
-    if (response.status == 200) {
-      const user = await response.json();
-      setUser(user);
-      getPreferences(user.userId);
-      console.log("Logged in:", user);
-      router.navigate("/(tabs)/main");
+      setUser(existingUser);
+      getPreferences(existingUser.userId);
+      router.push("/(tabs)/main");
+    } else if (checkResponse.status === 404) {
+      Alert.alert(
+        "User Not Found",
+        "This email is not registered in our system."
+      );
+      router.push("/");
     } else {
-      console.warn("Login failed:", await response.text());
+      const errorText = await checkResponse.text();
+      console.warn("Unexpected error checking Google user:", errorText);
     }
   };
+
+    const login = async () => {
+      const hashedPassword = SHA256(password).toString();
+      const response = await fetch(
+        `http://www.DatingServer.somee.com/api/users/login?email=${userEmail}&password=${hashedPassword}`
+      );
+
+      if (response.status == 200) {
+        const user = await response.json();
+        setUser(user);
+        getPreferences(user.userId);
+        console.log("Logged in:", user);
+        router.navigate("/(tabs)/main");
+      } else {
+        console.warn("Login failed:", await response.text());
+      }
+    };
 
   const getPreferences = async (id) => {
     const response = await fetch(
@@ -166,7 +176,7 @@ export default function Login() {
           <TouchableOpacity
             style={styles.signInButton}
             activeOpacity={0.85}
-            onPress={handleLogin}
+            onPress={login}
           >
             <Text style={styles.signInText}>Sign in</Text>
           </TouchableOpacity>
@@ -193,9 +203,8 @@ export default function Login() {
               <Text
                 style={{ marginLeft: 10, color: "#000", fontWeight: "bold" }}
               >
-                Sign in with Google 
+                Sign in with Google
               </Text>
-              
             </TouchableOpacity>
           </View>
         </SafeAreaView>

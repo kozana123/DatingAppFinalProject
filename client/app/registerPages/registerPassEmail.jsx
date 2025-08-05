@@ -11,16 +11,15 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from "expo-router";
 import SHA256 from "crypto-js/sha256";
-import {checkEmailExists} from '../api';
+import { checkEmailExists } from "../api";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
-
-const STAGE_PROGRESS = 60; 
-
+const STAGE_PROGRESS = 60;
 
 export default function RegisterPage() {
-
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
   console.log(`Email page`, newUser);
@@ -32,6 +31,35 @@ export default function RegisterPage() {
   const validateEmail = (email) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signOut();
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Full userInfo:", userInfo);
+
+      if (!userInfo || !userInfo.data || !userInfo.data.user) {
+        throw new Error("No user info returned from Google Sign-In");
+      }
+
+      const user = userInfo.data.user;
+      console.log("user: ", user.email);
+
+      const updatedUser = {
+        ...newUser,  
+        email: user.email,
+        password: "goolePass", 
+      };
+  
+  
+      setnewUser(updatedUser);
+      router.push({ pathname: "/registerPages/addImage", params: updatedUser });
+    
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
+    }
   };
 
   const handleNext = () => {
@@ -54,12 +82,12 @@ export default function RegisterPage() {
       alert("Passwords do not match.");
       return;
     }
-    const pass = checkEmailExists(newUser.email)
+    const pass = checkEmailExists(newUser.email);
 
-    if(pass){
+    if (pass) {
       const hashedPassword = SHA256(newUser.password).toString();
       const updatedUser = { ...newUser, password: hashedPassword };
-      router.push({pathname:"/registerPages/addImage", params: updatedUser})
+      router.push({ pathname: "/registerPages/addImage", params: updatedUser });
     }
   };
 
@@ -77,7 +105,9 @@ export default function RegisterPage() {
       >
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+            <View
+              style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
+            />
           </View>
 
           <View style={styles.container}>
@@ -87,7 +117,7 @@ export default function RegisterPage() {
               placeholder="Email"
               placeholderTextColor="#d8b8e6"
               style={styles.input}
-              onChangeText={(email) => setnewUser({ ...newUser, email: email})}
+              onChangeText={(email) => setnewUser({ ...newUser, email: email })}
               keyboardType="email-address"
               autoCapitalize="none"
               textContentType="emailAddress"
@@ -97,7 +127,9 @@ export default function RegisterPage() {
               placeholder="Password"
               placeholderTextColor="#d8b8e6"
               style={styles.input}
-              onChangeText={(password) => setnewUser({ ...newUser, password: password})}
+              onChangeText={(password) =>
+                setnewUser({ ...newUser, password: password })
+              }
               secureTextEntry
               autoCapitalize="none"
               textContentType="newPassword"
@@ -112,6 +144,32 @@ export default function RegisterPage() {
               autoCapitalize="none"
               textContentType="password"
             />
+            <View style={styles.dividerContainer}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>Or continue with</Text>
+              <View style={styles.divider} />
+            </View>
+
+            <View style={styles.socialContainer}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  backgroundColor: "#fff",
+                  padding: 12,
+                  borderRadius: 24,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                onPress={signInWithGoogle}
+              >
+                <FontAwesome name="google" size={24} color="#ea4335" />
+                <Text
+                  style={{ marginLeft: 10, color: "#000", fontWeight: "bold" }}
+                >
+                  Sign in with Google
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity
               style={styles.button}
@@ -167,7 +225,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     fontFamily: "Prompt-SemiBold",
     textAlign: "left",
-    direction:"ltr",
+    direction: "ltr",
   },
   input: {
     borderBottomWidth: 1.5,
@@ -199,4 +257,26 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
+
+
+dividerContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginVertical: 24,
+},
+divider: {
+  flex: 1,
+  height: 1,
+  backgroundColor: "#d8b8e6",
+},
+dividerText: {
+  marginHorizontal: 12,
+  color: "#d8b8e6",
+  fontSize: 14,
+},
+socialContainer: {
+  alignItems: "center",
+  marginBottom: 20,
+},
+
 });
