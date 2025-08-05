@@ -10,7 +10,7 @@ import {
   RTCSessionDescription
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
-const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
 // const SIGNALING_SERVER_URL = 'http://10.0.0.5:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
@@ -220,15 +220,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   localVideo: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width,
-    height,
-    zIndex: 0,
-  },
-  remoteVideo: {
-    position: 'absolute',
+   position: 'absolute',
     width: 120,
     height: 180,
     bottom: 20,
@@ -236,6 +228,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     zIndex: 1,
+  },
+  remoteVideo: {
+     position: 'absolute',
+    top: 0,
+    left: 0,
+    width,
+    height,
+    zIndex: 0,
   },
   searchingContent: {
     alignItems: 'center',
