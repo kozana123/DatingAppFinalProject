@@ -262,7 +262,7 @@ export default function ProfileScreen() {
                         <MaterialIcons name="my-location" size={24} color="#6a0dad" />
                       </View>
                     </TouchableOpacity>
-                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",backgroundColor: "#e7e7e7ff", borderRadius: 8,padding: 12, marginBottom: 12,}}>
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",backgroundColor: "#f1f1f1ff", borderRadius: 8,padding: 12, marginBottom: 12,}}>
                         <TextInput
                           value={location}
                           style={{ color: "#6a0dad" , width: "90%"}}
