@@ -287,7 +287,7 @@ export default function ProfileScreen() {
 
               <Text style={styles.label}>Email:</Text>
               <TextInput
-                style={[styles.input, { color: "#9c9c9cff" }]}
+                style={[styles.input, { color: "#00000075" }]}
                 value={user.userEmail}
                 editable={false}
               />

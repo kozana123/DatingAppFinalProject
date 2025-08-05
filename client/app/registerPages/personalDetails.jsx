@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   genderText: {
     color: "#eee",
     fontSize: 14,
-    fontFamily: "Prompt-Black",
+    fontFamily: "Prompt-Thin",
      borderColor: "#cc66cc"
   },
   nextButton: {

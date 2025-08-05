@@ -22,16 +22,17 @@
         shadowOpacity: 0.2,
         shadowRadius: 8,
         borderRadius: 20,
-        height: 70,
+        marginHorizontal: 10,
+        height: 60,
         borderTopWidth: 0,
       },
       tabBarLabelStyle: {
         fontSize: 13,
         fontWeight: "600",
-        paddingBottom: 5,
+        // paddingBottom: 5,
       },
       tabBarItemStyle: {
-        paddingTop: 8,
+        // paddingTop: 8,
       },
     }}
   >
@@ -54,7 +55,7 @@
           options={{
             title: 'Live Chat',
             tabBarIcon: ({ color }) => {
-              return <FontAwesome size={30} name="heart" color={color} />
+              return <FontAwesome size={24} name="heart" color={color} />
             },tabBarButton: (props) => (
               <TouchableOpacity activeOpacity={1} {...props} />
             ),

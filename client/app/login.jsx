@@ -16,16 +16,13 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import SHA256 from "crypto-js/sha256";
 import { DataContext } from "./DataContextProvider";
-
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { faL } from "@fortawesome/free-solid-svg-icons";
 
 export default function Login() {
   const [userEmail, setUserEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setUser, setUserPref } = useContext(DataContext);
-  console.log(userEmail, password);
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -49,8 +46,8 @@ export default function Login() {
       const { user } = userInfo;
       console.log(user.email);
       
-      // setUser(user);
-      // router.navigate("/(tabs)/main");
+      setUser(user);
+      router.navigate("/(tabs)/main");
   
     } catch (error) {
       console.error("Google Sign-In Error:", error);
@@ -58,7 +55,6 @@ export default function Login() {
   };
   
   const handleLogin = () => {
-    console.log("handleLogin");
 
     if (userEmail == "" && password == "") {
     } else {
@@ -193,13 +189,13 @@ export default function Login() {
               }}
               onPress={signInWithGoogle}
             >
-            
+              <FontAwesome name="google" size={24} color="#ea4335" />
               <Text
-                style={{ marginRight: 12, color: "#000", fontWeight: "bold" }}
+                style={{ marginLeft: 10, color: "#000", fontWeight: "bold" }}
               >
                 Sign in with Google 
               </Text>
-              <FontAwesome name="google" size={24} color="#ea4335" />
+              
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -299,16 +295,10 @@ const styles = StyleSheet.create({
   signInButton: {
     backgroundColor: "#ffffff",
     height: 50,
-    width: "300",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-
     borderColor: "#cc6699",
   },
   signInText: {
