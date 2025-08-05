@@ -633,6 +633,14 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
   },
+
+  avatarImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: "#DA58B7",
+  },
   input: {
     backgroundColor: "#ffffffff",
     padding: 10,
