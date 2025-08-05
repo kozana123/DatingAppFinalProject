@@ -27,7 +27,7 @@ export const checkEmailExists = async (email) => {
 export const registerUser = async (newUser) => {
   const formData = new FormData();
   console.log("Register Run");
-
+  
   // Append all text fields
   formData.append('UserName', newUser.name);
   formData.append('UserEmail', newUser.email);
