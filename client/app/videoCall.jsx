@@ -1,5 +1,5 @@
 // VideoCall.js
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator  } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import {
@@ -10,9 +10,12 @@ import {
   RTCSessionDescription
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
+import { DataContext } from "./DataContextProvider";
+
+
 const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-// const SIGNALING_SERVER_URL = 'http://10.0.0.5:3500'; // replace with your local IP address
+// const SIGNALING_SERVER_URL = 'http://10.0.0.11:3500'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -29,11 +32,16 @@ export default function VideoCall() {
   const remoteDescSet = useRef(false);
   const otherUserId = useRef(null);
   const [targetIdInput, setTargetIdInput] = useState('');
+    const { user, userPref,} = useContext(DataContext);
+  
 
   const [connected, setConnected] = useState(false);
+  console.log("user pref:", userPref);
+  console.log("user:", user);
 
 
   useEffect(() => {
+    const userDetails = {userGender: user.gender, userPref: userPref, }
     socket.current = io.connect(SIGNALING_SERVER_URL);
 
     socket.current.on('connect', () => {
@@ -47,6 +55,20 @@ export default function VideoCall() {
         setConnected(true);
       }
     };
+    // socket.current.emit('register-test', callerId);
+    // });
+
+    // peerConnection.current.ontrack = (event) => {
+    //   const remoteStream = event.streams[0];
+    //   setRemoteStream(remoteStream);
+    //   if (remoteStream) {
+    //     setConnected(true);
+    //   }
+    // };
+
+    
+
+    
 
     socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
       console.log("offer Activate");
@@ -129,25 +151,25 @@ export default function VideoCall() {
     //   }
     // };
 
-    peerConnection.current.onnegotiationneeded = async () => {
+    // peerConnection.current.onnegotiationneeded = async () => {
 
-      if (!otherUserId.current) {
-        console.warn("⚠️ Skipping negotiation: otherUserId not set yet.");
-        return;
-      }
+    //   if (!otherUserId.current) {
+    //     console.warn("⚠️ Skipping negotiation: otherUserId not set yet.");
+    //     return;
+    //   }
 
-      try {
-        const offer = await peerConnection.current.createOffer();
-        await peerConnection.current.setLocalDescription(offer);
-        socket.current.emit('offer', {
-          targetId: otherUserId.current,
-          offer,
-          senderId: callerId,
-        });
-      } catch (e) {
-        console.error("Negotiation error:", e);
-      }
-    };
+    //   try {
+    //     const offer = await peerConnection.current.createOffer();
+    //     await peerConnection.current.setLocalDescription(offer);
+    //     socket.current.emit('offer', {
+    //       targetId: otherUserId.current,
+    //       offer,
+    //       senderId: callerId,
+    //     });
+    //   } catch (e) {
+    //     console.error("Negotiation error:", e);
+    //   }
+    // };
 
     mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
       setLocalStream(stream);
