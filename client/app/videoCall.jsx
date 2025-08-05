@@ -67,9 +67,13 @@ export default function VideoCall() {
     //   }
     // };
 
-    
-
-    
+    mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
+      setLocalStream(stream);
+      stream.getTracks().forEach(track => {
+        peerConnection.current.addTrack(track, stream);
+      });
+      
+    });
 
     socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
       console.log("offer Activate");
@@ -146,10 +150,7 @@ export default function VideoCall() {
     };
 
     peerConnection.current.onconnectionstatechange = () => {
-      console.log("📡 Connection state:", peerConnection.current.connectionState);
-      if (peerConnection.current.connectionState === "connected") {
-        console.log("✅ WebRTC connection established!");
-      }
+      
       const state = peerConnection.current.connectionState;
       console.log("Peer connection state:", state);
 
@@ -184,13 +185,7 @@ export default function VideoCall() {
     //   }
     // };
 
-    mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
-      setLocalStream(stream);
-      stream.getTracks().forEach(track => {
-        peerConnection.current.addTrack(track, stream);
-      });
-      
-    });
+   
 
     return () => {
       socket.current.disconnect();
@@ -212,7 +207,7 @@ export default function VideoCall() {
     <View style={connected ? styles.connectedContainer : styles.searchingContainer}>
     {connected ? (
       <>
-        {/* Local stream full screen */}
+        {/* Local stream small in corner */}
         {localStream && (
           <RTCView
             streamURL={localStream.toURL()}
@@ -220,8 +215,8 @@ export default function VideoCall() {
             objectFit="cover"
           />
         )}
-        {/* Remote stream small in corner */}
-        {isCallStarted && remoteStream && (
+        {/* Remote stream full screen  */}
+        {remoteStream  && (
           <RTCView
             streamURL={remoteStream.toURL()}
             style={styles.remoteVideo}
