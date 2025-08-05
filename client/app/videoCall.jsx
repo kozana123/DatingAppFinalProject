@@ -32,7 +32,8 @@ export default function VideoCall() {
   const remoteDescSet = useRef(false);
   const otherUserId = useRef(null);
   const [targetIdInput, setTargetIdInput] = useState('');
-    const { user, userPref,} = useContext(DataContext);
+  const { user, userPref,} = useContext(DataContext);
+  const [isCallStarted, setIsCallStarted] = useState(false);  
   
 
   const [connected, setConnected] = useState(false);
@@ -144,12 +145,24 @@ export default function VideoCall() {
       }
     };
 
-    // peerConnection.current.onconnectionstatechange = () => {
-    //   console.log("📡 Connection state:", peerConnection.current.connectionState);
-    //   if (peerConnection.current.connectionState === "connected") {
-    //     console.log("✅ WebRTC connection established!");
-    //   }
-    // };
+    peerConnection.current.onconnectionstatechange = () => {
+      console.log("📡 Connection state:", peerConnection.current.connectionState);
+      if (peerConnection.current.connectionState === "connected") {
+        console.log("✅ WebRTC connection established!");
+      }
+      const state = peerConnection.current.connectionState;
+      console.log("Peer connection state:", state);
+
+      if (state === "connected") {
+        setIsCallStarted(true); // ✅ enable RTCView rendering now
+      }
+
+      if (state === "disconnected" || state === "failed" || state === "closed") {
+        // Optionally clean up here
+        setIsCallStarted(false);
+        console.log("Peer disconnected or failed");
+      }
+    };
 
     // peerConnection.current.onnegotiationneeded = async () => {
 
@@ -208,11 +221,12 @@ export default function VideoCall() {
           />
         )}
         {/* Remote stream small in corner */}
-        {remoteStream && (
+        {isCallStarted && remoteStream && (
           <RTCView
             streamURL={remoteStream.toURL()}
             style={styles.remoteVideo}
             objectFit="cover"
+            mirror={true}
           />
         )}
       </>
