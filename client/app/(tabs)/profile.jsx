@@ -29,7 +29,6 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from "react-native-picker-select";
-
 import { updateUserSearch, updateUserDetails } from "../api";
 
 export default function ProfileScreen() {
