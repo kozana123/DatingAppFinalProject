@@ -295,4 +295,21 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
     return null;
   }
 };
-//user pref: {"heightPreferences": "", "interests": "Introvert,Adventurous,Romantic,Traveler,Fitness Lover,Gaming,Cooking,Traveling", "isSmoker": false, "maxAgePreference": 35, "minAgePreference": 24, "preferredDistanceKm": 103, "preferredPartner": "Other", "relationshipType": "love", "religion": "", "userId": 9}
+
+export const deleteUserById = async (userId) => {
+  try {
+    const response = await fetch(`${apiUsersUrl}${userId}`, {
+      method: 'DELETE',
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log('User deleted:', data.message);
+    } else {
+      console.warn('Deletion failed:', data.message);
+    }
+  } catch (error) {
+    console.error('Network error:', error);
+  }
+};
+

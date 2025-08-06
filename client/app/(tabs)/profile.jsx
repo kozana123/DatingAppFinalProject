@@ -29,7 +29,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from "react-native-picker-select";
-import { updateUserSearch, updateUserDetails } from "../api";
+import { updateUserSearch, updateUserDetails, deleteUserById } from "../api";
 
 export default function ProfileScreen() {
   const { user, userPref, setUserPref, setUser, handleImageChoice, handleSearchLocation, handleUseCurrentLocation } = useContext(DataContext);
@@ -186,6 +186,14 @@ export default function ProfileScreen() {
     setGenderIndex(value);
     setUserPref({ ...userPref, preferredPartner: genders[value] });
   };
+
+  const onDeletedUser = () => {
+    const deleted = deleteUserById(user.userId)
+    if(deleted){
+      router.navigate("/")
+    }
+     
+  }
 
   return (
     <ImageBackground
@@ -567,7 +575,7 @@ export default function ProfileScreen() {
             </View>
             <TouchableOpacity
               style={styles.deleteBtn}
-              onPress={() => alert("Your account has been deleted.")}
+              onPress={onDeletedUser}
             >
               <Text style={styles.deleteText}> Delete Account 🗑️</Text>
             </TouchableOpacity>
