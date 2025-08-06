@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
+import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 
 const messages = [
@@ -72,18 +73,27 @@ const messages = [
 ];
 
 export default function Chats() {
+  const navigation = useNavigation();
 
   const { user } = useContext(DataContext);
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.chatItem}>
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.messageContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.message}>{item.message}</Text>
-      </View>
-      {item.unread && <View style={styles.unreadDot} />}
-      {item.favorite && <Text style={styles.favorite}>★</Text>}
-    </TouchableOpacity>
+    <TouchableOpacity
+    style={styles.chatItem}
+    onPress={() =>
+      navigation.navigate("ChatScreen", {
+        name: item.name,
+        avatar: item.avatar,
+      })
+    }
+  >
+    <Image source={{ uri: item.avatar }} style={styles.avatar} />
+    <View style={styles.messageContainer}>
+      <Text style={styles.name}>{item.name}</Text>
+      <Text style={styles.message}>{item.message}</Text>
+    </View>
+    {item.unread && <View style={styles.unreadDot} />}
+    {item.favorite && <Text style={styles.favorite}>★</Text>}
+  </TouchableOpacity>
   );
 
   return (
