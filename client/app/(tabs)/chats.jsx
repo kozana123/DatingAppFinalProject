@@ -131,16 +131,16 @@ export default function Chats() {
       >
         <View style={styles.header}>
           <Text style={styles.headerText}>Chat</Text>
-         <Image
-                   source={
-                     user && user.profileImage
-                       ? { uri: user.profileImage }
-                       : {
-                           uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                         }
-                   }
-                   style={styles.avatar}
-                  />
+        <Image
+          source={
+            user && user.profileImage
+              ? { uri: user.profileImage }
+              : {
+                  uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                }
+          }
+          style={styles.avatar}
+        />
                  
         </View>
         <View style={styles.separator} />
