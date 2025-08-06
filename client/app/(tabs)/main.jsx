@@ -150,7 +150,8 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 29,
     borderBottomStartRadius: 29,
 
-    height:"42%"
+    height:"42%",
+    
   },
 
   bottomSection: {
@@ -176,8 +177,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 22,
-    fontWeight: "bold",
-    color: "#DA58B7",
+    fontFamily: "Prompt-Thin",
+    color: "#ffe6ff",
   },
   logoCircle: {
     width: 40,

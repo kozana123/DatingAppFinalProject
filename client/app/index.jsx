@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   
   appName: {
-    fontWeight: "300",
+    fontWeight: "400",
     fontSize: 40,
     color: "#ffe6ff",
     fontFamily: "Prompt-Thin",
@@ -141,8 +141,8 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-SemiBold",
     lineHeight: 38,
     marginBottom: 0,
-    textAlign: "left", // מיישר את הטקסט לשמאל
-    direction: "ltr", // מיישר את כל ה־Text לשמאל במסך
+    textAlign: "left", 
+    direction: "ltr", 
   },
   description: {
     fontSize: 14,

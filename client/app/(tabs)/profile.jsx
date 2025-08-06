@@ -684,10 +684,9 @@ const styles = StyleSheet.create({
     // fontFamily: "Prompt-Black"
   },
   logo: {
-      fontSize: 22,
-      fontWeight: "bold",
-      color: "#DA58B7",
-      // fontFamily: "Prompt-SemiBold"
+    fontSize: 22,
+    fontFamily: "Prompt-Thin",
+    color: "#ffe6ff",
   },
   logoCircle: {
     width: 40,
@@ -844,11 +843,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center", 
     marginTop: 15, 
-    shadowColor: "#000", // הצללה עדינה
+    shadowColor: "#000", 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, // הצללה באנדרואיד
+    elevation: 5, 
   },
   saveBtnText: {
     color: "white",
@@ -860,7 +859,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    shadowColor: "#000", // הצללה עדינה
+    shadowColor: "#000", 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
