@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { router, useLocalSearchParams} from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import axios from 'axios';
 import {registerUser} from '../api';
 
 export default function ProfileIntro() {

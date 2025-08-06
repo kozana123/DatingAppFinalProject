@@ -43,8 +43,6 @@ export const registerUser = async (newUser) => {
   // Append the image
   const uriParts = newUser.image.split('.');
   const fileType = uriParts[uriParts.length - 1];
-  
-  
 
   formData.append('ProfileImageFile', {
     uri: newUser.image,
