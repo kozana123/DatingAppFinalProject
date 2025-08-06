@@ -3,6 +3,8 @@ import axios from 'axios';
 
 const apiPreferencesUrl = "http://www.DatingServer.somee.com/api/userpreferences/"
 const apiUsersUrl = "http://www.DatingServer.somee.com/api/users/"
+const apiMatchesUrl = "http://www.DatingServer.somee.com/api/Matches/"
+
 
 
 export const checkEmailExists = async (email) => {
@@ -233,6 +235,43 @@ export const updateUserLocation = async (userId, city, latitude, longitude) => {
     }
   } catch (error) {
     console.error('❌ Error updating user location:', error);
+  }
+};
+
+export const addMatch = async (user1ID, user2ID, matchStatus) => {
+  try {
+    const response = await fetch(`${apiMatchesUrl}add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user1ID,
+        user2ID,
+        matchStatus,
+      }),
+    });
+
+    const contentType = response.headers.get('content-type');
+
+    let data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text(); // fallback to raw text
+      console.error('Non-JSON response:', text);
+      return;
+    }
+
+    if (response.ok) {
+      console.log('✅ Match added:', data.message);
+      // handle success (e.g., show success message or update UI)
+    } else {
+      console.warn('⚠️ Error adding match:', data);
+      // handle error (e.g., show error message)
+    }
+  } catch (error) {
+    console.error('❌ Network error:', error);
   }
 };
 //user pref: {"heightPreferences": "", "interests": "Introvert,Adventurous,Romantic,Traveler,Fitness Lover,Gaming,Cooking,Traveling", "isSmoker": false, "maxAgePreference": 35, "minAgePreference": 24, "preferredDistanceKm": 103, "preferredPartner": "Other", "relationshipType": "love", "religion": "", "userId": 9}

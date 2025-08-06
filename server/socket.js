@@ -11,50 +11,22 @@ export function initIO(server) {
   });
 
   const users = new Map(); // Map<callerId, socketId>
-  const maleUsers = new Map();
-  const femaleUsers = new Map();  
-  const otherUsers = new Map();  
+  const usersInCall = new Map(); 
 
-  
-  
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  socket.on('register-test', (callerId, userDetails) => {
+  socket.on('register', (callerId, userDetails) => {
     users.set(callerId, { socketId: socket.id, userDetails: userDetails});
-    switch(userDetails.userGender){
-      case "Male":
-        maleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails});
-        break; 
 
-      case "Female":
-        femaleUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
-        break;
-
-      case "Other":
-        otherUsers.set(callerId, { socketId: socket.id, userDetails: userDetails}); 
-        break;
-    }
-    // console.log(maleUsers, femaleUsers, otherUsers);
     console.log(`User registered: ${callerId} -> ${socket.id}`);
     console.log(`Amount of users: ${users.size}`);
 
     let targeUser = null;
-    switch(userDetails.userPref.preferredPartner){
-      case "Male":
-        targeUser = GetBestUser(maleUsers, userDetails)
-        break 
-      
-      case "Female":
-        targeUser = GetBestUser(femaleUsers, userDetails) 
-        break
 
-      case "Other":
-        targeUser = GetBestUser(otherUsers, userDetails) 
-        break
-    }
+    targeUser = GetBestUser(userDetails)
     console.log(targeUser);
-    
+
     if (targeUser) {
       const targetId = targeUser.callerId;
       const initiatorId = callerId;
@@ -68,25 +40,9 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('register', (callerId) => {
-    users.set(callerId, socket.id);
-    console.log(`User registered: ${callerId} -> ${socket.id}`);
-    console.log(`Amount of users: ${users.size}`);
-
-    if (users.size >= 2) {
-    const [initiatorId, initiatorSocketId] = [...users.entries()][0];
-    const [targetId, targetSocketId] = [...users.entries()][1];
-
-    console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
-    io.to(initiatorSocketId).emit('initiate-offer', {
-      targetId: targetId,
-      senderId: initiatorId
-    });
-  }
-  });
-
   socket.on('offer', ({ targetId, offer, senderId }) => {
     const targetSocketId = users.get(targetId);
+
     console.log("getting OFFER");
     
     if (targetSocketId) {
@@ -99,7 +55,7 @@ io.on('connection', (socket) => {
     const targetSocketId = users.get(targetId);
     console.log('📥 Incoming answer - looking up:', targetId, '=>', targetSocketId.socketId);
     if (targetSocketId) {
-      console.log(`✅ the answer: ${answer}`);
+      // console.log(`✅ the answer: ${answer}`);
       io.to(targetSocketId.socketId).emit('answer', answer);
     }
     else {
@@ -109,13 +65,37 @@ io.on('connection', (socket) => {
 
   socket.on('ice-candidate', ({ targetId, candidate }) => {
     const targetSocketId = users.get(targetId);
+
     // console.log("targetSocketID:",targetSocketId);
-    
     // console.log('📥  Ice CandidaSendingte:', '=>', targetSocketId, "With: ", candidate);
     if (targetSocketId.socketId) {
       io.to(targetSocketId.socketId).emit('ice-candidate', {candidate});
     }
     
+  });
+
+  socket.on('like', ({ targetId, senderId }) => {
+    const target = users.get(targetId);
+    console.log(targetId, senderId);
+    
+    if (target) {
+      io.to(target.socketId).emit('liked', senderId);
+    }
+  });
+
+  socket.on('dislike', ({ targetId }) => {
+    const target = users.get(targetId);
+    if (target) {
+      io.to(target.socketId).emit('disliked');
+    }
+  });
+
+  socket.on('like-response', ({ targetId, response }) => {
+    const target = users.get(targetId);
+    
+    if (target) {
+      io.to(target.socketId).emit('like-response', { response});
+    }
   });
 
   socket.on('disconnect', () => {
@@ -125,35 +105,24 @@ io.on('connection', (socket) => {
         break;
       }
     }
-    for (const [callerId, details] of maleUsers.entries()) {
-      if (details.socketId === socket.id) {
-        maleUsers.delete(callerId);
-        break;
-      }
-    }
-    for (const [callerId, details] of femaleUsers.entries()) {
-      if (details.socketId === socket.id) {
-        femaleUsers.delete(callerId);
-        break;
-      }
-    }
-    for (const [callerId, details] of otherUsers.entries()) {
-      if (details.socketId === socket.id) {
-        otherUsers.delete(callerId);
-        break;
-      }
-    } 
     
     console.log('Client disconnected:', socket.id);
     console.log(`Amount of users: ${users.size}`);
   });
 })
 
-function GetBestUser(userType, user) {
+function GetBestUser(user) {
   let bestUser = null;
+  const usersFillteredList = new Map();
 
-  userType.forEach((entry, callerId) => {
-    // console.log(entry);
+  users.forEach((entry, callerId) => {
+    const { userDetails } = entry;
+    if(user.userPref.preferredPartner == userDetails.userGender){
+      usersFillteredList.set(callerId, entry)
+    }
+  })
+  
+  usersFillteredList.forEach((entry, callerId) => {
     const { socketId, userDetails } = entry;
     if(user.userPref.userId == userDetails.userPref.userId ){
       return;
@@ -161,7 +130,7 @@ function GetBestUser(userType, user) {
 
     if(userDetails.userPref.preferredPartner == user.userGender){
       console.log("Pass GENDER");
-        // Check age and distance
+
       if (user.userPref.minAgePreference <= userDetails.userAge, user.userPref.maxAgePreference >= userDetails.userAge,
         userDetails.userPref.minAgePreference <= user.userAge ,userDetails.userPref.maxAgePreference >= user.userAge) {
           console.log("Pass AGE");
@@ -171,19 +140,16 @@ function GetBestUser(userType, user) {
           if(user.userPref.preferredDistanceKm >= distance && userDetails.userPref.preferredDistanceKm >= distance){
             console.log("Pass DISTANCE");
 
-            // Count common likes
             let commonCount = 0;
             const set1 = new Set(user.interests);
             const set2 = new Set(userDetails.interests);
             console.log(set1,set2 );
             for (let item of set1) {
               if (set2.has(item)) {
-                // console.log(commonCount);
                 commonCount++;
               }
             }
 
-            // Update bestUser if this one is better
             if (!bestUser || commonCount > bestUser.same) {
               bestUser = {
                 callerId: callerId,
@@ -193,7 +159,6 @@ function GetBestUser(userType, user) {
               };
             }
           }
-        
       }
     }
    
