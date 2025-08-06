@@ -1,5 +1,5 @@
 import React from "react";
-import { useContext } from "react";
+import { useContext , useEffect, useState} from "react";
 import {
   View,
   Text,
@@ -14,85 +14,106 @@ import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
+import { fetchMatchedUsers } from "../api";
 
-const messages = [
-  {
-    id: "1",
-    name: "Anika",
-    message: "Oh i don't like fish 🙈",
-    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-    unread: true,
-  },
-  {
-    id: "2",
-    name: "Shreya",
-    message: "Can we go somewhere?",
-    avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-    unread: true,
-  },
-  {
-    id: "3",
-    name: "Lilly",
-    message: "You: If I were a stop light, I’d turn",
-    avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-    unread: false,
-  },
-  {
-    id: "4",
-    name: "Mona",
-    message: "See you soon 😉",
-    avatar: "https://randomuser.me/api/portraits/women/4.jpg",
-    unread: false,
-  },
-  {
-    id: "5",
-    name: "Sonia",
-    message: "Are you serious?!",
-    avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-    unread: true,
-  },
-  {
-    id: "6",
-    name: "Monika",
-    message: "You: How about a movie and then...",
-    avatar: "https://randomuser.me/api/portraits/women/6.jpg",
-    favorite: true,
-  },
-  {
-    id: "7",
-    name: "Katrina",
-    message: "OK",
-    avatar: "https://randomuser.me/api/portraits/women/7.jpg",
-  },
-  {
-    id: "8",
-    name: "Kiran",
-    message: "You: How are you?)",
-    avatar: "https://randomuser.me/api/portraits/women/8.jpg",
-  },
-];
+// const messages = [
+//   {
+//     id: "1",
+//     name: "Anika",
+//     message: "Oh i don't like fish 🙈",
+//     avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+//     unread: true,
+//   },
+//   {
+//     id: "2",
+//     name: "Shreya",
+//     message: "Can we go somewhere?",
+//     avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+//     unread: true,
+//   },
+//   {
+//     id: "3",
+//     name: "Lilly",
+//     message: "You: If I were a stop light, I’d turn",
+//     avatar: "https://randomuser.me/api/portraits/women/3.jpg",
+//     unread: false,
+//   },
+//   {
+//     id: "4",
+//     name: "Mona",
+//     message: "See you soon 😉",
+//     avatar: "https://randomuser.me/api/portraits/women/4.jpg",
+//     unread: false,
+//   },
+//   {
+//     id: "5",
+//     name: "Sonia",
+//     message: "Are you serious?!",
+//     avatar: "https://randomuser.me/api/portraits/women/5.jpg",
+//     unread: true,
+//   },
+//   {
+//     id: "6",
+//     name: "Monika",
+//     message: "You: How about a movie and then...",
+//     avatar: "https://randomuser.me/api/portraits/women/6.jpg",
+//     favorite: true,
+//   },
+//   {
+//     id: "7",
+//     name: "Katrina",
+//     message: "OK",
+//     avatar: "https://randomuser.me/api/portraits/women/7.jpg",
+//   },
+//   {
+//     id: "8",
+//     name: "Kiran",
+//     message: "You: How are you?)",
+//     avatar: "https://randomuser.me/api/portraits/women/8.jpg",
+//   },
+// ];
 
 export default function Chats() {
-  const navigation = useNavigation();
 
+  const navigation = useNavigation();
   const { user } = useContext(DataContext);
+  // const matches = fetchMatchedUsers(user.userId)
+
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMatches = async () => {
+      try {
+        const result = await fetchMatchedUsers(user.userId);
+        setMatches(result || []);
+      } catch (error) {
+        console.error("Failed to fetch matches:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMatches();
+  }, [user.userId]);
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
     style={styles.chatItem}
     onPress={() =>
       navigation.navigate("ChatScreen", {
-        name: item.name,
-        avatar: item.avatar,
+        name: item.userName,
+        avatar: item.profileImage,
       })
     }
   >
-    <Image source={{ uri: item.avatar }} style={styles.avatar} />
+    <Image source={{ uri: item.profileImage }} style={styles.avatar} />
     <View style={styles.messageContainer}>
-      <Text style={styles.name}>{item.name}</Text>
+      <Text style={styles.name}>{item.userName}</Text>
       <Text style={styles.message}>{item.message}</Text>
     </View>
     {item.unread && <View style={styles.unreadDot} />}
-    {item.favorite && <Text style={styles.favorite}>★</Text>}
+    {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
   </TouchableOpacity>
   );
 
@@ -125,26 +146,12 @@ export default function Chats() {
         <View style={styles.separator} />
 
         <FlatList
-          data={messages}
+          data={matches}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.matchedWithUserId}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
 
-        <View style={styles.navBar}>
-          <TouchableOpacity>
-            <Text style={styles.navIcon}>🏠</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.navIcon}>❤️</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.navIcon}>💬</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={[styles.navIcon, styles.activeNav]}>👤</Text>
-          </TouchableOpacity>
-        </View>
       </LinearGradient>
     </ImageBackground>
   );
@@ -231,23 +238,6 @@ const styles = StyleSheet.create({
     color: "#66ccff",
     fontSize: 16,
     marginLeft: 10,
-  },
-  navBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 70,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.2)",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
-  navIcon: {
-    fontSize: 24,
-    color: "#fff",
   },
   activeNav: {
     color: "#DA58B7",

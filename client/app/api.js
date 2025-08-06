@@ -274,4 +274,25 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
     console.error('❌ Network error:', error);
   }
 };
+
+
+ export const fetchMatchedUsers = async (userId) => {
+  try {
+    const response = await fetch(`${apiMatchesUrl}matched-users/${userId}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Matched users:', data);
+    
+    // You can now use the data (e.g., update state)
+    return data;
+
+  } catch (error) {
+    console.error('Error fetching matched users:', error);
+    return null;
+  }
+};
 //user pref: {"heightPreferences": "", "interests": "Introvert,Adventurous,Romantic,Traveler,Fitness Lover,Gaming,Cooking,Traveling", "isSmoker": false, "maxAgePreference": 35, "minAgePreference": 24, "preferredDistanceKm": 103, "preferredPartner": "Other", "relationshipType": "love", "religion": "", "userId": 9}
