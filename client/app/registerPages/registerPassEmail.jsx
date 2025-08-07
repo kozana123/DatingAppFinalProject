@@ -16,6 +16,7 @@ import SHA256 from "crypto-js/sha256";
 import { checkEmailExists } from "../api";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useEffect } from "react";
 
 const STAGE_PROGRESS = 60;
 
@@ -32,6 +33,12 @@ export default function RegisterPage() {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: "719538565443-ctovkc0i4kmt19n7l4pm7mqvhnshcnnr.apps.googleusercontent.com",
+    });
+  }, []);
 
   const signInWithGoogle = async () => {
     try {

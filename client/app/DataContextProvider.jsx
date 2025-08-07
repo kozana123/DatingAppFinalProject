@@ -78,8 +78,6 @@ export default function DataContextProvider(props) {
       alert("Permission to access location was denied");
       return;
     }
-    
-    
     try {
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;

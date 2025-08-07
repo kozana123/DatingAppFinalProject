@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     borderBottomEndRadius: 29,
     borderBottomStartRadius: 29,
-
+    
     height:"42%",
     
   },
