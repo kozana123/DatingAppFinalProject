@@ -5,9 +5,6 @@
 export async function createNewUserPreferences(req, res){ 
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
 
-    // if(!name || !date || !email || !password){
-    //     return res.status(404).json({message: 'Information missing'})
-    // }
 
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
     let token = await user.createUserPreferences()
@@ -18,14 +15,71 @@ export async function createNewUserPreferences(req, res){
 export async function test(req, res){ 
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
 
-    // if(!name || !date || !email || !password){
-    //     return res.status(404).json({message: 'Information missing'})
-    // }
-
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
     return res.status(200).json({message: user})
 }
 
+
+export async function getPreferences(req, res) {
+    const userId = req.params.userId;
+  
+    try {
+      const prefs = await UserPreferences.getUserPreferencesByUserId(userId);
+      if (!prefs) {
+        return res.status(404).json({message: `Preferences for user ${userId} not found.`});
+      }
+      return res.json(prefs);
+    } catch (error) {
+      return res.status(500).json({message: error.message});
+    }
+  }
+  
+
+  export async function updateSearchingPreferences(req, res) {
+    const userId = req.params.userId;
+    const {preferredPartner, preferredDistanceKm, minAgePreference, maxAgePreference} = req.body;
+  
+    if (!userId) {
+      return res.status(400).json({message: 'Missing userId'});
+    }
+  
+    let prefs = new UserPreferences(userId, preferredPartner, null, null, null, null, preferredDistanceKm, minAgePreference, maxAgePreference, null);
+  
+    try {
+      let rowsAffected = await prefs.updateSearchPreferences();
+      if (rowsAffected > 0) {
+        return res.sendStatus(204);
+      }
+      return res.status(404).json({message: 'User not found or no changes made'});
+    } catch (error) {
+      return res.status(500).json({message: error.message});
+    }
+  }
+  
+
+  export async function updateUserPreferences(req, res) {
+    const userId = req.params.userId;
+    const {relationshipType, heightPreferences, religion, isSmoker, interests} = req.body;
+  
+    if (!userId) {
+      return res.status(400).json({message: 'Missing userId'});
+    }
+  
+    let prefs = new UserPreferences(userId, null, relationshipType, heightPreferences, religion, isSmoker, null, null, null, interests);
+  
+    try {
+      let rowsAffected = await prefs.updateUserPreferences();
+      if (rowsAffected > 0) {
+        return res.sendStatus(204);
+      }
+      return res.status(404).json({message: 'User not found or no changes made'});
+    } catch (error) {
+      return res.status(500).json({message: error.message});
+    }
+  }
+
+
+  
 // // POST /userPreferences
 // export async function updatePreferences(req, res) {
 //   const prefs = req.body;
