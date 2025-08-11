@@ -1,7 +1,7 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-import sql from 'msnodesqlv8';
+import sql from 'mssql/msnodesqlv8.js';
 
 const dbConfig = {
   server: 'T67396',          // your machine name or IP
@@ -69,13 +69,13 @@ export async function addUserPreferencesToDB(userPref) {
          `);
 
       if (result.rowsAffected[0] > 0) {
-         return res.sendStatus(204); // No Content
+         return "Create new Preference"; // No Content
       } else {
-         return res.status(500).send('Failed to update preferences');
+         return 'Failed to update preferences';
       }
    } catch (err) {
-      console.error(err);
-      return res.status(500).send(err.message || 'Server error');
+      console.error('SQL Connection Error:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
+      return err.message || 'Server error';
    }
    // let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
    // users = JSON.parse(users.toString())
@@ -83,6 +83,6 @@ export async function addUserPreferencesToDB(userPref) {
    // users.push(user)
    // await writeFile(path.join(__dirname, 'DB', 'users.json'), JSON.stringify(users))
 
-   return user
+   
 }  
 

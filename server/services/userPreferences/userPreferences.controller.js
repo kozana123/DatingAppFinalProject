@@ -11,10 +11,19 @@ export async function createNewUserPreferences(req, res){
 
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
     let token = await user.createUserPreferences()
-    return res.status(404).json({message: 'Successfully added', token})
-
-
+    return res.status(204).json({message: 'Successfully added', token})
     
+}
+
+export async function test(req, res){ 
+    let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
+
+    // if(!name || !date || !email || !password){
+    //     return res.status(404).json({message: 'Information missing'})
+    // }
+
+    let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
+    return res.status(200).json({message: user})
 }
 
 // // POST /userPreferences

@@ -18,10 +18,10 @@ export default class UserPreferences {
       this.interests = interests
     }
 
-    static async createUserPreferences() {
+    async createUserPreferences() {
       let user = await addUserPreferencesToDB(this);
-      let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-      return token
+      // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
+      return user
     }
   
     static async getUserPreferencesByUserId(email) {

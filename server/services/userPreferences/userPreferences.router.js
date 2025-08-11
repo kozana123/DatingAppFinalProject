@@ -1,7 +1,7 @@
 
 
 import {Router} from 'express'
-import {getAllUsers, getUsersById, createNewUserPreferences, updateUser, deleteUser, loginUser} from './userPreferences.controller.js'
+import {getAllUsers, getUsersById, createNewUserPreferences, updateUser, deleteUser, loginUser, test} from './userPreferences.controller.js'
 import { auth } from '../../middlewares/auth.js';
 
 function logger (req, res, next) {

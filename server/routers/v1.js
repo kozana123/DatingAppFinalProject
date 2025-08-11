@@ -7,5 +7,9 @@ const v1Router = new Router();
 v1Router.use('/userDetails', userDetailsRouter)
 // v1Router.use('/upload', uploadRouter)
 v1Router.use('/userPreferences', userPreferencesRouter)
+v1Router.post('/test', (req, res) => {
+  console.log(req.body);
+  res.json({ received: req.body });
+});
 
 export default v1Router 
