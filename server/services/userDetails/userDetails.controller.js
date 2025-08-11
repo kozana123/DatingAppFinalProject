@@ -1,5 +1,5 @@
 import User from './userDetails.model.js'
-import { uploadImage } from './cloudinaryService.js';
+import { uploadImage } from '../cloudinaryService.js';
 
 
 
@@ -67,19 +67,6 @@ export async function getUsersById(req, res){
     return res.status(200).json({message: 'Found', user} )
  }
 
-export async function createNewUser(req, res){ 
-    let {name, date, email, password} = req.body
-
-    if(!name || !date || !email || !password){
-        return res.status(404).json({message: 'Information missing'})
-    }
-
-    let user = new User(name, date, email, password)
-    let token = await user.addUser()
-    return res.status(404).json({message: 'Successfully added', token})
-
-
-}
 
 export async function loginUser(req, res){
     let {email, password} = req.body

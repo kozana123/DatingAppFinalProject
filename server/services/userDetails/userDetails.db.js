@@ -1,7 +1,7 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-import sql from 'mssql' 
+// import sql from 'mssql' 
 
 const dbConfig = {
   user: 'YOUR_DB_USER',

@@ -1,7 +1,7 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-import sql from 'mssql/msnodesqlv8';
+import sql from 'msnodesqlv8';
 
 const dbConfig = {
   server: 'T67396',          // your machine name or IP
