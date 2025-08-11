@@ -1,43 +1,11 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-import sql from 'mssql/msnodesqlv8.js';
-
-
-const config = {
-  database: 'DatingApp',
-  server: 'T67396\\SQLEXPRESS', // <-- replace with your actual server + instance
-  driver: 'msnodesqlv8',
-  options: {
-    trustedConnection: true
-  }
-};
-
-try {
-  const pool = await sql.connect(config);
-  console.log('✅ Connected to SQL Server!');
-
-  const result = await pool.request().query('SELECT 1 AS number');
-  console.log(result.recordset);
-
-  await pool.close();
-} catch (err) {
-  console.error('❌ SQL Connection Error:', err.originalError || err);
-}
-
-const dbConfig = {
-  server: 'T67396',          // your machine name or IP
-  database: 'DatingApp',
-  driver: 'msnodesqlv8',
-  options: {
-    trustedConnection: true, // enables Windows Auth
-    trustServerCertificate: true, // optional, depends on your setup
-  },
-};
+import DB from '../db.js';
 
 export async function addUserPreferencesToDB(userPref) {
    try {
-      const pool = await sql.connect(dbConfig);
+      const pool = await sql.connect(DB.sqlConfig);
 
       const result = await pool.request()
          .input('PreferredPartner', sql.NVarChar, userPref.PreferredPartner)
