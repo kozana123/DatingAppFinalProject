@@ -16,6 +16,7 @@ export async function test(req, res){
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
 
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
+    
     return res.status(200).json({message: user})
 }
 

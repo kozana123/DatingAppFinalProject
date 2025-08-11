@@ -3,6 +3,28 @@ import path from 'path';
 import { __dirname } from '../../globals.js';
 import sql from 'mssql/msnodesqlv8.js';
 
+
+const config = {
+  database: 'DatingApp',
+  server: 'T67396\\SQLEXPRESS', // <-- replace with your actual server + instance
+  driver: 'msnodesqlv8',
+  options: {
+    trustedConnection: true
+  }
+};
+
+try {
+  const pool = await sql.connect(config);
+  console.log('✅ Connected to SQL Server!');
+
+  const result = await pool.request().query('SELECT 1 AS number');
+  console.log(result.recordset);
+
+  await pool.close();
+} catch (err) {
+  console.error('❌ SQL Connection Error:', err.originalError || err);
+}
+
 const dbConfig = {
   server: 'T67396',          // your machine name or IP
   database: 'DatingApp',
@@ -12,20 +34,6 @@ const dbConfig = {
     trustServerCertificate: true, // optional, depends on your setup
   },
 };
-
-export async function findAllUsers() {
-   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-   return JSON.parse(users.toString())
-}
-
-export async function findSpecificUser(email) {
-   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-   users = JSON.parse(users.toString())
-   let user = users.find(u => u.email == email)
-
-   return user
-   
-}
 
 export async function addUserPreferencesToDB(userPref) {
    try {
@@ -54,7 +62,9 @@ export async function addUserPreferencesToDB(userPref) {
             max_age_preference,
             interests,
             user_id
-         ) VALUES (
+         ) 
+         OUTPUT INSERTED.preference_id
+         VALUES (
             @PreferredPartner,
             @RelationshipType,
             @HeightPreferences,
@@ -69,13 +79,15 @@ export async function addUserPreferencesToDB(userPref) {
          `);
 
       if (result.rowsAffected[0] > 0) {
-         return "Create new Preference"; // No Content
+         return { message: "Preference created", id: result.recordset[0].preference_id };
       } else {
-         return 'Failed to update preferences';
+         return { message: 'Failed to update preferences' };
       }
    } catch (err) {
       console.error('SQL Connection Error:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
-      return err.message || 'Server error';
+      return { message: err.message || 'Server error' };
+   } finally {
+      sql.close();
    }
    // let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
    // users = JSON.parse(users.toString())
@@ -85,4 +97,18 @@ export async function addUserPreferencesToDB(userPref) {
 
    
 }  
+
+export async function findAllUsers() {
+   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
+   return JSON.parse(users.toString())
+}
+
+export async function findSpecificUser(email) {
+   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
+   users = JSON.parse(users.toString())
+   let user = users.find(u => u.email == email)
+
+   return user
+   
+}
 
