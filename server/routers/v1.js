@@ -1,10 +1,11 @@
 import {Router} from 'express'
-import userRouter from '../services/users/user.router.js'
-import uploadRouter from '../services/upload/upload.router.js'
+import userDetailsRouter from '../services/userDetails/userDetails.router.js'
+import userPreferencesRouter from '../services/userPreferences/userPreferences.router.js'
 
 const v1Router = new Router();
 
-v1Router.use('/users', userRouter)
+v1Router.use('/userDetails', userDetailsRouter)
 v1Router.use('/upload', uploadRouter)
+v1Router.use('/userPreferences', userPreferencesRouter)
 
 export default v1Router 

@@ -1,5 +1,7 @@
+
+
 import {Router} from 'express'
-import {getAllUsers, getUsersById, createNewUser, updateUser, deleteUser, loginUser} from './userPreferences.controller.js'
+import {getAllUsers, getUsersById, createNewUserPreferences, updateUser, deleteUser, loginUser} from './userPreferences.controller.js'
 import { auth } from '../../middlewares/auth.js';
 
 function logger (req, res, next) {
@@ -8,10 +10,10 @@ function logger (req, res, next) {
    };
 
 
-const userRouter = Router()
+const userPreferencesRouter = Router()
 
-userRouter
-    .post('/', createNewUser)
+userPreferencesRouter
+    .post('/register', createNewUserPreferences)
     .get('/',logger, getAllUsers)
     .get('/profile/:email', getUsersById)
     
@@ -19,4 +21,4 @@ userRouter
     .put('/:email', updateUser)
     .delete('/:email', auth ,deleteUser)
 
-export default userRouter 
+export default userPreferencesRouter 

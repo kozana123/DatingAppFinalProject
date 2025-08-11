@@ -1,16 +1,22 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-import {findAllUsers, findSpecificUser, addUserToDB, } from './user.db.js'
+import {findAllUsers, findSpecificUser, addUserToDB, } from './userDetails.db.js'
 
 
 export default class User {
-    constructor(name, date, email, password) {
-      this.name = name;
-      this.date = date;
-      this.email = email;
-      this.password = bcrypt.hashSync(password, 15);
-    }
+  constructor(userId, userName, userEmail, userPassword, birthDate, gender, profileImage, city, latitude, longitude) {
+    this.userId = userId;
+    this.userName = userName;
+    this.userEmail = userEmail;
+    this.userPassword = userPassword;
+    this.birthDate = birthDate;       // Should be a JS Date object
+    this.gender = gender;
+    this.profileImage = profileImage;
+    this.city = city;
+    this.latitude = latitude;         // float/number
+    this.longitude = longitude;       // float/number
+  }
 
     static async allUsers() {
       return await findAllUsers();

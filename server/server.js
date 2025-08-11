@@ -36,5 +36,5 @@ initIO(httpServer);
 
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
-  console.log(`🌐 Web client at      http://<your-ip>:${PORT}/webclient.html`);
+  // console.log(`🌐 Web client at      http://<your-ip>:${PORT}/webclient.html`);
 });

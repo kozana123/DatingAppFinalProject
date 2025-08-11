@@ -1,4 +1,6 @@
-import UserPreferences from './userPreferences.model.js'
+
+
+ import UserPreferences from './userPreferences.model.js'
 
 export async function createNewUserPreferences(req, res){ 
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
@@ -12,7 +14,92 @@ export async function createNewUserPreferences(req, res){
     return res.status(404).json({message: 'Successfully added', token})
 
 
+    
 }
+
+// // POST /userPreferences
+// export async function updatePreferences(req, res) {
+//   const prefs = req.body;
+//   if (!prefs) {
+//     return res.status(400).json({ message: 'Invalid preferences data' });
+//   }
+
+//   try {
+//     const rowsAffected = await userPreferencesDb.updatePreferences(prefs);
+//     if (rowsAffected > 0) {
+//       return res.sendStatus(204); // No Content
+//     }
+//     return res.status(500).json({ message: 'Failed to update preferences' });
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+// // GET /:userId
+// export async function getPreferences(req, res) {
+//   const { userId } = req.params;
+//   try {
+//     const prefs = await userPreferencesDb.getUserPreferencesByUserId(userId);
+//     if (!prefs) {
+//       return res.status(404).json({ message: `Preferences for user ${userId} not found.` });
+//     }
+//     return res.json(prefs);
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+// // PUT /editUserPreferences/:userId
+// export async function updateSearchingPreferences(req, res) {
+//   const { userId } = req.params;
+//   const prefs = req.body;
+
+//   if (!prefs) {
+//     return res.status(400).json({ message: 'Invalid preferences data' });
+//   }
+
+//   try {
+//     const rowsAffected = await userPreferencesDb.updateSelectedPreferences(userId, prefs);
+//     if (rowsAffected > 0) {
+//       return res.sendStatus(204);
+//     }
+//     return res.status(404).json({ message: 'User not found or no changes made' });
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+// // PUT /editUserDetails/:userId
+// export async function updateUserPreferences(req, res) {
+//   const { userId } = req.params;
+//   const prefs = req.body;
+
+//   if (!prefs) {
+//     return res.status(400).json({ message: 'Invalid preferences data' });
+//   }
+
+//   try {
+//     const rowsAffected = await userPreferencesDb.updateUserPreferences(userId, prefs);
+//     if (rowsAffected > 0) {
+//       return res.sendStatus(204);
+//     }
+//     return res.status(404).json({ message: 'User not found or no changes made' });
+//   } catch (err) {
+//     return res.status(500).json({ message: err.message });
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
 
 export async function getAllUsers(req, res){
 

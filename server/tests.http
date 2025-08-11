@@ -1,18 +1,24 @@
-@host = http://localhost:5500/api/v1
+@host = http://localhost:3500/api/v1
 
 
 GET {{host}}/users
 ###
 GET {{host}}/users/profile/Dor@example.com
 ###
-POST {{host}}/users
+POST {{host}}/userPreferences/register
 content-Type: application/json
 
-{   
-    "name": "Dor2",
-    "date": "14/09/1997",
-    "email": "Dor@example.com",
-    "password": "1234567"
+{
+  "userId": 51,
+  "preferredPartner": "female",
+  "relationshipType": "long-term",
+  "heightPreferences": "170",
+  "religion": "none",
+  "isSmoker": false,
+  "preferredDistanceKm": 50,
+  "minAgePreference": 25,
+  "maxAgePreference": 35,
+  "interests": "music,travel,sports"
 }
 ###
 PUT {{host}}/users/Dor@example.com
