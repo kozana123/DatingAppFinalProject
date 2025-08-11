@@ -1,4 +1,4 @@
-@host = http://localhost:3500/api/v1
+@host = http://localhost:3501/api/v1
 
 
 GET {{host}}/users
@@ -9,7 +9,7 @@ POST {{host}}/userPreferences/register
 content-Type: application/json
 
 {
-  "userId": 51,
+  "userId": 31,
   "preferredPartner": "female",
   "relationshipType": "long-term",
   "heightPreferences": "170",

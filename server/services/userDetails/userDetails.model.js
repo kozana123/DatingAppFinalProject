@@ -39,9 +39,11 @@ export default class User {
     } 
   
     async addUser() {
+      console.log("run module");
       let user = await addUserToDB(this);
-      let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-      return token
+      
+      // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
+      return user
     } 
 }
 

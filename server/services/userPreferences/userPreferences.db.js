@@ -2,22 +2,27 @@ import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
 // import DB from '../../db.js';
-// import sql from 'mssql';
+import sql from 'mssql';
 
-import * as sql from 'mssql';
-
-const dbConfig = {
-  server: 'T67396',
-  database: 'DatingApp',
-  options: {
-    trustedConnection: true,
-    trustServerCertificate: true,
-  },
-};
+const sqlConfig = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    server: process.env.DB_SERVER,
+    pool: {
+      max: 10,
+      min: 0,
+      idleTimeoutMillis: 30000
+    },
+    options: {
+      encrypt: false, // true for azure
+      trustServerCertificate: true //false for local
+    }
+  }
 
 export async function addUserPreferencesToDB(userPref) {
    try {
-      const pool = await sql.connect(dbConfig);
+      const pool = await sql.connect(sqlConfig);
       console.log("run DB");
       
       const result = await pool.request()
@@ -44,7 +49,6 @@ export async function addUserPreferencesToDB(userPref) {
             interests,
             user_id
          ) 
-         OUTPUT INSERTED.preference_id
          VALUES (
             @PreferredPartner,
             @RelationshipType,
@@ -60,7 +64,7 @@ export async function addUserPreferencesToDB(userPref) {
          `);
 
       if (result.rowsAffected[0] > 0) {
-         return { message: "Preference created", id: result.recordset[0].preference_id };
+         return { message: "Preference created"};
       } else {
          return { message: 'Failed to update preferences' };
       }

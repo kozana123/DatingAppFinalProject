@@ -7,7 +7,7 @@ export async function createNewUserPreferences(req, res){
     console.log("run CONTROLLER");
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
     let token = await user.createUserPreferences()
-    if (token.id) {
+    if (token) {
     return res.status(201).json(token);
     } else {
     return res.status(400).json(token);

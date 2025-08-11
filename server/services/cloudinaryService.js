@@ -18,16 +18,17 @@ export async function uploadImage(file, filename, folder = 'DatingAppFinalProjec
   try {
     const uploadOptions = {
       folder,
-      use_filename: true,
-      unique_filename: false,
-      overwrite: true,
+      use_filename: false,
+      unique_filename: true,
+      overwrite: false,
     };
 
     let result;
     if (Buffer.isBuffer(file)) {
       // Upload from buffer (e.g., file from multer memory storage)
       result = await cloudinary.uploader.upload_stream(uploadOptions, (error, res) => {
-        if (error) throw error;
+        if (error) console.log(error);
+         error;
         return res;
       });
       // However, cloudinary.uploader.upload_stream is callback-based, so better to wrap in Promise:

@@ -1,8 +1,6 @@
 import User from './userDetails.model.js'
 import { uploadImage } from '../cloudinaryService.js';
 
-
-
 export async function createNewUser(req, res){ 
 
     try {
@@ -29,7 +27,7 @@ export async function createNewUser(req, res){
         parseFloat(dto.latitude),
         parseFloat(dto.longitude)
         );
-
+console.log("run Controller");
         // Save user & generate JWT token (assuming addUser returns token)
         const token = await user.addUser();
 
@@ -40,12 +38,6 @@ export async function createNewUser(req, res){
     }
 
 }
-
-
-
-
-
-
 
 export async function getAllUsers(req, res){
 
