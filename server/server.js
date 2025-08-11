@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { createServer } from 'http';
-
+import 'dotenv/config'
 import { initIO } from './socket.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import v1Router from './routers/v1.js';
@@ -31,7 +31,7 @@ app.use(errorHandler);
 
 // --- Create server and initialize Socket.IO ---
 const httpServer = createServer(app);
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3501;
 initIO(httpServer);
 
 httpServer.listen(PORT, () => {

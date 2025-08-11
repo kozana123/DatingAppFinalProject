@@ -4,11 +4,14 @@
 
 export async function createNewUserPreferences(req, res){ 
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
-
-
+    console.log("run CONTROLLER");
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
     let token = await user.createUserPreferences()
-    return res.status(204).json({message: 'Successfully added', token})
+    if (token.id) {
+    return res.status(201).json(token);
+    } else {
+    return res.status(400).json(token);
+    }
     
 }
 
@@ -16,8 +19,8 @@ export async function test(req, res){
     let {userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests} = req.body
 
     let user = new UserPreferences(userId, preferredPartner, relationshipType, heightPreferences, religion, isSmoker, preferredDistanceKm, minAgePreference, maxAgePreference, interests)
-    
-    return res.status(200).json({message: user})
+
+    return await res.status(200).json({message: user})
 }
 
 

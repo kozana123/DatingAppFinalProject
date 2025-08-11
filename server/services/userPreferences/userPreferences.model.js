@@ -19,6 +19,7 @@ export default class UserPreferences {
     }
 
     async createUserPreferences() {
+      console.log("run MODEL");
       let user = await addUserPreferencesToDB(this);
       // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
       return user

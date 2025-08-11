@@ -2,6 +2,7 @@ import sql from 'mssql';
 
 export default class DB {
 
+  
   static sqlConfig = {
     server: process.env.DB_SERVER,
     database: process.env.DB_NAME,
@@ -9,7 +10,7 @@ export default class DB {
     encrypt: false,
     trustServerCertificate: true,
     trustedConnection: true,  // This enables Windows Authentication
-    enableArithAbort: true,   // Recommended for newer versions
+    // enableArithAbort: true,   // Recommended for newer versions
   },
   pool: {
     max: 10,
@@ -45,6 +46,7 @@ export default class DB {
     }
   }
 }
+  console.log(process.env.DB_SERVER, process.env.DB_NAME);
 
 const connectToDb = async () => {
   try {

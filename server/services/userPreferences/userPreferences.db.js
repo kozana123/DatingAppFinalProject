@@ -1,23 +1,36 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-import DB from '../db.js';
+// import DB from '../../db.js';
+// import sql from 'mssql';
+
+import * as sql from 'mssql';
+
+const dbConfig = {
+  server: 'T67396',
+  database: 'DatingApp',
+  options: {
+    trustedConnection: true,
+    trustServerCertificate: true,
+  },
+};
 
 export async function addUserPreferencesToDB(userPref) {
    try {
-      const pool = await sql.connect(DB.sqlConfig);
-
+      const pool = await sql.connect(dbConfig);
+      console.log("run DB");
+      
       const result = await pool.request()
-         .input('PreferredPartner', sql.NVarChar, userPref.PreferredPartner)
-         .input('RelationshipType', sql.NVarChar, userPref.RelationshipType)
-         .input('HeightPreferences', sql.NVarChar, userPref.HeightPreferences)
-         .input('Religion', sql.NVarChar, userPref.Religion)
-         .input('IsSmoker', sql.Bit, userPref.IsSmoker)
-         .input('PreferredDistanceKm', sql.Int, userPref.PreferredDistanceKm)
-         .input('MinAgePreference', sql.Int, userPref.MinAgePreference)
-         .input('MaxAgePreference', sql.Int, userPref.MaxAgePreference)
-         .input('Interests', sql.NVarChar, userPref.Interests || null)
-         .input('UserId', sql.Int, userPref.UserId)
+         .input('PreferredPartner', sql.NVarChar, userPref.preferredPartner)
+         .input('RelationshipType', sql.NVarChar, userPref.relationshipType)
+         .input('HeightPreferences', sql.NVarChar, userPref.heightPreferences)
+         .input('Religion', sql.NVarChar, userPref.religion)
+         .input('IsSmoker', sql.Bit, userPref.isSmoker)
+         .input('PreferredDistanceKm', sql.Int, userPref.preferredDistanceKm)
+         .input('MinAgePreference', sql.Int, userPref.minAgePreference)
+         .input('MaxAgePreference', sql.Int, userPref.maxAgePreference)
+         .input('Interests', sql.NVarChar, userPref.interests || null)
+         .input('UserId', sql.Int, userPref.userId)
          .query(`
          INSERT INTO user_preferences (
             preferred_partner,
@@ -52,18 +65,12 @@ export async function addUserPreferencesToDB(userPref) {
          return { message: 'Failed to update preferences' };
       }
    } catch (err) {
-      console.error('SQL Connection Error:', JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
-      return { message: err.message || 'Server error' };
+      console.error('SQL ERROR:', err);
+      throw err; // let it bubble up so controller returns error
+
    } finally {
       sql.close();
    }
-   // let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-   // users = JSON.parse(users.toString())
-
-   // users.push(user)
-   // await writeFile(path.join(__dirname, 'DB', 'users.json'), JSON.stringify(users))
-
-   
 }  
 
 export async function findAllUsers() {
