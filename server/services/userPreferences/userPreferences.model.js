@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-import {findAllUsers, findSpecificUser, addUserPreferencesToDB, } from './userPreferences.db.js'
+import {findSpecificUser, addUserPreferencesToDB, updateSearch,updateUser } from './userPreferences.db.js'
 
 
 export default class UserPreferences {
@@ -25,26 +25,18 @@ export default class UserPreferences {
       return user
     }
   
-    static async getUserPreferencesByUserId(email) {
-      return await findSpecificUser(email);
+    static async getUserPreferencesByUserId(id) {
+      return await findSpecificUser(id);
     }
 
-    static async updateSearchPreferences(email, password) {
-      let user = await User.findUser(email);
+    static async updateSearchPreferences(userId, prefs) {
 
-      if (user && bcrypt.compareSync(password, user.password)){
-        delete user.password
-        let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-        return token
-      }      
-      else
-        return null
+      return await updateSearch(userId, prefs);
     } 
   
-    async updateUserPreferences() {
-      let user = await addUserToDB(this);
-      let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-      return token
+    static async updateUserPreferences(userId, prefs) {
+      let user = await updateUser(userId, prefs);
+      return user
     } 
 }
 

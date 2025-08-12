@@ -1,6 +1,7 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
+import UserPreferences from './userPreferences.model.js'
 // import DB from '../../db.js';
 import sql from 'mssql';
 
@@ -75,19 +76,108 @@ export async function addUserPreferencesToDB(userPref) {
    } finally {
       sql.close();
    }
-}  
+} 
+
+export async function findSpecificUser(userId) {
+  try {
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool
+      .request()
+      .input('user_id', sql.Int, userId)
+      .query('SELECT * FROM user_preferences WHERE user_id = @user_id');
+
+    if (result.recordset.length > 0) {
+      const row = result.recordset[0];
+      return new UserPreferences(
+        row.user_id,
+        row.preferred_partner,
+        row.relationship_type,
+        row.height_preferences,
+        row.religion,
+        row.is_smoker,
+        row.preferred_distance_km,
+        row.min_age_preference,
+        row.max_age_preference,
+        row.interests ?? null
+      );
+    }
+
+    return null;
+  } catch (err) {
+    console.error('Error fetching user preferences:', err);
+    throw err;
+  }
+  finally {
+      sql.close();
+  }
+}
+
+export async function updateSearch(userId, prefs) {
+  try {
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool.request()
+      .input('PreferredPartner', sql.NVarChar, prefs.preferredPartner ?? null)
+      .input('PreferredDistanceKm', sql.Int, prefs.preferredDistanceKm)
+      .input('MinAgePreference', sql.Int, prefs.minAgePreference)
+      .input('MaxAgePreference', sql.Int, prefs.maxAgePreference)
+      .input('UserId', sql.Int, userId)
+      .query(`
+        UPDATE user_preferences
+        SET
+          preferred_partner = @PreferredPartner,
+          preferred_distance_km = @PreferredDistanceKm,
+          min_age_preference = @MinAgePreference,
+          max_age_preference = @MaxAgePreference
+        WHERE user_id = @UserId
+      `);
+
+    return result.rowsAffected[0]; // Same as C# ExecuteNonQuery()
+  } catch (err) {
+    throw new Error('Database update failed: ' + err.message);
+  }
+}
+
+export async function updateUser(userId, prefs) {
+  try {
+   
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool.request()
+      .input("RelationshipType", sql.VarChar, prefs.relationshipType)
+      .input("HeightPreferences", sql.VarChar, prefs.heightPreferences)
+      .input("Religion", sql.VarChar, prefs.religion)
+      .input("IsSmoker", sql.Bit, prefs.isSmoker)
+      .input("Interests", sql.VarChar, prefs.interests)
+      .input("UserId", sql.Int, userId)
+      .query(`
+        UPDATE user_preferences
+        SET
+          relationship_type = @RelationshipType,
+          height_preferences = @HeightPreferences,
+          religion = @Religion,
+          is_smoker = @IsSmoker,
+          interests = @Interests
+        WHERE user_id = @UserId;
+      `);
+
+    return result.rowsAffected[0]; // number of updated rows
+  } catch (err) {
+    throw new Error("Database update failed: " + err.message);
+  }
+}
+
+
 
 export async function findAllUsers() {
    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
    return JSON.parse(users.toString())
 }
 
-export async function findSpecificUser(email) {
-   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-   users = JSON.parse(users.toString())
-   let user = users.find(u => u.email == email)
+// export async function findSpecificUser(email) {
+//    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
+//    users = JSON.parse(users.toString())
+//    let user = users.find(u => u.email == email)
 
-   return user
+//    return user
    
-}
+// }
 

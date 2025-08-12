@@ -1,7 +1,7 @@
 
 
 import {Router} from 'express'
-import {getAllUsers, getUsersById, createNewUserPreferences, updateUser, deleteUser, loginUser, test} from './userPreferences.controller.js'
+import { createNewUserPreferences, getPreferences, updateSearchingPreferences, updateUserPreferences} from './userPreferences.controller.js'
 import { auth } from '../../middlewares/auth.js';
 
 function logger (req, res, next) {
@@ -14,11 +14,15 @@ const userPreferencesRouter = Router()
 
 userPreferencesRouter
     .post('/register', createNewUserPreferences)
-    .get('/',logger, getAllUsers)
-    .get('/profile/:email', getUsersById)
+    .get('/getUserById/:userId', getPreferences)
+    .put('/updateSearching/:userId', updateSearchingPreferences)
+    .put('/updateUser/:userId', updateUserPreferences)
+
+
+
+    // .get('/',logger, getAllUsers)
     
-    .post('/login', loginUser)
-    .put('/:email', updateUser)
-    .delete('/:email', auth ,deleteUser)
+    // .put('/:email', updateUser)
+    // .delete('/:email', auth ,deleteUser)
 
 export default userPreferencesRouter 

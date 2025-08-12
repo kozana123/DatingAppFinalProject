@@ -12,7 +12,7 @@ import {
 import io from 'socket.io-client';
 import { DataContext } from "./DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
-import { addMatch } from "./api";
+import { addMatch } from "../api";
 
 
 

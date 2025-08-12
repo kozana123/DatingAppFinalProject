@@ -1,7 +1,14 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
-import {findAllUsers, findSpecificUser, addUserToDB, } from './userDetails.db.js'
+import {
+  addUserToDB,
+  getUserByEmailAndPasswordFromDB,
+  emailExistsInDB,
+  getUserByIdFromDB,
+  updateProfileImageInDB,
+  updateUserLocationInDB,
+  deleteUserByIdFromDB
+} from "./userDetails.db.js";
 
 
 export default class User {
@@ -18,25 +25,6 @@ export default class User {
     this.longitude = longitude;       // float/number
   }
 
-    static async allUsers() {
-      return await findAllUsers();
-    }
-  
-    static async findUser(email) {
-      return await findSpecificUser(email);
-    }
-
-    static async login(email, password) {
-      let user = await User.findUser(email);
-
-      if (user && bcrypt.compareSync(password, user.password)){
-        delete user.password
-        let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-        return token
-      }      
-      else
-        return null
-    } 
   
     async addUser() {
       console.log("run module");
@@ -45,6 +33,72 @@ export default class User {
       // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
       return user
     } 
+
+    async addUser() {
+      return await addUserToDB(this);
+    }
+
+
+    static async emailExists(email) {
+      return await emailExistsInDB(email);
+    }
+
+
+    static async getUserByEmailAndPassword(email, password) {
+      
+      const user = await getUserByEmailAndPasswordFromDB(email);
+      if (!user) return null;
+      
+      if(password == user.user_password){
+        return user;
+      } else{
+        return false;
+      }
+    }  
+
+    static async getUserById(userId) {
+      return await getUserByIdFromDB(userId);
+    }
+  
+ 
+    static async updateProfileImage(userId, imageUrl) {
+      console.log("in module");
+
+      return await updateProfileImageInDB(userId, imageUrl);
+    }
+  
+
+    static async updateUserLocation(userId, city, latitude, longitude) {
+      return await updateUserLocationInDB(userId, city, latitude, longitude);
+    }
+  
+
+    static async deleteUserById(userId) {
+      return await deleteUserByIdFromDB(userId);
+    }
+  
+  
+    
 }
 
 
+
+    // static async allUsers() {
+    //   return await findAllUsers();
+    // }
+  
+    // static async findUser(email) {
+    //   return await findSpecificUser(email);
+    // }
+
+    // static async login(email, password) {
+    //   let user = await User.findUser(email);
+
+    //   if (user && bcrypt.compareSync(password, user.password)){
+    //     delete user.password
+    //     let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
+    //     return token
+    //   }      
+    //   else
+    //     return null
+    // } 

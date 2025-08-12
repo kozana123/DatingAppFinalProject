@@ -29,7 +29,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from "react-native-picker-select";
-import { updateUserSearch, updateUserDetails, deleteUserById } from "../api";
+import { updateUserSearch, updateUserDetails, deleteUserById } from "../../api";
 
 export default function ProfileScreen() {
   const { user, userPref, setUserPref, setUser, handleImageChoice, handleSearchLocation, handleUseCurrentLocation } = useContext(DataContext);
@@ -227,7 +227,7 @@ export default function ProfileScreen() {
               <Avatar
                 size={140}
                 rounded
-                source={ { uri: user.profileImage }}
+                source={ { uri: user.profile_image }}
                 onPress={handleImageChoice}
               >
                 <Avatar.Accessory
@@ -238,7 +238,7 @@ export default function ProfileScreen() {
               <Text style={[styles.name, { fontFamily: "Prompt-SemiBold" }]}>
                 {user.userName},{" "}
                 <Text style={[styles.birthDate, { fontFamily: "Prompt-Thin" }]}>
-                  {getAge(user.birthDate)}
+                  {getAge(user.birth_date)}
                 </Text>
               </Text>
             </View>

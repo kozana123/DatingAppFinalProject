@@ -1,10 +1,31 @@
 @host = http://localhost:3501/api/v1
 
 
-GET {{host}}/users
+GET {{host}}/userDetails/check-email?email=dor@xample.com
 ###
-GET {{host}}/users/profile/Dor@example.com
+POST {{host}}/userDetails/login
+content-Type: application/json
+
+{
+  "email": "dor@example.com" , 
+  "password": "securePassword123"
+}
 ###
+PUT {{host}}/userDetails/location/30
+content-Type: application/json
+
+{
+  "city": "Netantya" , 
+  "latitude": 40.6666,
+  "longitude": 40.7777
+}
+###
+
+DELETE {{host}}/userDetails/delete/31
+content-Type: application/json
+
+###
+
 POST {{host}}/userPreferences/register
 content-Type: application/json
 
@@ -21,21 +42,36 @@ content-Type: application/json
   "interests": "music,travel,sports"
 }
 ###
-PUT {{host}}/users/Dor@example.com
-###
+PUT http://10.0.0.20:3501/api/v1/userDetails/register
+Content-Type: application/json
 
-GET {{host}}/upload/pic
+{
+  "preferredPartner": "male",
+  "preferredDistanceKm": 100,
+  "minAgePreference": 18,
+  "maxAgePreference": 24
+}
 ###
-GET {{host}}/upload/pic/Dor@example.com
-###
+PUT {{host}}/userPreferences/updateUser/21
+Content-Type: application/json
 
-POST {{host}}/users/login
+{
+  "relationshipType": "male",
+  "heightPreferences": "152",
+  "religion": "Hindu",
+  "isSmoker": false,
+  "interests": "Traveling,Gaming,Shy,Adventurous,Music"
+}
+###
+POST {{host}}/matches/add
 content-Type: application/json
 
 {
-    "email": "Dor@example.com",
-    "password": "1234567"
+  "User1ID": 30 , 
+  "User2ID": 32,
+  "MatchStatus": "true"
 }
 ###
-DELETE {{host}}/users/Dor@example.com
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRG9yMiIsImRhdGUiOiIxNC8wOS8xOTk3IiwiZW1haWwiOiJEb3JAZXhhbXBsZS5jb20iLCJpYXQiOjE3NDYyOTQxMzh9.9uuxyH0lJR-5ozVCrYRFDuXYQZUMCEJ1qV3fAec5ZyY
+
+GET {{host}}/matches/matched-users/32
+###

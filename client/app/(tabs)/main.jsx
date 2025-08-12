@@ -80,8 +80,8 @@ export default function VideoCallStartScreen() {
 
         <Image
           source={
-            user && user.profileImage
-              ? { uri: user.profileImage }
+            user && user.profile_image
+              ? { uri: user.profile_image }
               : {
                   uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
                 }

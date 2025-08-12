@@ -1,15 +1,19 @@
 import { router } from "expo-router";
 import axios from 'axios';
 
-const apiPreferencesUrl = "http://www.DatingServer.somee.com/api/userpreferences/"
-const apiUsersUrl = "http://www.DatingServer.somee.com/api/users/"
-const apiMatchesUrl = "http://www.DatingServer.somee.com/api/Matches/"
+const SIGNALING_SERVER_URL = 'http://10.0.0.20:3501';
+
+const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
+const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
+const apiMatchesUrl = `${SIGNALING_SERVER_URL}/api/v1/matches`
 
 
 
 export const checkEmailExists = async (email) => {
   try {
-    const res = await fetch(`${apiUsersUrl}check-email?email=${encodeURIComponent(email)}`);
+    console.log(email);
+
+    const res = await fetch(`${apiUsersUrl}/check-email?email=${encodeURIComponent(email)}`);
     const data = await res.json();
     console.log(res);
     
@@ -21,44 +25,43 @@ export const checkEmailExists = async (email) => {
     }
   } catch (err) {
     console.error("Email check failed:", err);
+    return false
   }
   
 };
 
-
 export const registerUser = async (newUser) => {
   const formData = new FormData();
-  console.log("Register Run");
   
   // Append all text fields
-  formData.append('UserName', newUser.name);
-  formData.append('UserEmail', newUser.email);
-  formData.append('UserPassword', newUser.password);
-  formData.append('BirthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
-  formData.append('Gender', newUser.gender);
-  formData.append('City', newUser.city);
-  formData.append('Latitude', newUser.latitude.toString());
-  formData.append('Longitude', newUser.longitude.toString());
+  formData.append('userName', newUser.name);
+  formData.append('userEmail', newUser.email);
+  formData.append('userPassword', newUser.password);
+  formData.append('birthDate', newUser.birthDate); // format: 'YYYY-MM-DD'
+  formData.append('gender', newUser.gender);
+  formData.append('city', newUser.city);
+  formData.append('latitude', newUser.latitude.toString());
+  formData.append('longitude', newUser.longitude.toString());
 
   // Append the image
   const uriParts = newUser.image.split('.');
   const fileType = uriParts[uriParts.length - 1];
 
-  formData.append('ProfileImageFile', {
+  formData.append('profileImageFile', {
     uri: newUser.image,
     name: `profile.${fileType}`,
     type: `image/${fileType}`
   });
 
   try {
-    const response = await axios.post(apiUsersUrl+"register", formData, {
+    const response = await axios.post(`${apiUsersUrl}/register`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
     console.log('Registration successful:', response.data);
-    const userId = {userId: response.data.userId}
+    const userId = {userId: response.data.token}
     
     router.push({pathname:"/registerPages/registerIntrest", params: userId})
 
@@ -72,7 +75,7 @@ export const RegisterPreferences = async (prefs, userPreference) => {
 
     const preferences = {
       userId: userPreference.userId, // Replace with actual user ID
-      preferredPartner: userPreference.genderPreference ,
+      preferredPartner: userPreference.genderPreference,
       relationshipType: userPreference.interest,
       heightPreferences: "",
       religion: "",
@@ -84,7 +87,7 @@ export const RegisterPreferences = async (prefs, userPreference) => {
     };
 
     try {
-      const response = await fetch(`${apiPreferencesUrl}userPreferences`, {
+      const response = await fetch(`${apiPreferencesUrl}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +95,7 @@ export const RegisterPreferences = async (prefs, userPreference) => {
         body: JSON.stringify(preferences),
       });
 
-      if (response.status === 204) {
+      if (response.status === 201) {
         console.log("Preferences updated successfully.");
         router.push("/login")
       } else {

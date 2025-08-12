@@ -50,3 +50,52 @@ export async function uploadImage(file, filename, folder = 'DatingAppFinalProjec
     throw new Error('Cloudinary upload failed: ' + error.message);
   }
 }
+
+function extractImageNameFromUrl(url) {
+  // Split by '/upload/' to isolate the part after upload
+  const parts = url.split('/upload/');
+  if (parts.length < 2) return null;
+
+  // Remove version prefix (v1234567890/)
+  let afterUpload = parts[1].replace(/^v\d+\//, '');
+
+  // Remove the file extension (.jpg, .png, etc)
+  const publicId = afterUpload.replace(/\.[^/.]+$/, '');
+
+  // Now extract only the file name after the last slash
+  const segments = publicId.split('/');
+  return segments[segments.length - 1]; // last part is the file name
+}
+
+export async function replaceImage(newFile, fileName, folder = 'DatingAppFinalProject') {
+  try {
+    const publicId = extractImageNameFromUrl(fileName)
+    console.log(publicId);
+    
+    const uploadOptions = {
+      public_id: publicId,
+      overwrite: true,
+      resource_type: 'image',
+      folder, // optional, Cloudinary uses public_id's folder anyway
+    };
+
+    let result;
+    if (Buffer.isBuffer(newFile)) {
+      // Upload buffer with overwrite
+      result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(uploadOptions, (error, res) => {
+          if (error) reject(error);
+          else resolve(res);
+        });
+        stream.end(newFile);
+      });
+    } else {
+      // Upload from path or URL with overwrite
+      result = await cloudinary.uploader.upload(newFile, uploadOptions);
+    }
+
+    return result.secure_url;
+  } catch (error) {
+    throw new Error('Cloudinary replace failed: ' + error.message);
+  }
+}

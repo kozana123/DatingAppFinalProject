@@ -1,5 +1,12 @@
 import {Router} from 'express'
-import {createNewUser} from './userDetails.controller.js'
+import {
+    createNewUser,
+    checkEmailExists,
+    login,
+    updateLocation,
+    updateProfileImage,
+    deleteUser
+  } from './userDetails.controller.js';
 // import { auth } from '../../middlewares/auth.js';
 import multer from 'multer';
 
@@ -11,14 +18,11 @@ function logger (req, res, next) {
 
 const upload = multer()
 const userDetailsRouter = Router()
+userDetailsRouter.post('/register', upload.single('profileImageFile'), createNewUser);
+userDetailsRouter.get('/check-email', checkEmailExists);
+userDetailsRouter.post('/login', login);
+userDetailsRouter.put('/location/:id', updateLocation);
+userDetailsRouter.put('/profile-image/:userId', upload.single('profileImageFile'), updateProfileImage);
+userDetailsRouter.delete('/delete/:id', deleteUser);
 
-userDetailsRouter
-    .post('/register', upload.single('profileImageFile') ,createNewUser)
-
-    // .get('/',logger, getAllUsers)
-    // .get('/profile/:email', getUsersById)
-    // .post('/login', loginUser)
-    // .put('/:email', updateUser)
-    // .delete('/:email', auth ,deleteUser)
-
-export default userDetailsRouter 
+export default userDetailsRouter;

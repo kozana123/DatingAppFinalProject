@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import SHA256 from "crypto-js/sha256";
-import { checkEmailExists } from "../api";
+import { checkEmailExists } from "../../api";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useEffect } from "react";
@@ -69,7 +69,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async  () => {
     if (!newUser.email || !newUser.password || confirmPassword == "") {
       alert("Please fill all fields.");
       return;
@@ -89,7 +89,7 @@ export default function RegisterPage() {
       alert("Passwords do not match.");
       return;
     }
-    const pass = checkEmailExists(newUser.email);
+    const pass = await checkEmailExists(newUser.email);
 
     if (pass) {
       const hashedPassword = SHA256(newUser.password).toString();

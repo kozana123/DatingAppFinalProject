@@ -72,29 +72,59 @@ export default function Login() {
     }
   };
 
-    const login = async () => {
-      const hashedPassword = SHA256(password).toString();
-      const response = await fetch(
-        `http://www.DatingServer.somee.com/api/users/login?email=${userEmail}&password=${hashedPassword}`
-      );
+  const login = async () => {
+    const hashedPassword = SHA256(password).toString();
+    console.log(hashedPassword);
 
-      if (response.status == 200) {
+    try {
+      const response = await fetch('http://10.0.0.20:3501/api/v1/userDetails/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          password: hashedPassword,
+        }),
+      });
+
+      if (response.status === 201) {
         const user = await response.json();
         setUser(user);
-        getPreferences(user.userId);
-        console.log("Logged in:", user);
-        router.navigate("/(tabs)/main");
+        getPreferences(user.user_id);
+        console.log('Logged in:', user);
+        router.navigate('/(tabs)/main');
       } else {
-        console.warn("Login failed:", await response.text());
+        console.warn('Login failed:', await response.text());
       }
-    };
+    } catch (error) {
+      console.error('Login request error:', error);
+    }
+  };
+
+    // const login = async () => {
+    //   const hashedPassword = SHA256(password).toString();
+    //   const response = await fetch(
+    //     `http://10.0.0.20:3501/userDetails/login?email=${userEmail}&password=${hashedPassword}`
+    //   );
+
+    //   if (response.status == 200) {
+    //     const user = await response.json();
+    //     setUser(user);
+    //     getPreferences(user.userId);
+    //     console.log("Logged in:", user);
+    //     router.navigate("/(tabs)/main");
+    //   } else {
+    //     console.warn("Login failed:", await response.text());
+    //   }
+    // };
 
   const getPreferences = async (id) => {
     const response = await fetch(
-      `http://www.DatingServer.somee.com/api/userpreferences/${id}`
+      `http://10.0.0.20:3501/api/v1/userPreferences/getUserById/${id}`
     );
 
-    if (response.status == 200) {
+    if (response.status == 201) {
       const userPref = await response.json();
       setUserPref(userPref);
       console.log("got pref:", userPref);

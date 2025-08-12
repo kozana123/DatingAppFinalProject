@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
-import { fetchMatchedUsers } from "../api";
+import { fetchMatchedUsers } from "../../api";
 
 // const messages = [
 //   {

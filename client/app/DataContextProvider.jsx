@@ -4,7 +4,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { updateProfileImage, updateUserLocation } from "./api";
+import { updateProfileImage, updateUserLocation } from "../api";
 import * as Location from "expo-location";
 
 
