@@ -1,24 +1,23 @@
 import {readFile, writeFile} from 'fs/promises'
 import path from 'path';
 import { __dirname } from '../../globals.js';
-// import sql from 'mssql' 
-import { sql } from '../../db.js';
+import sql from 'mssql' 
 
-// const sqlConfig = {
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASS,
-//   database: process.env.DB_NAME,
-//   server: process.env.DB_SERVER,
-//   pool: {
-//     max: 10,
-//     min: 0,
-//     idleTimeoutMillis: 30000
-//   },
-//   options: {
-//     encrypt: false, // true for azure
-//     trustServerCertificate: true //false for local
-//   }
-// }
+const sqlConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  server: process.env.DB_SERVER,
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
+  },
+  options: {
+    encrypt: false, // true for azure
+    trustServerCertificate: true //false for local
+  }
+}
 
 
 export async function addUserToDB(user) {
