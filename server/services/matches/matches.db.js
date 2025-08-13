@@ -29,7 +29,7 @@ export async function addMatchToDB(dto) {
     const request = new sql.Request();
     request.input('User1ID', sql.Int, dto.User1ID);
     request.input('User2ID', sql.Int, dto.User2ID);
-    request.input('MatchStatus', sql.VarChar(50), dto.MatchStatus);
+    request.input('MatchStatus', sql.Bit, dto.MatchStatus);
 
     const result = await request.query(query);
     return result.rowsAffected[0] > 0;

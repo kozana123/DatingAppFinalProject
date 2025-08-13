@@ -74,10 +74,10 @@ export default function Login() {
 
   const login = async () => {
     const hashedPassword = SHA256(password).toString();
-    console.log(hashedPassword);
-
+    console.log(userEmail, hashedPassword);
+    
     try {
-      const response = await fetch('http://10.0.0.20:3501/api/v1/userDetails/login', {
+      const response = await fetch('http://10.0.0.25:3501/api/v1/userDetails/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,11 +87,11 @@ export default function Login() {
           password: hashedPassword,
         }),
       });
-
+      
       if (response.status === 201) {
         const user = await response.json();
         setUser(user);
-        getPreferences(user.user_id);
+        await getPreferences(user.user_id);
         console.log('Logged in:', user);
         router.navigate('/(tabs)/main');
       } else {
@@ -102,26 +102,9 @@ export default function Login() {
     }
   };
 
-    // const login = async () => {
-    //   const hashedPassword = SHA256(password).toString();
-    //   const response = await fetch(
-    //     `http://10.0.0.20:3501/userDetails/login?email=${userEmail}&password=${hashedPassword}`
-    //   );
-
-    //   if (response.status == 200) {
-    //     const user = await response.json();
-    //     setUser(user);
-    //     getPreferences(user.userId);
-    //     console.log("Logged in:", user);
-    //     router.navigate("/(tabs)/main");
-    //   } else {
-    //     console.warn("Login failed:", await response.text());
-    //   }
-    // };
-
   const getPreferences = async (id) => {
     const response = await fetch(
-      `http://10.0.0.20:3501/api/v1/userPreferences/getUserById/${id}`
+      `http://10.0.0.25:3501/api/v1/userPreferences/getUserById/${id}`
     );
 
     if (response.status == 201) {

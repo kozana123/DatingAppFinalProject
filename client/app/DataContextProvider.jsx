@@ -53,8 +53,8 @@ export default function DataContextProvider(props) {
     });
 
     if (!result.canceled) {
-      setUser({...user, profileImage: result.assets[0].uri})
-      updateProfileImage(user.userId, result.assets[0].uri)
+      setUser({...user, profile_image: result.assets[0].uri})
+      updateProfileImage(user.user_id, result.assets[0].uri)
     }
   };
 
@@ -67,7 +67,8 @@ export default function DataContextProvider(props) {
     });
 
     if (!result.canceled) {
-      setUser({...user, profileImage: result.assets[0].uri})
+      setUser({...user, profile_image: result.assets[0].uri})
+      updateProfileImage(user.user_id, result.assets[0].uri)
     }
   };
 
@@ -90,7 +91,7 @@ export default function DataContextProvider(props) {
 
         setUser({...user, latitude: latitude, longitude: longitude, city: formattedAddress})
         alert(`Found your location at: ${formattedAddress}`)
-        updateUserLocation(user.userId, formattedAddress, latitude, longitude)
+        updateUserLocation(user.user_id, formattedAddress, latitude, longitude)
       }
     }
     catch (error) {
@@ -121,7 +122,7 @@ export default function DataContextProvider(props) {
         const formattedAddress = `${place.city}`;
         setUser({...user, latitude: latitude, longitude: longitude, city: formattedAddress})
         alert(`Found your location at:${formattedAddress}`)
-        updateUserLocation(user.userId, formattedAddress, latitude, longitude)
+        updateUserLocation(user.user_id, formattedAddress, latitude, longitude)
       }
     } catch (error) {
       alert("Error searching for location: " + error.message);

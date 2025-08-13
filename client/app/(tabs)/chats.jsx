@@ -16,63 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import { fetchMatchedUsers } from "../../api";
 
-// const messages = [
-//   {
-//     id: "1",
-//     name: "Anika",
-//     message: "Oh i don't like fish 🙈",
-//     avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-//     unread: true,
-//   },
-//   {
-//     id: "2",
-//     name: "Shreya",
-//     message: "Can we go somewhere?",
-//     avatar: "https://randomuser.me/api/portraits/women/2.jpg",
-//     unread: true,
-//   },
-//   {
-//     id: "3",
-//     name: "Lilly",
-//     message: "You: If I were a stop light, I’d turn",
-//     avatar: "https://randomuser.me/api/portraits/women/3.jpg",
-//     unread: false,
-//   },
-//   {
-//     id: "4",
-//     name: "Mona",
-//     message: "See you soon 😉",
-//     avatar: "https://randomuser.me/api/portraits/women/4.jpg",
-//     unread: false,
-//   },
-//   {
-//     id: "5",
-//     name: "Sonia",
-//     message: "Are you serious?!",
-//     avatar: "https://randomuser.me/api/portraits/women/5.jpg",
-//     unread: true,
-//   },
-//   {
-//     id: "6",
-//     name: "Monika",
-//     message: "You: How about a movie and then...",
-//     avatar: "https://randomuser.me/api/portraits/women/6.jpg",
-//     favorite: true,
-//   },
-//   {
-//     id: "7",
-//     name: "Katrina",
-//     message: "OK",
-//     avatar: "https://randomuser.me/api/portraits/women/7.jpg",
-//   },
-//   {
-//     id: "8",
-//     name: "Kiran",
-//     message: "You: How are you?)",
-//     avatar: "https://randomuser.me/api/portraits/women/8.jpg",
-//   },
-// ];
-
 export default function Chats() {
 
   const navigation = useNavigation();
@@ -85,7 +28,7 @@ export default function Chats() {
   useEffect(() => {
     const loadMatches = async () => {
       try {
-        const result = await fetchMatchedUsers(user.userId);
+        const result = await fetchMatchedUsers(user.user_id);
         setMatches(result || []);
       } catch (error) {
         console.error("Failed to fetch matches:", error);
@@ -95,7 +38,7 @@ export default function Chats() {
     };
 
     loadMatches();
-  }, [user.userId]);
+  }, [user.matched_user_id]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -103,11 +46,11 @@ export default function Chats() {
     onPress={() =>
       navigation.navigate("ChatScreen", {
         name: item.userName,
-        avatar: item.profileImage,
+        avatar: item.profile_image,
       })
     }
   >
-    <Image source={{ uri: item.profileImage }} style={styles.avatar} />
+    <Image source={{ uri: item.profile_image }} style={styles.avatar} />
     <View style={styles.messageContainer}>
       <Text style={styles.name}>{item.userName}</Text>
       <Text style={styles.message}>{item.message}</Text>
@@ -132,13 +75,7 @@ export default function Chats() {
         <View style={styles.header}>
           <Text style={styles.headerText}>Chat</Text>
         <Image
-          source={
-            user && user.profileImage
-              ? { uri: user.profileImage }
-              : {
-                  uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                }
-          }
+          source={{ uri: user.profile_image }}
           style={styles.avatar}
         />
                  

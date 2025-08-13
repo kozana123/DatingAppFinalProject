@@ -504,7 +504,7 @@ export default function ProfileScreen() {
 
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={() => updateUserDetails(userPref, user.userId)}
+                onPress={() => updateUserDetails(userPref, user.user_id)}
               >
                 <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>
@@ -568,7 +568,7 @@ export default function ProfileScreen() {
               />
               <TouchableOpacity
                 style={styles.deleteBtn}
-                onPress={() => updateUserSearch(userPref, user.userId)}
+                onPress={() => updateUserSearch(userPref, user.user_id)}
               >
                 <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>

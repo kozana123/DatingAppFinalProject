@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import axios from 'axios';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.20:3501';
+const SIGNALING_SERVER_URL = 'http://10.0.0.25:3501';
 
 const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
 const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
@@ -111,21 +111,21 @@ export const updateUserSearch = async (userPref, userId) => {
   try {
     console.log("updateUserSearch");
     
-    const res = await fetch(`${apiPreferencesUrl}editUserPreferences/${userId}`, {
+    const res = await fetch(`${apiPreferencesUrl}/updateSearching/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        PreferredPartner: userPref.preferredPartner,
-        PreferredDistanceKm: userPref. preferredDistanceKm,
-        MinAgePreference: userPref.minAgePreference,
-        MaxAgePreference: userPref.maxAgePreference,
-        RelationshipType: userPref.relationshipType,
-        HeightPreferences: userPref.heightPreferences,
-        Religion: userPref.religion,
-        IsSmoker: userPref.isSmoker,
-        Interests: userPref.interests
+        preferredPartner: userPref.preferredPartner,
+        preferredDistanceKm: userPref.preferredDistanceKm,
+        minAgePreference: userPref.minAgePreference,
+        maxAgePreference: userPref.maxAgePreference,
+        relationshipType: userPref.relationshipType,
+        heightPreferences: userPref.heightPreferences,
+        religion: userPref.religion,
+        isSmoker: userPref.isSmoker,
+        interests: userPref.interests
       }),
     });
 
@@ -145,21 +145,21 @@ export const updateUserSearch = async (userPref, userId) => {
 export const updateUserDetails = async (userPref, userId) => {
   try {
     
-    const res = await fetch(`${apiPreferencesUrl}editUserDetails/${userId}`, {
+    const res = await fetch(`${apiPreferencesUrl}/updateUser/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        PreferredPartner: userPref.preferredPartner,
-        PreferredDistanceKm: userPref.preferredDistanceKm,
+        preferredPartner: userPref.preferredPartner,
+        preferredDistanceKm: userPref.preferredDistanceKm,
         MinAgePreference: userPref.minAgePreference,
         MaxAgePreference: userPref.maxAgePreference,
-        RelationshipType: userPref.relationshipType,
-        HeightPreferences: userPref.heightPreferences,
-        Religion: userPref.religion,
-        IsSmoker: userPref.isSmoker,
-        Interests: userPref.interests
+        relationshipType: userPref.relationshipType,
+        heightPreferences: userPref.heightPreferences,
+        religion: userPref.religion,
+        isSmoker: userPref.isSmoker,
+        interests: userPref.interests
       }),
     });
 
@@ -185,13 +185,13 @@ export const updateProfileImage = async (userId, imageUri) => {
     const fileType = fileName.split('.').pop();
 
     formData.append('userId', userId); // Optional: if the backend needs it
-    formData.append('newImage', {
+    formData.append('profileImageFile', {
       uri: imageUri,
       type: `image/${fileType}`,
       name: fileName,
     });
 
-    const res = await fetch(`${apiUsersUrl}update-profile-image/${userId}`, {
+    const res = await fetch(`${apiUsersUrl}/profile-image/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -214,7 +214,7 @@ export const updateProfileImage = async (userId, imageUri) => {
 
 export const updateUserLocation = async (userId, city, latitude, longitude) => {
   try {
-    const response = await fetch(`${apiUsersUrl}updateLocation/${userId}`, {
+    const response = await fetch(`${apiUsersUrl}/location/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -241,7 +241,7 @@ export const updateUserLocation = async (userId, city, latitude, longitude) => {
 
 export const addMatch = async (user1ID, user2ID, matchStatus) => {
   try {
-    const response = await fetch(`${apiMatchesUrl}add`, {
+    const response = await fetch(`${apiMatchesUrl}/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -279,7 +279,7 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
 
  export const fetchMatchedUsers = async (userId) => {
   try {
-    const response = await fetch(`${apiMatchesUrl}matched-users/${userId}`);
+    const response = await fetch(`${apiMatchesUrl}/matched-users/${userId}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

@@ -1,84 +1,53 @@
 import sql from 'mssql';
 
-export default class DB {
-
-  
-  static sqlConfig = {
-    server: process.env.DB_SERVER,
-    database: process.env.DB_NAME,
-  options: {
-    encrypt: false,
-    trustServerCertificate: true,
-    trustedConnection: true,  // This enables Windows Authentication
-    // enableArithAbort: true,   // Recommended for newer versions
-  },
+const sqlConfig = {
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  server: process.env.DB_SERVER,
   pool: {
     max: 10,
     min: 0,
     idleTimeoutMillis: 30000
+  },
+  options: {
+    encrypt: false,
+    trustServerCertificate: true
   }
-  }
+};
 
-  static async selectData(query) {
+let pool;
+
+/**
+ * Connect to the database (singleton connection)
+ */
+export async function connectDB() {
+  if (!pool) {
     try {
-      const pool = await sql.connect(DB.sqlConfig);
-      const result = await pool.request().query(query);
-      return result.recordset;
+      pool = await sql.connect(sqlConfig);
+      console.log('✅ Database connected');
     } catch (err) {
-      console.log(err);
+      console.error('❌ Database connection failed:', err);
+      throw err;
     }
   }
+  return pool;
+}
 
-  static async insert(procName, data) {
+/**
+ * Close the database connection
+ */
+export async function closeDB() {
+  if (pool) {
     try {
-      const pool = await sql.connect(DB.sqlConfig);
-
-      let request = new sql.Request();
-      
-      for (const [key, value] of Object.entries(data)) {
-        request.input(key, value)
-      }
-
-      return await pool.request(request).execute(procName);
-
+      await pool.close();
+      console.log('🔌 Database connection closed');
     } catch (err) {
-      console.log(err);
+      console.error('❌ Error closing database connection:', err);
+    } finally {
+      pool = null;
     }
   }
 }
-  console.log(process.env.DB_SERVER, process.env.DB_NAME);
 
-const connectToDb = async () => {
-  try {
-    pool = await sql.connect(config);
-    console.log('Connected to MSSQL database using Windows Authentication');
-  } catch (err) {
-    console.error('Error connecting to MSSQL database:', err);
-    console.error('Make sure:');
-    console.error('1. SQL Server is configured for Windows Authentication');
-    console.error('2. Your Windows user has access to the database');
-    console.error('3. SQL Server is running and accessible');
-    throw err;
-  }
-};
-
-const getPool = () => {
-  if (!pool) {
-    throw new Error('Database pool not initialized. Call connectToDb() first.');
-  }
-  return pool;
-};
-
-const closeConnection = async () => {
-  try {
-    if (pool) {
-      await pool.close();
-      console.log('Database connection closed');
-    }
-  } catch (err) {
-    console.error('Error closing database connection:', err);
-  }
-};
-
-// Initialize connection
-// connectToDb();
+export { sql };

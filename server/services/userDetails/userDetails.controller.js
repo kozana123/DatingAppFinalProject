@@ -49,7 +49,8 @@ export async function checkEmailExists(req, res) {
   export async function login(req, res) {
     try {
       const { email, password } = req.body;  
-
+      console.log(email, password );
+      
       const user = await User.getUserByEmailAndPassword(email, password);
       if (!user) return res.status(404).json({ message: "Invalid credentials" });
       res.status(201).json(user);

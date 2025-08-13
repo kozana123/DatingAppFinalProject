@@ -3,11 +3,13 @@ import Match from './matches.model.js';
 export async function addMatch(req, res) {
   try {
     const dto = req.body;
-    if (!dto || !dto.User1ID || !dto.User2ID || !dto.MatchStatus) {
+    
+    if (!dto || !dto.user1ID || !dto.user2ID || !dto.matchStatus) {
       return res.status(400).json({ message: 'Missing match data' });
     }
 
-    const match = new Match(dto.User1ID, dto.User2ID, dto.MatchStatus);
+    const match = new Match(dto.user1ID, dto.user2ID, dto.matchStatus);
+    console.log(match);
     const success = await match.addMatch();
 
     if (success) {
