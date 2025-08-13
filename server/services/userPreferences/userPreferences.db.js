@@ -3,24 +3,23 @@ import path from 'path';
 import { __dirname } from '../../globals.js';
 import UserPreferences from './userPreferences.model.js'
 // import DB from '../../db.js';
-// import sql from 'mssql';
-import { sql } from '../../db.js';
+import sql from 'mssql';
 
-// const sqlConfig = {
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASS,
-//     database: process.env.DB_NAME,
-//     server: process.env.DB_SERVER,
-//     pool: {
-//       max: 10,
-//       min: 0,
-//       idleTimeoutMillis: 30000
-//     },
-//     options: {
-//       encrypt: false, // true for azure
-//       trustServerCertificate: true //false for local
-//     }
-//   }
+const sqlConfig = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    server: process.env.DB_SERVER,
+    pool: {
+      max: 10,
+      min: 0,
+      idleTimeoutMillis: 30000
+    },
+    options: {
+      encrypt: false, // true for azure
+      trustServerCertificate: true //false for local
+    }
+  }
 
 export async function addUserPreferencesToDB(userPref) {
    try {
@@ -81,11 +80,11 @@ export async function addUserPreferencesToDB(userPref) {
 
 export async function findSpecificUser(userId) {
   try {
-    // const pool = await sql.connect(sqlConfig);
-    const request  = new sql.Request();
-    request.input('user_id', sql.Int, userId)
-
-    const result = await request.query('SELECT * FROM user_preferences WHERE user_id = @user_id');
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool
+      .request()
+      .input('user_id', sql.Int, userId)
+      .query('SELECT * FROM user_preferences WHERE user_id = @user_id');
 
     if (result.recordset.length > 0) {
       const row = result.recordset[0];
@@ -109,7 +108,7 @@ export async function findSpecificUser(userId) {
     throw err;
   }
   finally {
-      // sql.close();
+      sql.close();
   }
 }
 
