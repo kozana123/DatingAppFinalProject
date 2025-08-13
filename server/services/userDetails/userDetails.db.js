@@ -23,7 +23,7 @@ const sqlConfig = {
 export async function addUserToDB(user) {
    
    try {
-    // await sql.connect(sqlConfig);
+    await sql.connect(sqlConfig);
 console.log("run DB");
     const result = await sql.query`
       INSERT INTO user_details (
@@ -59,7 +59,7 @@ console.log("run DB");
     console.error('SQL Insert Error:', error);
     throw new Error('Failed to insert user into database');
   } finally {
-    // await sql.close();
+    await sql.close();
   }
 }
 
@@ -85,7 +85,7 @@ export async function emailExistsInDB(email) {
 export async function getUserByEmailAndPasswordFromDB(email) {
     console.log("in DB");
   try {
-    // await sql.connect(sqlConfig);
+    await sql.connect(sqlConfig);
     const result = await sql.query`
       SELECT *
       FROM user_details
@@ -96,14 +96,14 @@ export async function getUserByEmailAndPasswordFromDB(email) {
     console.error("SQL Get User By Email Error:", error);
     throw new Error("Failed to get user by email");
   } finally {
-    // await sql.close();
+    await sql.close();
   }
 }
 
 // קבלת משתמש לפי ID
 export async function getUserByIdFromDB(userId) {
   try {
-    // await sql.connect(sqlConfig);
+    await sql.connect(sqlConfig);
     const result = await sql.query`
       SELECT *
       FROM user_details
@@ -117,7 +117,7 @@ export async function getUserByIdFromDB(userId) {
     console.error("SQL Get User By ID Error:", error);
     throw new Error("Failed to get user by ID");
   } finally {
-    // await sql.close();
+    await sql.close();
   }
 }
 
