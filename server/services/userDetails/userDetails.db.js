@@ -86,7 +86,7 @@ export async function emailExistsInDB(email) {
 export async function getUserByEmailAndPasswordFromDB(email) {
     console.log("in DB");
   try {
-    // await sql.connect(sqlConfig);
+    await sql.connect(sqlConfig);
     const result = await sql.query`
       SELECT *
       FROM user_details
@@ -97,7 +97,7 @@ export async function getUserByEmailAndPasswordFromDB(email) {
     console.error("SQL Get User By Email Error:", error);
     throw new Error("Failed to get user by email");
   } finally {
-    // await sql.close();
+    await sql.close();
   }
 }
 

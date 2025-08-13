@@ -25,6 +25,10 @@ export default function Login() {
   const router = useRouter();
   const { setUser, setUserPref } = useContext(DataContext);
 
+
+  const SERVER_IP = '192.168.68.106';
+  const LOGIN_URL = `http://${SERVER_IP}:3501/api/v1/userDetails/login`;
+
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
@@ -33,51 +37,63 @@ export default function Login() {
     });
   }, []);
 
+
   const signInWithGoogle = async () => {
-    await GoogleSignin.hasPlayServices();
-    await GoogleSignin.signOut();
-
-    const userInfo = await GoogleSignin.signIn();
-    console.log("Full userInfo:", userInfo);
-
-    const user = userInfo.data.user;
-
-    if (!user || !user.email) {
-      throw new Error("No user info returned from Google Sign-In");
-    }
-
-    const email = user.email;
-    const password = "goolePass";
-    // const hashedPassword = SHA256(password).toString();
-
-    const checkResponse = await fetch(
-      `http://www.DatingServer.somee.com/api/users/login?email=${email}&password=${password}`
-    );
-    if (checkResponse.status === 200) {
-      const existingUser = await checkResponse.json();
-      console.log("Image page", existingUser);
-
-      setUser(existingUser);
-      getPreferences(existingUser.userId);
-      router.push("/(tabs)/main");
-    } else if (checkResponse.status === 404) {
-      Alert.alert(
-        "User Not Found",
-        "This email is not registered in our system."
-      );
-      router.push("/");
-    } else {
-      const errorText = await checkResponse.text();
-      console.warn("Unexpected error checking Google user:", errorText);
+    try {
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signOut();
+  
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Full userInfo:", userInfo);
+  
+      const user = userInfo.data?.user;
+      if (!user || !user.email) {
+        throw new Error("No user info returned from Google Sign-In");
+      }
+  
+      const email = user.email;
+      const password = "googlePass";
+      const hashedPassword = SHA256(password).toString();
+  
+      
+      const response = await fetch(LOGIN_URL,{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: hashedPassword,
+        }),
+      });
+  
+      if (response.status === 201) {
+        const existingUser = await response.json();
+        console.log("User from server:", existingUser);
+  
+        setUser(existingUser);
+        await getPreferences(existingUser.user_id);
+        router.push("/(tabs)/main");
+      } else if (response.status === 404) {
+        Alert.alert(
+          "User Not Found",
+          "This email is not registered in our system."
+        );
+        router.push("/");
+      } else {
+        console.warn("Unexpected error checking Google user:", await response.text());
+      }
+    } catch (error) {
+      console.error("Google Sign-In Error:", error);
     }
   };
-
+  
   const login = async () => {
     const hashedPassword = SHA256(password).toString();
     console.log(userEmail, hashedPassword);
     
     try {
-      const response = await fetch('http://10.0.0.25:3501/api/v1/userDetails/login', {
+      const response = await fetch(LOGIN_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +120,7 @@ export default function Login() {
 
   const getPreferences = async (id) => {
     const response = await fetch(
-      `http://10.0.0.25:3501/api/v1/userPreferences/getUserById/${id}`
+       `http://${SERVER_IP}:3501/api/v1/userPreferences/getUserById/${id}`
     );
 
     if (response.status == 201) {
