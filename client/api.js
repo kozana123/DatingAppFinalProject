@@ -61,9 +61,12 @@ export const registerUser = async (newUser) => {
     });
 
     console.log('Registration successful:', response.data);
-    const userId = {userId: response.data.token}
+    // const userId = {userId: response.data.token}
     
-    router.push({pathname:"/registerPages/registerIntrest", params: userId})
+    router.push({
+      pathname: "/registerPages/registerIntrest",
+      params: { userId: response.data.token }
+    });
 
   } catch (error) {
     console.error('Registration failed:', error.response?.data || error.message);
@@ -297,20 +300,43 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
   }
 };
 
+// export const deleteUserById = async (userId) => {
+//   try {
+//     const response = await fetch(`${apiUsersUrl}${userId}`, {
+//       method: 'DELETE',
+//     });
+
+//     const data = await response.json();
+//     if (response.ok) {
+//       console.log('User deleted:', data.message);
+//     } else {
+//       console.warn('Deletion failed:', data.message);
+//     }
+//   } catch (error) {
+//     console.error('Network error:', error);
+//   }
+// };
+
+
+
 export const deleteUserById = async (userId) => {
   try {
-    const response = await fetch(`${apiUsersUrl}${userId}`, {
+    console.log("userId", userId);
+    const response = await fetch(`${apiUsersUrl}/delete/${userId}`, {
       method: 'DELETE',
     });
 
-    const data = await response.json();
+   
+    const text = await response.text();
+    console.log('Server response:', text);
+
     if (response.ok) {
+      const data = JSON.parse(text);
       console.log('User deleted:', data.message);
     } else {
-      console.warn('Deletion failed:', data.message);
+      console.warn('Deletion failed:', text);
     }
   } catch (error) {
     console.error('Network error:', error);
   }
 };
-

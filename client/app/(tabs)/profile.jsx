@@ -188,7 +188,7 @@ export default function ProfileScreen() {
   };
 
   const onDeletedUser = () => {
-    const deleted = deleteUserById(user.userId)
+    const deleted = deleteUserById(user.user_id)
     if(deleted){
       router.navigate("/")
     }

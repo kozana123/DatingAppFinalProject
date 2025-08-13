@@ -52,25 +52,17 @@ export default function Login() {
       }
   
       const email = user.email;
-      const password = "googlePass";
-      const hashedPassword = SHA256(password).toString();
+      const password = "goolePass"; 
   
-      
-      const response = await fetch(LOGIN_URL,{
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: hashedPassword,
-        }),
+      const response = await fetch(LOGIN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }), 
       });
   
       if (response.status === 201) {
         const existingUser = await response.json();
-        console.log("User from server:", existingUser);
-  
+        console.log("User found:", existingUser);
         setUser(existingUser);
         await getPreferences(existingUser.user_id);
         router.push("/(tabs)/main");

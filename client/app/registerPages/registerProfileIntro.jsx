@@ -58,7 +58,7 @@ export default function ProfileIntro() {
               style={styles.continueButton}
               onPress={() => registerUser(newUser)}
             >
-              {/* () => router.push("/registerPages/registerIntrest") */}
+              {/* () => router.push("/registerPages/registerIntrest")  */}
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
           </View>

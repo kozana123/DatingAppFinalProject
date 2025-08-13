@@ -178,8 +178,6 @@ export async function deleteUserByIdFromDB(userId) {
 
 
 
-
-
 // export async function findAllUsers() {
 //    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
 //    return JSON.parse(users.toString())
