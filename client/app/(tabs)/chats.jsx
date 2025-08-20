@@ -85,7 +85,7 @@ export default function Chats() {
         <FlatList
           data={matches}
           renderItem={renderItem}
-          keyExtractor={(item) => item.matchedWithUserId}
+          keyExtractor={(item) => item.matched_user_id}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
 

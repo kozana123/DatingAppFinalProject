@@ -8,6 +8,7 @@ import 'dotenv/config'
 import { initIO } from './socket.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import v1Router from './routers/v1.js';
+import { connectDB, closeDB } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,7 +35,37 @@ const httpServer = createServer(app);
 const PORT = process.env.PORT || 3501;
 initIO(httpServer);
 
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-  // console.log(`🌐 Web client at      http://<your-ip>:${PORT}/webclient.html`);
-});
+
+async function startServer() {
+  try {
+    await connectDB(); // connect once at startup
+
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
+    });
+
+    // Graceful shutdown (when Ctrl+C or kill signal is sent)
+    process.on('SIGINT', async () => {
+      console.log('\n🛑 Shutting down server...');
+      await closeDB();
+      process.exit(0);
+    });
+
+    process.on('SIGTERM', async () => {
+      console.log('\n🛑 Shutting down server...');
+      await closeDB();
+      process.exit(0);
+    });
+
+  } catch (err) {
+    console.error('❌ Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
+
+// httpServer.listen(PORT, () => {
+//   console.log(`🚀 Server running at http://localhost:${PORT}`);
+//   // console.log(`🌐 Web client at      http://<your-ip>:${PORT}/webclient.html`);
+// });

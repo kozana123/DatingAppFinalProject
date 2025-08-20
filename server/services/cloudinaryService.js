@@ -1,10 +1,9 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary - put your credentials here or use env variables
 cloudinary.config({
-  cloud_name: 'dr9wfscl7',
-  api_key: '618543579249246',
-  api_secret: 'GW1AyOnnWpuFcNWTL-XbgDqMv-0',
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET,
 });
 
 // /**

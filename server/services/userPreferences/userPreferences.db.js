@@ -1,29 +1,27 @@
-import {readFile, writeFile} from 'fs/promises'
-import path from 'path';
 import { __dirname } from '../../globals.js';
 import UserPreferences from './userPreferences.model.js'
-// import DB from '../../db.js';
-import sql from 'mssql';
+import { connectDB, sql } from '../../db.js';
+// import sql from 'mssql';
 
-const sqlConfig = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    server: process.env.DB_SERVER,
-    pool: {
-      max: 10,
-      min: 0,
-      idleTimeoutMillis: 30000
-    },
-    options: {
-      encrypt: false, // true for azure
-      trustServerCertificate: true //false for local
-    }
-  }
+// const sqlConfig = {
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASS,
+//     database: process.env.DB_NAME,
+//     server: process.env.DB_SERVER,
+//     pool: {
+//       max: 10,
+//       min: 0,
+//       idleTimeoutMillis: 30000
+//     },
+//     options: {
+//       encrypt: false, // true for azure
+//       trustServerCertificate: true //false for local
+//     }
+//   }
 
 export async function addUserPreferencesToDB(userPref) {
    try {
-      const pool = await sql.connect(sqlConfig);
+      const pool = await connectDB();
       console.log("run DB");
       
       const result = await pool.request()
@@ -72,15 +70,12 @@ export async function addUserPreferencesToDB(userPref) {
    } catch (err) {
       console.error('SQL ERROR:', err);
       throw err; // let it bubble up so controller returns error
-
-   } finally {
-      sql.close();
-   }
+   } 
 } 
 
 export async function findSpecificUser(userId) {
   try {
-    const pool = await sql.connect(sqlConfig);
+    const pool = await connectDB();
     const result = await pool
       .request()
       .input('user_id', sql.Int, userId)
@@ -107,14 +102,11 @@ export async function findSpecificUser(userId) {
     console.error('Error fetching user preferences:', err);
     throw err;
   }
-  finally {
-      sql.close();
-  }
 }
 
 export async function updateSearch(userId, prefs) {
   try {
-    const pool = await sql.connect(sqlConfig);
+    const pool = await connectDB();
     const result = await pool.request()
       .input('PreferredPartner', sql.NVarChar, prefs.preferredPartner ?? null)
       .input('PreferredDistanceKm', sql.Int, prefs.preferredDistanceKm)
@@ -140,7 +132,7 @@ export async function updateSearch(userId, prefs) {
 export async function updateUser(userId, prefs) {
   try {
    
-    const pool = await sql.connect(sqlConfig);
+    const pool = await connectDB();
     const result = await pool.request()
       .input("RelationshipType", sql.VarChar, prefs.relationshipType)
       .input("HeightPreferences", sql.VarChar, prefs.heightPreferences)
@@ -164,20 +156,4 @@ export async function updateUser(userId, prefs) {
     throw new Error("Database update failed: " + err.message);
   }
 }
-
-
-
-export async function findAllUsers() {
-   let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-   return JSON.parse(users.toString())
-}
-
-// export async function findSpecificUser(email) {
-//    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-//    users = JSON.parse(users.toString())
-//    let user = users.find(u => u.email == email)
-
-//    return user
-   
-// }
 

@@ -1,31 +1,13 @@
-import {readFile, writeFile} from 'fs/promises'
-import path from 'path';
 import { __dirname } from '../../globals.js';
-import sql from 'mssql' 
-
-const sqlConfig = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  server: process.env.DB_SERVER,
-  pool: {
-    max: 10,
-    min: 0,
-    idleTimeoutMillis: 30000
-  },
-  options: {
-    encrypt: false, // true for azure
-    trustServerCertificate: true //false for local
-  }
-}
+import { connectDB, sql } from '../../db.js';
 
 
 export async function addUserToDB(user) {
    
    try {
-    await sql.connect(sqlConfig);
-console.log("run DB");
-    const result = await sql.query`
+    const pool = await connectDB();
+    console.log("run DB");
+    const result = await pool.query`
       INSERT INTO user_details (
         userName,
         userEmail,
@@ -58,16 +40,14 @@ console.log("run DB");
   } catch (error) {
     console.error('SQL Insert Error:', error);
     throw new Error('Failed to insert user into database');
-  } finally {
-    await sql.close();
   }
 }
 
 // בדיקת אם אימייל קיים
 export async function emailExistsInDB(email) {
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB();
+    const result = await pool.query`
       SELECT COUNT(*) AS count
       FROM user_details
       WHERE userEmail = ${email}
@@ -76,17 +56,15 @@ export async function emailExistsInDB(email) {
   } catch (error) {
     console.error("SQL Email Exists Error:", error);
     throw new Error("Failed to check if email exists");
-  } finally {
-    await sql.close();
-  }
+  } 
 }
 
 
 export async function getUserByEmailAndPasswordFromDB(email) {
     console.log("in DB");
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB()
+    const result = await pool.query`
       SELECT *
       FROM user_details
       WHERE userEmail = ${email}
@@ -95,16 +73,14 @@ export async function getUserByEmailAndPasswordFromDB(email) {
   } catch (error) {
     console.error("SQL Get User By Email Error:", error);
     throw new Error("Failed to get user by email");
-  } finally {
-    await sql.close();
   }
 }
 
 // קבלת משתמש לפי ID
 export async function getUserByIdFromDB(userId) {
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB();
+    const result = await pool.query`
       SELECT *
       FROM user_details
       WHERE user_id = ${userId}
@@ -116,16 +92,14 @@ export async function getUserByIdFromDB(userId) {
   } catch (error) {
     console.error("SQL Get User By ID Error:", error);
     throw new Error("Failed to get user by ID");
-  } finally {
-    await sql.close();
   }
 }
 
 
 export async function updateProfileImageInDB(userId, imageUrl) {
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB();
+    const result = await pool.query`
       UPDATE user_details
       SET profile_image = ${imageUrl}
       WHERE user_id = ${userId}
@@ -134,16 +108,14 @@ export async function updateProfileImageInDB(userId, imageUrl) {
   } catch (error) {
     console.error("SQL Update Profile Image Error:", error);
     throw new Error("Failed to update profile image");
-  } finally {
-    await sql.close();
   }
 }
 
 
 export async function updateUserLocationInDB(userId, city, latitude, longitude) {
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB();
+    const result = await pool.query`
       UPDATE user_details
       SET city = ${city},
           latitude = ${latitude},
@@ -154,16 +126,14 @@ export async function updateUserLocationInDB(userId, city, latitude, longitude) 
   } catch (error) {
     console.error("SQL Update Location Error:", error);
     throw new Error("Failed to update user location");
-  } finally {
-    await sql.close();
   }
 }
 
 
 export async function deleteUserByIdFromDB(userId) {
   try {
-    await sql.connect(sqlConfig);
-    const result = await sql.query`
+    const pool = await connectDB();
+    const result = await pool.query`
       DELETE FROM user_preferences WHERE user_id = ${userId}
       DELETE FROM user_details WHERE user_id = ${userId}
     `;
@@ -171,26 +141,7 @@ export async function deleteUserByIdFromDB(userId) {
   } catch (error) {
     console.error("SQL Delete User Error:", error);
     throw new Error("Failed to delete user");
-  } finally {
-    await sql.close();
   }
 }
-
-
-
-// export async function findAllUsers() {
-//    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-//    return JSON.parse(users.toString())
-// }
-
-// export async function findSpecificUser(email) {
-//    let users = await readFile(path.join(__dirname, 'DB', 'users.json'))
-//    users = JSON.parse(users.toString())
-//    let user = users.find(u => u.email == email)
-
-//    return user
-   
-// }
-
 
 
