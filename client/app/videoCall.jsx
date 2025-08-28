@@ -16,9 +16,9 @@ import { addMatch } from "../api";
 
 
 
-const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
+// const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-// const SIGNALING_SERVER_URL = 'http://10.0.0.11:3500'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.0.0.15:3501'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -74,7 +74,8 @@ export default function VideoCall() {
       peerConnection.current.close();
       peerConnection.current = null;
     }
-
+    
+    InCallManager.stop();
     setConnected(false);
     setRemoteStream(null);
     setLocalStream(null);
@@ -85,7 +86,7 @@ export default function VideoCall() {
     const userInterests = userPref.interests.split(",").map(s => s.trim())
     console.log(userInterests);
     
-    const userDetails = {userGender: user.gender, userAge: getAge(user.birthDate), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
+    const userDetails = {userGender: user.gender, userAge: getAge(user.birth_date), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
     socket.current = io.connect(SIGNALING_SERVER_URL);
 
     socket.current.on('connect', () => {
@@ -97,6 +98,7 @@ export default function VideoCall() {
       setRemoteStream(remoteStream);
       if (remoteStream) {
         setConnected(true);
+        InCallManager.setForceSpeakerphoneOn(true);
       }
     };
 
@@ -104,9 +106,11 @@ export default function VideoCall() {
       setLocalStream(stream);
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
-      });
-      
+      }); 
     });
+
+    InCallManager.start({ media: 'audio/video' });
+    InCallManager.setForceSpeakerphoneOn(true);
 
     socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
       console.log("offer Activate");
@@ -153,8 +157,17 @@ export default function VideoCall() {
       }
     });
 
+    // socket.current.on('answer', async (answer) => {
+    // await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
+    // });
+
     socket.current.on('answer', async (answer) => {
-    await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
+      await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
+      remoteDescSet.current = true;
+      for (const candidate of pendingCandidates.current) {
+        await peerConnection.current.addIceCandidate(candidate);
+      }
+      pendingCandidates.current = [];
     });
 
     socket.current.on('ice-candidate', async (data) => {

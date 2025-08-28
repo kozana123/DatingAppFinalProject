@@ -17,20 +17,23 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('register', (callerId, userDetails) => {
-    users.set(callerId, { socketId: socket.id, userDetails: userDetails});
-
     console.log(`User registered: ${callerId} -> ${socket.id}`);
-    console.log(`Amount of users: ${users.size}`);
 
     let targeUser = null;
 
     targeUser = GetBestUser(userDetails)
-    console.log(targeUser);
+    // console.log(targeUser);
 
     if (targeUser) {
       const targetId = targeUser.callerId;
       const initiatorId = callerId;
       const initiatorSocketId = socket.id;
+
+      users.delete(targetId);
+      usersInCall.set(targeUser.callerId, {socketId: targeUser.socketId, userDetails: targeUser.user})
+      usersInCall.set(callerId, { socketId: socket.id, userDetails: userDetails})
+      console.log(`Amount of users: ${usersInCall.size}`);
+      console.log(usersInCall);
 
       console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
       io.to(initiatorSocketId).emit('initiate-offer', {
@@ -38,10 +41,15 @@ io.on('connection', (socket) => {
         senderId: initiatorId
       });
     }
+    else{
+      users.set(callerId, { socketId: socket.id, userDetails: userDetails});
+    }
+    console.log(`Amount of users: ${users.size}`);
+    
   });
 
   socket.on('offer', ({ targetId, offer, senderId }) => {
-    const targetSocketId = users.get(targetId);
+    const targetSocketId = usersInCall.get(targetId);
 
     console.log("getting OFFER");
     
@@ -52,7 +60,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('answer', ({ targetId, answer }) => {
-    const targetSocketId = users.get(targetId);
+    const targetSocketId = usersInCall.get(targetId);
     console.log('📥 Incoming answer - looking up:', targetId, '=>', targetSocketId.socketId);
     if (targetSocketId) {
       // console.log(`✅ the answer: ${answer}`);
@@ -64,7 +72,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('ice-candidate', ({ targetId, candidate }) => {
-    const targetSocketId = users.get(targetId);
+    const targetSocketId = usersInCall.get(targetId);
 
     // console.log("targetSocketID:",targetSocketId);
     // console.log('📥  Ice CandidaSendingte:', '=>', targetSocketId, "With: ", candidate);
@@ -75,7 +83,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('like', ({ targetId, senderId }) => {
-    const target = users.get(targetId);
+    const target = usersInCall.get(targetId);
     console.log(targetId, senderId);
     
     if (target) {
@@ -84,14 +92,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('dislike', ({ targetId }) => {
-    const target = users.get(targetId);
+    const target = usersInCall.get(targetId);
     if (target) {
       io.to(target.socketId).emit('disliked');
     }
   });
 
   socket.on('like-response', ({ targetId, response }) => {
-    const target = users.get(targetId);
+    const target = usersInCall.get(targetId);
     
     if (target) {
       io.to(target.socketId).emit('like-response', { response});
@@ -105,9 +113,18 @@ io.on('connection', (socket) => {
         break;
       }
     }
+
+    for (const [callerId, details] of usersInCall.entries()) {
+      if (details.socketId === socket.id) {
+        usersInCall.delete(callerId);
+        break;
+      }
+    }
     
     console.log('Client disconnected:', socket.id);
     console.log(`Amount of users: ${users.size}`);
+    console.log(`Amount of usersInCall: ${usersInCall.size}`);
+
   });
 })
 
@@ -129,36 +146,39 @@ function GetBestUser(user) {
     }
 
     if(userDetails.userPref.preferredPartner == user.userGender){
-      console.log("Pass GENDER");
+      // console.log("Pass GENDER");
+      console.log("Pass AGE: " + user.userAge + " " +  userDetails.userAge);
 
-      if (user.userPref.minAgePreference <= userDetails.userAge, user.userPref.maxAgePreference >= userDetails.userAge,
-        userDetails.userPref.minAgePreference <= user.userAge ,userDetails.userPref.maxAgePreference >= user.userAge) {
-          console.log("Pass AGE");
-          const distance = getDistanceBetweenUsers(user, userDetails)
-          console.log(distance);
-          
-          if(user.userPref.preferredDistanceKm >= distance && userDetails.userPref.preferredDistanceKm >= distance){
-            console.log("Pass DISTANCE");
+      if (user.userPref.minAgePreference <= userDetails.userAge &&
+        user.userPref.maxAgePreference >= userDetails.userAge &&
+        userDetails.userPref.minAgePreference <= user.userAge &&
+        userDetails.userPref.maxAgePreference >= user.userAge) 
+      {
+        const distance = getDistanceBetweenUsers(user, userDetails)
+        // console.log(distance);
+        
+        if(user.userPref.preferredDistanceKm >= distance && userDetails.userPref.preferredDistanceKm >= distance){
+          // console.log("Pass DISTANCE");
 
-            let commonCount = 0;
-            const set1 = new Set(user.interests);
-            const set2 = new Set(userDetails.interests);
-            console.log(set1,set2 );
-            for (let item of set1) {
-              if (set2.has(item)) {
-                commonCount++;
-              }
-            }
-
-            if (!bestUser || commonCount > bestUser.same) {
-              bestUser = {
-                callerId: callerId,
-                socketId: socketId,
-                user: userDetails,
-                same: commonCount
-              };
+          let commonCount = 0;
+          const set1 = new Set(user.interests);
+          const set2 = new Set(userDetails.interests);
+          // console.log(set1,set2 );
+          for (let item of set1) {
+            if (set2.has(item)) {
+              commonCount++;
             }
           }
+
+          if (!bestUser || commonCount > bestUser.same) {
+            bestUser = {
+              callerId: callerId,
+              socketId: socketId,
+              user: userDetails,
+              same: commonCount
+            };
+          }
+        }
       }
     }
    

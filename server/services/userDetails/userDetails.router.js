@@ -17,6 +17,7 @@ function logger (req, res, next) {
    };
 
 const upload = multer()
+
 const userDetailsRouter = Router()
 userDetailsRouter.post('/register', upload.single('profileImageFile'), createNewUser);
 userDetailsRouter.get('/check-email', checkEmailExists);
