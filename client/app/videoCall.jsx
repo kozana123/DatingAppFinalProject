@@ -18,7 +18,7 @@ import { addMatch } from "../api";
 
 // const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.15:3501'; // replace with your local IP address
+const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -26,6 +26,9 @@ export default function VideoCall() {
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
+  // const [callStartTime, setCallStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState("00:00");
+  const timerRef = useRef(null);
 
   const [callerId] = useState(
   Math.floor(100000 + Math.random() * 900000).toString());
@@ -40,8 +43,41 @@ export default function VideoCall() {
   
 
   const [connected, setConnected] = useState(false);
-  console.log("user pref:", userPref);
-  console.log("user:", user);
+  const [choice, setChoise] = useState(false);
+
+  // console.log("user pref:", userPref);
+  // console.log("user:", user);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  const startTimer = (startTimestamp) => {
+    // setCallStartTime(startTimestamp);
+
+    timerRef.current = setInterval(() => {
+      const now = Date.now();
+      const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
+      const format = formatTime(elapsedSeconds)
+      setElapsedTime(format);
+        console.log(format);
+      if(format == "00:05"){
+        console.log("GOT TO TIME" + format);
+        setChoise(true)
+      }
+    }, 1000);
+  };
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setElapsedTime("00:00");
+    // setCallStartTime(null);
+  };
 
   const getAge = (birthDateString) => {
     const today = new Date();
@@ -74,7 +110,8 @@ export default function VideoCall() {
       peerConnection.current.close();
       peerConnection.current = null;
     }
-    
+
+    stopTimer();
     InCallManager.stop();
     setConnected(false);
     setRemoteStream(null);
@@ -102,7 +139,7 @@ export default function VideoCall() {
       }
     };
 
-    mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 44100 }}).then((stream) => {
+    mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, sampleRate: 44100 }}).then((stream) => {
       setLocalStream(stream);
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
@@ -111,6 +148,7 @@ export default function VideoCall() {
 
     InCallManager.start({ media: 'audio/video' });
     InCallManager.setForceSpeakerphoneOn(true);
+    // InCallManager.setVolume(0.1);
 
     socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
       console.log("offer Activate");
@@ -168,6 +206,18 @@ export default function VideoCall() {
         await peerConnection.current.addIceCandidate(candidate);
       }
       pendingCandidates.current = [];
+
+      const startTimestamp = Date.now();
+      startTimer(startTimestamp);
+
+      socket.current.emit("start-call", { 
+        targetId: otherUserId.current, 
+        startTimestamp 
+      });
+    });
+
+    socket.current.on("start-call", ({ startTimestamp }) => {
+      startTimer(startTimestamp);
     });
 
     socket.current.on('ice-candidate', async (data) => {
@@ -261,11 +311,10 @@ export default function VideoCall() {
 
     return () => {
       socket.current.disconnect();
-
+      stopTimer();
       if (localStream) {
         localStream.getTracks().forEach(track => {track.stop(); });
       }
-
       // Close peer connection
       if (peerConnection.current) {
         peerConnection.current.close();
@@ -279,11 +328,16 @@ export default function VideoCall() {
     <View style={connected ? styles.connectedContainer : styles.searchingContainer}>
     {connected ? (
       <>
-        {connected && (
+        {choice && (
           <View style={{ position: 'absolute', top: 50, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, }}>
             <Button title="❤️ Like" onPress={handleLike} />
             <Button title="❌ Dislike" onPress={handleDislike} color="red" />
-          </View>
+          </View>   
+        )}
+        {connected && (
+          <View >
+            <Text style={styles.timer}>{elapsedTime}</Text>
+          </View>  
         )}
         {/* Local stream small in corner */}
         {localStream && (
@@ -309,7 +363,6 @@ export default function VideoCall() {
         <Text style={styles.searchingText}>Searching for a partner...</Text>
       </View>
     )}
-      {/* <Button title="Start Call" onPress={startCall} /> */}
 
   </View>
   );
@@ -353,6 +406,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: 'white',
     fontSize: 18,
+  },
+  timer: {
+    position: "absolute",
+    top: 10,
+    alignSelf: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 6,
+    borderRadius: 8,
+    zIndex: 3,
   },
 });
 

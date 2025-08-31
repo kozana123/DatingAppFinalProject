@@ -71,6 +71,13 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on("start-call", ({ targetId, startTimestamp }) => {
+    const targetSocketId = usersInCall.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId.socketId).emit("start-call", { startTimestamp });
+    }
+  });
+
   socket.on('ice-candidate', ({ targetId, candidate }) => {
     const targetSocketId = usersInCall.get(targetId);
 
