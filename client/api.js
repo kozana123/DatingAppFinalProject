@@ -6,8 +6,7 @@ const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501';
 const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
 const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
 const apiMatchesUrl = `${SIGNALING_SERVER_URL}/api/v1/matches`
-
-
+const apiChatSessionsUrl = `${SIGNALING_SERVER_URL}/api/v1/videoChats`
 
 export const checkEmailExists = async (email) => {
   try {
@@ -340,3 +339,20 @@ export const deleteUserById = async (userId) => {
     console.error('Network error:', error);
   }
 };
+
+export async function addChatSession(callDate, callDurationMinutes, isMatch) {
+  try {
+    const response = await axios.post(`${apiChatSessionsUrl}/addSession`, {
+      CallDate: callDate,                // string: "2025-09-01T12:34:56"
+      CallDurationMinutes: callDurationMinutes, // number
+      IsMatch: isMatch                   // boolean (true/false)
+    });
+
+    console.log("✅ Chat session saved:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("❌ Failed to save chat session:", error.response?.data || error.message);
+    throw error;
+  }
+}
