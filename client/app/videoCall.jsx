@@ -18,7 +18,7 @@ import { addMatch, addChatSession } from "../api";
 
 const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501'; // replace with your local IP address
+// const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
