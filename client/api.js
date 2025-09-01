@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import axios from 'axios';
 
-const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501';
+const SIGNALING_SERVER_URL = 'http://192.168.68.108:3501';
 
 const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
 const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
