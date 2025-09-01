@@ -1,6 +1,6 @@
 // VideoCall.js
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator, Alert, BackHandler  } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import {
   RTCPeerConnection,
@@ -11,8 +11,8 @@ import {
 } from 'react-native-webrtc';
 import io from 'socket.io-client';
 import { DataContext } from "./DataContextProvider";
-import { useNavigation } from "@react-navigation/native";
-import { addMatch } from "../api";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { addMatch, addChatSession } from "../api";
 
 
 
@@ -27,7 +27,9 @@ export default function VideoCall() {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   // const [callStartTime, setCallStartTime] = useState(null);
-  const [elapsedTime, setElapsedTime] = useState("00:00");
+  const [elapsedTime, setElapsedTime] = useState();
+  console.log(elapsedTime);
+  
   const timerRef = useRef(null);
 
   const [callerId] = useState(
@@ -96,8 +98,21 @@ export default function VideoCall() {
 
   const handleDislike = () => {
     socket.current.emit('dislike', { targetId: otherUserId.current });
+    console.log("got disliked");
+    handleSaveChat(false)
     endCall(); // End your own call
   };
+
+
+  const handleSaveChat = async (isMatch) => {
+    const minutes = parseInt(elapsedTime.split(":")[0], 10);
+    const now = new Date().toISOString(); // current timestamp
+    const duration = minutes; // 12 minutes
+    const match = isMatch;
+
+    await addChatSession(now, duration, match);
+  };
+
 
   const endCall = () => {
     if (socket.current) socket.current.disconnect();
@@ -118,6 +133,21 @@ export default function VideoCall() {
     setLocalStream(null);
     navigation.goBack();
   };
+
+  // useFocusEffect(
+  //     React.useCallback(() => {
+  //       const onBackPress = () => {
+  //         // Block back button completely
+  //         return true;
+  //       };
+
+  //       BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+  //       return () => {
+  //         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+  //       };
+  //     }, [])
+  //   );
 
   useEffect(() => {
     const userInterests = userPref.interests.split(",").map(s => s.trim())
@@ -282,6 +312,7 @@ export default function VideoCall() {
             text: 'No',
             onPress: () => {
               socket.current.emit('like-response', { targetId: otherUserId.current, response: false });
+              handleSaveChat(false)
               endCall();
             },
             style: 'cancel',
@@ -292,6 +323,7 @@ export default function VideoCall() {
               socket.current.emit('like-response', { targetId: otherUserId.current, response: true });
               console.log(userPref.userId, senderId);
               addMatch(userPref.userId, senderId, true)
+              handleSaveChat(true)
               endCall();
             },
           },
