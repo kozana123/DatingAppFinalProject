@@ -58,3 +58,32 @@ export async function getMatchedUsersFromDB(userId) {
     throw new Error('Failed to get matched users');
   }
 }
+
+export async function unMatchUserFromDB(userId, unmatchUserId) {
+  try {
+    const pool = await connectDB();
+
+    const query = `
+      UPDATE Matches
+      SET MatchStatus = 0
+      WHERE MatchStatus = 1
+        AND (
+          (User1ID = @UserID AND User2ID = @OtherUserID)
+          OR
+          (User1ID = @OtherUserID AND User2ID = @UserID)
+        );
+    `;
+
+    const request = pool.request();
+    request.input('UserID', sql.Int, userId);
+    request.input('OtherUserID', sql.Int, unmatchUserId);
+
+
+    const result = await request.query(query);
+    return result.rowsAffected[0] > 0;
+
+  } catch (error) {
+    console.error('SQL unMatched User Error:', error);
+    throw new Error('Failed to unMatche user');
+  }
+}

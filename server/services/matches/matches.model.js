@@ -1,4 +1,4 @@
-import { addMatchToDB, getMatchedUsersFromDB } from './matches.db.js';
+import { addMatchToDB, getMatchedUsersFromDB, unMatchUserFromDB } from './matches.db.js';
 
 export default class Match {
   constructor(User1ID, User2ID, MatchStatus = 'pending') {
@@ -13,5 +13,8 @@ export default class Match {
 
   static async getMatchedUsers(userId) {
     return await getMatchedUsersFromDB(userId);
+  }
+  static async unMatchUser(userId, unmatchUserId) {
+    return await unMatchUserFromDB(userId, unmatchUserId);
   }
 }

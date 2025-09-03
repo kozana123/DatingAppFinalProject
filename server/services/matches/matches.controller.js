@@ -31,3 +31,17 @@ export async function getMatchedUsers(req, res) {
     res.status(500).json({ message: error.message });
   }
 }
+
+export async function unMatchUser(req, res) {
+  try {
+    const { userId } = req.params;
+    const { unmatchUserId } = req.body;
+    console.log(userId,unmatchUserId);
+    
+    
+    const matchedUser = await Match.unMatchUser(parseInt(userId), parseInt(unmatchUserId));
+    res.json(matchedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}

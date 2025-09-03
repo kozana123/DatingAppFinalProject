@@ -9,12 +9,13 @@ import {
   TouchableOpacity,
   ImageBackground,
   Dimensions,
+  Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
-import { fetchMatchedUsers } from "../../api";
+import { fetchMatchedUsers, unMatchUser } from "../../api";
 
 export default function Chats() {
 
@@ -24,6 +25,9 @@ export default function Chats() {
 
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     const loadMatches = async () => {
@@ -41,6 +45,7 @@ export default function Chats() {
   }, [user.matched_user_id]);
 
   const renderItem = ({ item }) => (
+    
     <TouchableOpacity
     style={styles.chatItem}
     onPress={() =>
@@ -49,6 +54,11 @@ export default function Chats() {
         avatar: item.profile_image,
       })
     }
+    onLongPress={() => {
+      setSelectedUser(item.matched_user_id);
+      setMenuVisible(true);
+    }}
+
   >
     <Image source={{ uri: item.profile_image }} style={styles.avatar} />
     <View style={styles.messageContainer}>
@@ -58,9 +68,11 @@ export default function Chats() {
     {item.unread && <View style={styles.unreadDot} />}
     {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
   </TouchableOpacity>
+  
   );
 
   return (
+    
     <ImageBackground
       source={require("../../assets/images/design.png")}
       style={styles.backgroundImage}
@@ -72,6 +84,43 @@ export default function Chats() {
         end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
+        <Modal
+          transparent
+          visible={menuVisible}
+          animationType="slide"
+          onRequestClose={() => setMenuVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPressOut={() => setMenuVisible(false)} // close when tap outside
+          >
+            <View style={styles.bottomSheet}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  console.log("Unmatch:", selectedUser);
+                  unMatchUser( user.user_id,selectedUser)
+                }}
+              >
+                <Text style={styles.menuText}>Unmatch</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  console.log("Report:", selectedUser);
+                  // TODO: call report API
+                }}
+              >
+                <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
         <View style={styles.header}>
           <Text style={styles.headerText}>Chat</Text>
         <Image
@@ -178,5 +227,27 @@ const styles = StyleSheet.create({
   },
   activeNav: {
     color: "#DA58B7",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
+  bottomSheet: {
+    backgroundColor: "white",
+    paddingVertical: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    elevation: 10,
+  },
+  menuItem: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  menuText: {
+    fontSize: 18,
+    color: "#333",
+    textAlign: "center",
   },
 });

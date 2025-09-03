@@ -1,12 +1,13 @@
 import { router } from "expo-router";
 import axios from 'axios';
 
-const SIGNALING_SERVER_URL = 'http://192.168.68.108:3501';
 
-const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
-const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
-const apiMatchesUrl = `${SIGNALING_SERVER_URL}/api/v1/matches`
-const apiChatSessionsUrl = `${SIGNALING_SERVER_URL}/api/v1/videoChats`
+const SERVER_IP = '10.0.0.2';
+
+const apiPreferencesUrl = `http://${SERVER_IP}:3501/api/v1/userPreferences`
+const apiUsersUrl = `http://${SERVER_IP}:3501/api/v1/userDetails`
+const apiMatchesUrl = `http://${SERVER_IP}:3501/api/v1/matches`
+const apiChatSessionsUrl = `http://${SERVER_IP}:3501/api/v1/videoChats`
 
 export const checkEmailExists = async (email) => {
   try {
@@ -278,8 +279,7 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
   }
 };
 
-
- export const fetchMatchedUsers = async (userId) => {
+export const fetchMatchedUsers = async (userId) => {
   try {
     const response = await fetch(`${apiMatchesUrl}/matched-users/${userId}`);
     
@@ -289,6 +289,34 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
 
     const data = await response.json();
     console.log('Matched users:', data);
+    
+    // You can now use the data (e.g., update state)
+    return data;
+
+  } catch (error) {
+    console.error('Error fetching matched users:', error);
+    return null;
+  }
+};
+
+ export const unMatchUser = async (userId, unmatched) => {
+  try {
+    console.log("try to unmatch" + userId + unmatched);
+    
+    const response = await fetch(`${apiMatchesUrl}/unmatch/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ unmatchUserId: unmatched }) // 0 or 1
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('unMatched user:', data);
     
     // You can now use the data (e.g., update state)
     return data;

@@ -26,7 +26,7 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = '192.168.68.108';
+  const SERVER_IP = '10.0.0.2';
   const LOGIN_URL = `http://${SERVER_IP}:3501/api/v1/userDetails/login`;
 
   useEffect(() => {
