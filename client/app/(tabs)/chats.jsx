@@ -19,6 +19,7 @@ import {
   query,
   where,
   onSnapshot,
+  orderBy,
 } from "firebase/firestore";
 
 const { width } = Dimensions.get("window");
@@ -34,17 +35,28 @@ export default function Chats() {
   useEffect(() => {
     if (!user?.user_id) return;
 
-    // מאזין לכל הצ’אטים שבהם המשתמש הנוכחי שותף
     const q = query(
       collection(db, "chats"),
-      where("users", "array-contains", user.user_id)
+      where("users", "array-contains", user.user_id),
+      orderBy("lastMessageTimestamp", "desc")
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const chatData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const chatData = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const otherUser =
+          data.usersData?.find((u) => u.userId !== user.user_id) || {
+            userName: "Unknown",
+            profile_image: "https://via.placeholder.com/50",
+          };
+        return {
+          id: doc.id,
+          lastMessage: data.lastMessage || "Say hi 👋",
+          lastMessageTimestamp: data.lastMessageTimestamp || null,
+          usersData: data.usersData,
+          otherUser,
+        };
+      });
       setChats(chatData);
     });
 
@@ -52,8 +64,7 @@ export default function Chats() {
   }, [user.user_id]);
 
   const renderItem = ({ item }) => {
-    // למצוא את הצד השני של הצ'אט (לא המשתמש הנוכחי)
-    const otherUser = item.usersData?.find((u) => u.userId !== user.user_id);
+    const otherUser = item.otherUser;
 
     return (
       <TouchableOpacity
@@ -69,12 +80,10 @@ export default function Chats() {
           setMenuVisible(true);
         }}
       >
-        <Image source={{ uri: otherUser?.profile_image }} style={styles.avatar} />
+        <Image source={{ uri: otherUser.profile_image }} style={styles.avatar} />
         <View style={styles.messageContainer}>
-          <Text style={styles.name}>{otherUser?.userName}</Text>
-          <Text style={styles.message}>
-            {item.lastMessage || "Say hi 👋"}
-          </Text>
+          <Text style={styles.name}>{otherUser.userName}</Text>
+          <Text style={styles.message}>{item.lastMessage}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -92,7 +101,6 @@ export default function Chats() {
         end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
-      
         <Modal
           transparent
           visible={menuVisible}
@@ -110,18 +118,17 @@ export default function Chats() {
                 onPress={() => {
                   setMenuVisible(false);
                   console.log("Unmatch chat:", selectedChat);
-                  // כאן אפשר להוסיף מחיקה מ-Firestore אם רוצים
+                  // אפשר להוסיף מחיקה מ-Firestore כאן
                 }}
               >
                 <Text style={styles.menuText}>Unmatch</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
                   setMenuVisible(false);
                   console.log("Report chat:", selectedChat);
-                  // TODO: קריאה ל־API דיווח
+                  // אפשר לקרוא ל-API דיווח כאן
                 }}
               >
                 <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
@@ -130,7 +137,6 @@ export default function Chats() {
           </TouchableOpacity>
         </Modal>
 
-        {/* כותרת */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Chats</Text>
           <Image source={{ uri: user.profile_image }} style={styles.avatar} />
@@ -138,13 +144,18 @@ export default function Chats() {
 
         <View style={styles.separator} />
 
-        {/* רשימת צ'אטים */}
-        <FlatList
-          data={chats}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 80 }}
-        />
+        {chats.length === 0 ? (
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <Text style={{ color: "#fff", fontSize: 16 }}>No chats yet 😢</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={chats}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingBottom: 80 }}
+          />
+        )}
       </LinearGradient>
     </ImageBackground>
   );
@@ -153,11 +164,7 @@ export default function Chats() {
 const styles = StyleSheet.create({
   backgroundImage: { flex: 1 },
   gradientOverlay: { flex: 1, paddingTop: 60, paddingHorizontal: 16 },
-  separator: {
-    backgroundColor: "#ffffff33",
-    marginVertical: 8,
-    height: 4,
-  },
+  separator: { backgroundColor: "#ffffff33", marginVertical: 8, height: 4 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -171,29 +178,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   headerText: { fontSize: 22, fontWeight: "bold", color: "#fff" },
-  chatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomColor: "rgba(255,255,255,0.1)",
-    borderBottomWidth: 1,
-  },
+  chatItem: { flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomColor: "rgba(255,255,255,0.1)", borderBottomWidth: 1 },
   avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 12 },
   messageContainer: { flex: 1 },
   name: { fontWeight: "bold", color: "#fff", fontSize: 16 },
   message: { color: "#eee", fontSize: 14 },
   modalOverlay: { flex: 1, justifyContent: "flex-end" },
-  bottomSheet: {
-    backgroundColor: "white",
-    paddingVertical: 20,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  menuItem: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
+  bottomSheet: { backgroundColor: "white", paddingVertical: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+  menuItem: { paddingVertical: 15, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#eee" },
   menuText: { fontSize: 18, color: "#333", textAlign: "center" },
 });
