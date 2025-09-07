@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,27 +8,66 @@ import {
   TouchableOpacity,
   FlatList,
   ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-
-const chatMessages = [
-  { id: "1", sender: "them", text: "Hey! How’s your day going?" },
-  { id: "2", sender: "me", text: "Pretty good! Just working on my app. You?" },
-  { id: "3", sender: "them", text: "Same here! I’m loving your design work btw." },
-  { id: "4", sender: "me", text: "Thanks! Wanna catch a coffee later?" },
-  { id: "5", sender: "them", text: "Sure! That’d be nice ☕" },
-];
+import { DataContext } from "../DataContextProvider";
+import { db } from "./fireBase";
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 export default function ChatScreen() {
   const route = useRoute();
-  const { name, avatar } = route.params;
+  const { chatId, otherUser } = route.params;
+  const { user } = useContext(DataContext);
+
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+
+  // מאזין להודעות בזמן אמת
+  useEffect(() => {
+    if (!chatId) return;
+
+    const messagesRef = collection(db, "chats", chatId, "messages");
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMessages(msgs);
+    });
+
+    return () => unsubscribe();
+  }, [chatId]);
+
+  // פונקציה לשליחת הודעה
+  const sendMessage = async () => {
+    if (!text.trim()) return;
+
+    const messagesRef = collection(db, "chats", chatId, "messages");
+    await addDoc(messagesRef, {
+      senderId: user.user_id,
+      text: text.trim(),
+      timestamp: serverTimestamp(),
+    });
+    setText(""); // מנקה את השדה אחרי שליחה
+  };
 
   const renderItem = ({ item }) => (
     <View
       style={[
         styles.messageBubble,
-        item.sender === "me" ? styles.myMessage : styles.theirMessage,
+        item.senderId === user.user_id ? styles.myMessage : styles.theirMessage,
       ]}
     >
       <Text style={styles.messageText}>{item.text}</Text>
@@ -44,28 +83,35 @@ export default function ChatScreen() {
         colors={["rgba(106,13,173,0.6)", "rgba(209,71,163,0.6)"]}
         style={styles.container}
       >
-        <View style={styles.header}>
-          <Image source={{ uri: avatar }} style={styles.avatar} />
-          <Text style={styles.name}>{name}</Text>
-        </View>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <View style={styles.header}>
+            <Image source={{ uri: otherUser.profile_image }} style={styles.avatar} />
+            <Text style={styles.name}>{otherUser.userName}</Text>
+          </View>
 
-        <FlatList
-          data={chatMessages}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.chatContent}
-        />
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Type a message..."
-            placeholderTextColor="#ccc"
-            style={styles.input}
+          <FlatList
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.chatContent}
           />
-          <TouchableOpacity style={styles.sendButton}>
-            <Text style={styles.sendText}>Send</Text>
-          </TouchableOpacity>
-        </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Type a message..."
+              placeholderTextColor="#ccc"
+              style={styles.input}
+              value={text}
+              onChangeText={setText}
+            />
+            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+              <Text style={styles.sendText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
       </LinearGradient>
     </ImageBackground>
   );
@@ -73,51 +119,15 @@ export default function ChatScreen() {
 
 const styles = StyleSheet.create({
   backgroundImage: { flex: 1 },
-  container: {
-    flex: 1,
-    paddingTop: 50,
-    paddingHorizontal: 16,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    marginRight: 12,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  chatContent: {
-    flexGrow: 1,
-    paddingVertical: 10,
-  },
-  messageBubble: {
-    maxWidth: "75%",
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 12,
-  },
-  myMessage: {
-    backgroundColor: "#DA58B7",
-    alignSelf: "flex-end",
-    borderTopRightRadius: 0,
-  },
-  theirMessage: {
-    backgroundColor: "#6A0DAD",
-    alignSelf: "flex-start",
-    borderTopLeftRadius: 0,
-  },
-  messageText: {
-    color: "#fff",
-    fontSize: 15,
-  },
+  container: { flex: 1, paddingTop: 50, paddingHorizontal: 16 },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
+  avatar: { width: 45, height: 45, borderRadius: 22.5, marginRight: 12 },
+  name: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  chatContent: { flexGrow: 1, paddingVertical: 10 },
+  messageBubble: { maxWidth: "75%", padding: 10, marginVertical: 4, borderRadius: 12 },
+  myMessage: { backgroundColor: "#DA58B7", alignSelf: "flex-end", borderTopRightRadius: 0 },
+  theirMessage: { backgroundColor: "#6A0DAD", alignSelf: "flex-start", borderTopLeftRadius: 0 },
+  messageText: { color: "#fff", fontSize: 15 },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -127,20 +137,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginBottom: 16,
   },
-  input: {
-    flex: 1,
-    color: "#fff",
-    fontSize: 16,
-    paddingHorizontal: 10,
-  },
-  sendButton: {
-    backgroundColor: "#DA58B7",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  sendText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  input: { flex: 1, color: "#fff", fontSize: 16, paddingHorizontal: 10 },
+  sendButton: { backgroundColor: "#DA58B7", borderRadius: 20, paddingHorizontal: 16, paddingVertical: 8 },
+  sendText: { color: "#fff", fontWeight: "bold" },
 });

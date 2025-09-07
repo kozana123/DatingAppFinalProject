@@ -1,5 +1,4 @@
-import React from "react";
-import { useContext , useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,65 +13,74 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
+import { db } from "../fireBase";  
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+
 const { width } = Dimensions.get("window");
-import { fetchMatchedUsers, unMatchUser } from "../../api";
 
 export default function Chats() {
-
   const navigation = useNavigation();
   const { user } = useContext(DataContext);
-  // const matches = fetchMatchedUsers(user.userId)
 
-  const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  const [chats, setChats] = useState([]);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedChat, setSelectedChat] = useState(null);
 
   useEffect(() => {
-    const loadMatches = async () => {
-      try {
-        const result = await fetchMatchedUsers(user.user_id);
-        setMatches(result || []);
-      } catch (error) {
-        console.error("Failed to fetch matches:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!user?.user_id) return;
 
-    loadMatches();
-  }, [user.matched_user_id]);
+    // מאזין לכל הצ’אטים שבהם המשתמש הנוכחי שותף
+    const q = query(
+      collection(db, "chats"),
+      where("users", "array-contains", user.user_id)
+    );
 
-  const renderItem = ({ item }) => (
-    
-    <TouchableOpacity
-    style={styles.chatItem}
-    onPress={() =>
-      navigation.navigate("ChatScreen", {
-        name: item.userName,
-        avatar: item.profile_image,
-      })
-    }
-    onLongPress={() => {
-      setSelectedUser(item.matched_user_id);
-      setMenuVisible(true);
-    }}
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const chatData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setChats(chatData);
+    });
 
-  >
-    <Image source={{ uri: item.profile_image }} style={styles.avatar} />
-    <View style={styles.messageContainer}>
-      <Text style={styles.name}>{item.userName}</Text>
-      <Text style={styles.message}>{item.message}</Text>
-    </View>
-    {item.unread && <View style={styles.unreadDot} />}
-    {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
-  </TouchableOpacity>
-  
-  );
+    return () => unsubscribe();
+  }, [user.user_id]);
+
+  const renderItem = ({ item }) => {
+    // למצוא את הצד השני של הצ'אט (לא המשתמש הנוכחי)
+    const otherUser = item.usersData?.find((u) => u.userId !== user.user_id);
+
+    return (
+      <TouchableOpacity
+        style={styles.chatItem}
+        onPress={() =>
+          navigation.navigate("ChatScreen", {
+            chatId: item.id,
+            otherUser,
+          })
+        }
+        onLongPress={() => {
+          setSelectedChat(item.id);
+          setMenuVisible(true);
+        }}
+      >
+        <Image source={{ uri: otherUser?.profile_image }} style={styles.avatar} />
+        <View style={styles.messageContainer}>
+          <Text style={styles.name}>{otherUser?.userName}</Text>
+          <Text style={styles.message}>
+            {item.lastMessage || "Say hi 👋"}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
-    
     <ImageBackground
       source={require("../../assets/images/design.png")}
       style={styles.backgroundImage}
@@ -84,6 +92,7 @@ export default function Chats() {
         end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
+      
         <Modal
           transparent
           visible={menuVisible}
@@ -93,15 +102,15 @@ export default function Chats() {
           <TouchableOpacity
             style={styles.modalOverlay}
             activeOpacity={1}
-            onPressOut={() => setMenuVisible(false)} // close when tap outside
+            onPressOut={() => setMenuVisible(false)}
           >
             <View style={styles.bottomSheet}>
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
                   setMenuVisible(false);
-                  console.log("Unmatch:", selectedUser);
-                  unMatchUser( user.user_id,selectedUser)
+                  console.log("Unmatch chat:", selectedChat);
+                  // כאן אפשר להוסיף מחיקה מ-Firestore אם רוצים
                 }}
               >
                 <Text style={styles.menuText}>Unmatch</Text>
@@ -111,8 +120,8 @@ export default function Chats() {
                 style={styles.menuItem}
                 onPress={() => {
                   setMenuVisible(false);
-                  console.log("Report:", selectedUser);
-                  // TODO: call report API
+                  console.log("Report chat:", selectedChat);
+                  // TODO: קריאה ל־API דיווח
                 }}
               >
                 <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
@@ -121,42 +130,33 @@ export default function Chats() {
           </TouchableOpacity>
         </Modal>
 
+        {/* כותרת */}
         <View style={styles.header}>
-          <Text style={styles.headerText}>Chat</Text>
-        <Image
-          source={{ uri: user.profile_image }}
-          style={styles.avatar}
-        />
-                 
+          <Text style={styles.headerText}>Chats</Text>
+          <Image source={{ uri: user.profile_image }} style={styles.avatar} />
         </View>
+
         <View style={styles.separator} />
 
+        {/* רשימת צ'אטים */}
         <FlatList
-          data={matches}
+          data={chats}
           renderItem={renderItem}
-          keyExtractor={(item) => item.matched_user_id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
-
       </LinearGradient>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-  },
-  gradientOverlay: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: 16,
-  },
+  backgroundImage: { flex: 1 },
+  gradientOverlay: { flex: 1, paddingTop: 60, paddingHorizontal: 16 },
   separator: {
-
     backgroundColor: "#ffffff33",
     marginVertical: 8,
-    height: 4, 
+    height: 4,
   },
   header: {
     flexDirection: "row",
@@ -167,27 +167,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "rgba(0,0,0,0.3)",
     borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 9 },
-    width: width -12,
+    width: width - 12,
     alignSelf: "center",
-    position: "relative",
-    zIndex: 1,
-
-    marginBottom: 10, 
   },
-  headerText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  profileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  },
+  headerText: { fontSize: 22, fontWeight: "bold", color: "#fff" },
   chatItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -195,49 +178,16 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(255,255,255,0.1)",
     borderBottomWidth: 1,
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
-  },
-  messageContainer: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: "bold",
-    color: "#fff",
-    fontSize: 16,
-  },
-  message: {
-    color: "#eee",
-    fontSize: 14,
-  },
-  unreadDot: {
-    width: 10,
-    height: 10,
-    backgroundColor: "red",
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  favorite: {
-    color: "#66ccff",
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  activeNav: {
-    color: "#DA58B7",
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
+  avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 12 },
+  messageContainer: { flex: 1 },
+  name: { fontWeight: "bold", color: "#fff", fontSize: 16 },
+  message: { color: "#eee", fontSize: 14 },
+  modalOverlay: { flex: 1, justifyContent: "flex-end" },
   bottomSheet: {
     backgroundColor: "white",
     paddingVertical: 20,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    elevation: 10,
   },
   menuItem: {
     paddingVertical: 15,
@@ -245,9 +195,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  menuText: {
-    fontSize: 18,
-    color: "#333",
-    textAlign: "center",
-  },
+  menuText: { fontSize: 18, color: "#333", textAlign: "center" },
 });
