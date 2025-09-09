@@ -125,16 +125,12 @@ export default function Login() {
   };
 
   return (
-    <ImageBackground
-      source={require("../assets/images/design.png")}
-      style={styles.backgroundImage}
-      resizeMode="cover"
-    >
-      <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
+    
+    <View style={styles.gradientOverlay}>
+      <ImageBackground
+        source={require("../assets/images/design.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
         <SafeAreaView style={styles.container}>
           <Text style={styles.title}>Welcome Back!</Text>
@@ -154,7 +150,7 @@ export default function Login() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="#e1bee7"
+                placeholderTextColor="#CBF7FF"
                 value={userEmail}
                 onChangeText={setUserEmail}
                 autoCapitalize="none"
@@ -175,7 +171,7 @@ export default function Login() {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                placeholderTextColor="#e1bee7"
+                placeholderTextColor="#CBF7FF"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -229,27 +225,26 @@ export default function Login() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </LinearGradient>
-    </ImageBackground>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
   },
   gradientOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#19607E", // dominant background (60%)
   },
   container: {
-    width: "90%",
-    alignSelf: "center",
+    width: "100%",
     marginTop: Platform.OS === "ios" ? 60 : 30,
-    backgroundColor: "rgba(0,0,0,0.15)",
+    backgroundColor: "rgba(0,0,0,0.2)",
     borderRadius: 24,
     padding: 24,
     shadowColor: "#000",
@@ -260,7 +255,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#ffe6ff",
+    color: "#CBF7FF", // highlight (10%)
     marginBottom: 6,
     fontFamily: "Prompt-SemiBold",
     letterSpacing: 1,
@@ -268,20 +263,17 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#f8d7ff",
+    color: "#FFFFFF",
     marginBottom: 28,
     fontFamily: "Prompt-Thin",
-    textAlign: "left",
-    direction: "ltr",
+    textAlign: "center",
   },
   inputLabelContainer: {
     width: "100%",
     marginBottom: 18,
-    direction: "ltr",
-    alignItems: "flex-start", // אם את רוצה את Forgot Password בצד שמאל
   },
   inputLabel: {
-    color: "#f8d7ff",
+    color: "#CBF7FF",
     fontSize: 15,
     marginBottom: 6,
     fontFamily: "Prompt-SemiBold",
@@ -293,13 +285,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#cc66cc",
+    borderColor: "#CBF7FF", // highlight border
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   input: {
     flex: 1,
-    color: "#ffe6ff",
+    color: "#FFFFFF",
     fontSize: 17,
     fontFamily: "Prompt-Thin",
     paddingVertical: 8,
@@ -307,9 +299,11 @@ const styles = StyleSheet.create({
   },
   inputIcon: {
     marginRight: 8,
+    color: "#CBF7FF",
   },
   inputIconRight: {
     marginLeft: 8,
+    color: "#CBF7FF",
   },
   forgotPassword: {
     marginTop: 4,
@@ -317,44 +311,47 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   forgotPasswordText: {
-    color: "#f8d7ff",
+    color: "#CBF7FF",
     fontSize: 13,
     fontFamily: "Prompt-Thin",
-    direction: "ltr",
   },
+  
   signInButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868", // accent (30%)
     height: 50,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
-    borderColor: "#cc6699",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   signInText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
-    fontFamily: "Prompt-Black",
+    color: "#FFFFFF",
+    fontFamily: "Prompt-SemiBold",
     letterSpacing: 1,
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 10,
+    marginVertical: 14,
     width: "100%",
     alignSelf: "center",
   },
   divider: {
     flex: 1,
     height: 1.5,
-    backgroundColor: "#cc66cc",
+    backgroundColor: "#CBF7FF",
     opacity: 0.5,
   },
   dividerText: {
     marginHorizontal: 10,
-    color: "#f8d7ff",
-    fontSize: 15,
+    color: "#CBF7FF",
+    fontSize: 14,
     fontFamily: "Prompt-Thin",
   },
   socialContainer: {
@@ -363,13 +360,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   socialButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.89)",
-    borderRadius: 36,
-    padding: 10,
-    marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: "#cc66cc",
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    padding: 12,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#19607E", // tie into theme
   },
 });

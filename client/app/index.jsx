@@ -10,20 +10,11 @@ import {
   ImageBackground,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
-import { I18nManager } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
-if (I18nManager.isRTL) {
-I18nManager.forceRTL(false);
-// This requires a full app reload
-} 
-
 export default function Index() {
-
-
   const router = useRouter();
   const [fontsLoaded] = useFonts({
     "Prompt-Thin": require("../assets/fonts/Prompt-Thin.ttf"),
@@ -38,32 +29,25 @@ export default function Index() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
+      <View style={styles.overlay}>
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.container}>
-            <View style={styles.logoCircle}>
-              <Image
-                source={require("../assets/images/AppLogo.png")}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
+            <Image
+              source={require("../assets/images/AppLogo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
 
             <Text style={styles.appName}>Luvio</Text>
 
             <Text style={styles.headline}>
-              Connect People{"\n"}
-              Easily & Quickly
+              Find Love {"\n"}
+              With Style
             </Text>
 
             <Text style={styles.description}>
-              Join us to discover your ideal partner and ignite the sparks of
-              romance in your journey.
+              Discover meaningful connections, share your journey, and let love
+              happen naturally.
             </Text>
 
             <View style={styles.footerContainer}>
@@ -82,25 +66,26 @@ export default function Index() {
                   activeOpacity={0.7}
                   style={{ marginTop: 5 }}
                 >
-                  <Text style={styles.footerLink}>sign up</Text>
+                  <Text style={styles.footerLink}>Sign Up</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </SafeAreaView>
-      </LinearGradient>
+      </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
+ backgroundImage: {
     flex: 1,
     width: "100%",
     height: "100%",
   },
-  gradientOverlay: {
+  overlay: {
     flex: 1,
+    backgroundColor: "#19607E", // dominant background (60%)
   },
   safeArea: {
     flex: 1,
@@ -111,92 +96,64 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "space-around",
   },
-  // logoCircle: {
-  //   width: 160,
-  //   height: 160,
-  //   borderRadius: 100,
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  //   shadowOpacity: 0.6,
-  //   shadowRadius: 15,
-  //   shadowOffset: { width: 0, height: 8 },
-  //   elevation: 12,
-  //   position: "relative",
-  // },
-  logoImage: { 
+  logoImage: {
     width: 160,
     height: 160,
   },
-  
   appName: {
-    fontWeight: "400",
-    fontSize: 40,
-    color: "#ffe6ff",
-    fontFamily: "Prompt-Thin",
-    
+    fontSize: 42,
+    color: "#CBF7FF", // highlight (10%)
+    fontFamily: "Prompt-SemiBold",
+    letterSpacing: 2,
   },
   headline: {
-    fontSize: 30,
-    color: "#f8d7ff",
+    fontSize: 28,
+    color: "#CBF7FF", // highlight (10%)
     fontFamily: "Prompt-SemiBold",
-    lineHeight: 38,
-    marginBottom: 0,
-    textAlign: "left", 
-    direction: "ltr", 
+    lineHeight: 36,
+    textAlign: "center",
   },
   description: {
-    fontSize: 14,
-    color: "#ffd1ff",
+    fontSize: 15,
+    color: "#FFFFFF", // neutral readable text
     fontFamily: "Prompt-Thin",
     lineHeight: 22,
     textAlign: "center",
-    marginBottom: 20,
+    paddingHorizontal: 10,
   },
   signInButton: {
-    backgroundColor: "#ffffff",
-    height: 50,
-    width: "300",
-    borderRadius: 20,
+    backgroundColor: "#FF6868", // accent CTA (30%)
+    height: 52,
+    width: 280,
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderWidth: 2,
-    borderColor: "#cc6699",
+    shadowColor: "#000", // subtle depth
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
-
   signInText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "700",
-    color: "#6a0dad",
-    fontFamily: "Prompt-Black",
+    color: "#FFFFFF",
+    fontFamily: "Prompt-SemiBold",
     letterSpacing: 1,
   },
-
   footerContainer: {
     alignItems: "center",
     marginTop: 20,
   },
-
-  signUpContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
-
   footerText: {
-    fontSize: 16,
-    color: "#ffe6ff",
+    fontSize: 15,
+    color: "#CBF7FF", // highlight (10%)
     fontFamily: "Prompt-Thin",
   },
-
   footerLink: {
     fontSize: 16,
-    color: "#ffffff",
-    fontFamily: "Prompt-Thin",
+    color: "#FF6868", // accent (30%)
+    fontFamily: "Prompt-SemiBold",
     textDecorationLine: "underline",
     marginLeft: 4,
   },
