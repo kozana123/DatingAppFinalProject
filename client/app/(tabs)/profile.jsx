@@ -29,7 +29,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from "react-native-picker-select";
-import { updateUserSearch, updateUserDetails, deleteUserById } from "../../api";
+import { updateUserSearch, updateUserDetails, } from "../../api";
 
 export default function ProfileScreen() {
   const { user, userPref, setUserPref, setUser, handleImageChoice, handleSearchLocation, handleUseCurrentLocation } = useContext(DataContext);
@@ -187,14 +187,6 @@ export default function ProfileScreen() {
     setUserPref({ ...userPref, preferredPartner: genders[value] });
   };
 
-  const onDeletedUser = () => {
-    const deleted = deleteUserById(user.user_id)
-    if(deleted){
-      router.navigate("/")
-    }
-     
-  }
-
   return (
     <ImageBackground
       source={require("../../assets/images/design.png")}
@@ -294,12 +286,6 @@ export default function ProfileScreen() {
                 </View>
               </Modal>
 
-              <Text style={styles.label}>Email:</Text>
-              <TextInput
-                style={[styles.input, { color: "#00000075" }]}
-                value={user.userEmail}
-                editable={false}
-              />
               <Text style={styles.label}>Hieght:</Text>
 
               <RNPickerSelect
@@ -573,12 +559,7 @@ export default function ProfileScreen() {
                 <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.deleteBtn}
-              onPress={onDeletedUser}
-            >
-              <Text style={styles.deleteText}> Delete Account 🗑️</Text>
-            </TouchableOpacity>
+
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>

@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Prompt-Thin",
   },
-    signInButton: {
+  signInButton: {
     backgroundColor: "#FF6868", // accent (30%)
     height: 50,
     borderRadius: 20,
