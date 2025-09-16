@@ -8,7 +8,7 @@ export async function addMatch(req, res) {
       return res.status(400).json({ message: 'Missing match data' });
     }
 
-    const match = new Match(dto.user1ID, dto.user2ID, dto.matchStatus);
+    const match = new Match(dto.user1ID, dto.user2ID, dto.matchStatus, dto.chatId);
     console.log(match);
     const success = await match.addMatch();
 

@@ -14,7 +14,7 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "./DataContextProvider";
-import { db } from "./fireBase";
+import { db } from "../fireBase";
 import {
   collection,
   query,

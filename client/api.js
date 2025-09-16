@@ -1,13 +1,16 @@
 import { router } from "expo-router";
 import axios from 'axios';
+import {createChat} from "./fireBase";
 
 
-const SERVER_IP = '192.168.68.108';
+const SERVER_IP = '10.0.0.5';
 
 const apiPreferencesUrl = `http://${SERVER_IP}:3501/api/v1/userPreferences`
 const apiUsersUrl = `http://${SERVER_IP}:3501/api/v1/userDetails`
 const apiMatchesUrl = `http://${SERVER_IP}:3501/api/v1/matches`
 const apiChatSessionsUrl = `http://${SERVER_IP}:3501/api/v1/videoChats`
+const apireportsUrl = `http://${SERVER_IP}:3501/api/v1/reports`
+
 
 export const checkEmailExists = async (email) => {
   try {
@@ -244,6 +247,7 @@ export const updateUserLocation = async (userId, city, latitude, longitude) => {
 
 export const addMatch = async (user1ID, user2ID, matchStatus) => {
   try {
+    const chatId = await createChat()
     const response = await fetch(`${apiMatchesUrl}/add`, {
       method: 'POST',
       headers: {
@@ -253,6 +257,7 @@ export const addMatch = async (user1ID, user2ID, matchStatus) => {
         user1ID,
         user2ID,
         matchStatus,
+        chatId
       }),
     });
 
@@ -381,6 +386,24 @@ export async function addChatSession(callDate, callDurationMinutes, isMatch) {
 
   } catch (error) {
     console.error("❌ Failed to save chat session:", error.response?.data || error.message);
+    throw error;
+  }
+}
+
+export async function addReport(reporterID, reportedUserID, reason, reportDate) {
+  try {
+    const response = await axios.post(`${apireportsUrl}/report`, {
+      ReporterID: reporterID,
+      ReportedUserID: reportedUserID,
+      Reason: reason,
+      ReportDate: reportDate
+    });
+
+    console.log("✅ Report saved:", response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error("❌ Failed to save report:", error.response?.data || error.message);
     throw error;
   }
 }

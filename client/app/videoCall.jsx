@@ -1,6 +1,6 @@
 // VideoCall.js
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator, Alert, BackHandler  } from 'react-native';
+import { View, Button, Text, TextInput, StyleSheet, Dimensions, ActivityIndicator, Alert, BackHandler, Modal, TouchableOpacity  } from 'react-native';
 import InCallManager from 'react-native-incall-manager';
 import {
   RTCPeerConnection,
@@ -12,13 +12,15 @@ import {
 import io from 'socket.io-client';
 import { DataContext } from "./DataContextProvider";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { addMatch, addChatSession } from "../api";
+import { addMatch, addChatSession, addReport } from "../api";
+import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 
 
 
-const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-// const SIGNALING_SERVER_URL = 'http://10.0.0.4:3501'; // replace with your local IP address
+// const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
+
+const SIGNALING_SERVER_URL = 'http://10.0.0.10:3501'; // replace with your local IP address
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
 export default function VideoCall() {
@@ -28,24 +30,36 @@ export default function VideoCall() {
   const [remoteStream, setRemoteStream] = useState(null);
   // const [callStartTime, setCallStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState();
-  console.log(elapsedTime);
+  // console.log(elapsedTime);
   
   const timerRef = useRef(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [step, setStep] = useState(1);
 
   const [callerId] = useState(
   Math.floor(100000 + Math.random() * 900000).toString());
 
   const socket = useRef(null);
-  const peerConnection = useRef(new RTCPeerConnection(configuration));
+  const peerConnection = useRef(null);
 
   const pendingCandidates = useRef([]);
   const remoteDescSet = useRef(false);
+  const otherUserCallId = useRef(null);
+  const otherUserSocketId = useRef(null);
   const otherUserId = useRef(null);
+
+  // const [otherUserId, setOtherUserId] = useState();
+  
   const { user, userPref,} = useContext(DataContext);
   
 
   const [connected, setConnected] = useState(false);
   const [choice, setChoise] = useState(false);
+  const [foundPartner, setFoundPartner] = useState(false);
+  const [userReady, setReady] = useState(false);
+
+
+
 
   // console.log("user pref:", userPref);
   // console.log("user:", user);
@@ -64,7 +78,7 @@ export default function VideoCall() {
       const elapsedSeconds = Math.floor((now - startTimestamp) / 1000);
       const format = formatTime(elapsedSeconds)
       setElapsedTime(format);
-        console.log(format);
+        // console.log(format);
       if(format == "00:05"){
         console.log("GOT TO TIME" + format);
         setChoise(true)
@@ -92,12 +106,22 @@ export default function VideoCall() {
     return age;
   };
 
+  const ready = () => {
+    socket.current.emit('check-ready', {senderId: callerId, targetId: otherUserCallId.current});
+    setReady(true)
+  }
+
+  const notReady = () => {
+    socket.current.emit('not-ready', {targetId: otherUserCallId.current});
+    endCall();
+  }
+
   const handleLike = () => {
-    socket.current.emit('like', { targetId: otherUserId.current, senderId: userPref.userId});
+    socket.current.emit('like', { targetSocketId: otherUserSocketId.current,});
   };
 
   const handleDislike = () => {
-    socket.current.emit('dislike', { targetId: otherUserId.current });
+    socket.current.emit('dislike', { targetSocketId: otherUserSocketId.current });
     console.log("got disliked");
     handleSaveChat(false)
     endCall(); // End your own call
@@ -106,12 +130,18 @@ export default function VideoCall() {
 
   const handleSaveChat = async (isMatch) => {
     const minutes = parseInt(elapsedTime.split(":")[0], 10);
-    const now = new Date().toISOString(); // current timestamp
+    const date = new Date().toISOString(); // current timestamp
     const duration = minutes; // 12 minutes
     const match = isMatch;
 
-    await addChatSession(now, duration, match);
+    await addChatSession(date, duration, match);
   };
+
+  const report = async (reportReason) =>{
+    console.log("Got Reported: " + reportReason);
+    const date = new Date().toISOString();
+    await addReport(userPref.userId, otherUserId.current, reportReason, date)
+  }
 
 
   const endCall = () => {
@@ -127,8 +157,8 @@ export default function VideoCall() {
     }
 
     stopTimer();
-    InCallManager.stop();
-    setConnected(false);
+    // InCallManager.stop();
+    // setConnected(false);
     setRemoteStream(null);
     setLocalStream(null);
     navigation.goBack();
@@ -150,10 +180,11 @@ export default function VideoCall() {
   //   );
 
   useEffect(() => {
+    peerConnection.current = new RTCPeerConnection(configuration);
     const userInterests = userPref.interests.split(",").map(s => s.trim())
-    console.log(userInterests);
+    // console.log(userInterests);
     
-    const userDetails = {userGender: user.gender, userAge: getAge(user.birth_date), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
+    const userDetails = {userId: userPref.userId, userGender: user.gender, userAge: getAge(user.birth_date), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
     socket.current = io.connect(SIGNALING_SERVER_URL);
 
     socket.current.on('connect', () => {
@@ -176,23 +207,40 @@ export default function VideoCall() {
       }); 
     });
 
-    InCallManager.start({ media: 'audio/video' });
-    InCallManager.setForceSpeakerphoneOn(true);
+    // InCallManager.start({ media: 'audio/video' });
+    // InCallManager.setForceSpeakerphoneOn(true);
     // InCallManager.setVolume(0.1);
 
-    socket.current.on('initiate-offer', async ({ targetId, senderId }) => {
-      console.log("offer Activate");
-      console.log('📨 Sending offer From:',senderId, 'To:', targetId);
+    socket.current.on('found-partner', async ({targetId, targetSocketId, targetUserId }) => {
+      console.log("found partner");
       
       try {
-        otherUserId.current = targetId;
+        otherUserCallId.current = targetId
+        otherUserSocketId.current = targetSocketId;
+        otherUserId.current = targetUserId;
+        console.log( userPref.userId + ": " + targetId +  " " + targetUserId);
+        
+        setFoundPartner(true)
+      } catch (err) {
+        console.error("❌ Failed to set partner:", err);
+      }
+    });
+
+    socket.current.on('not-ready', () => {
+      setFoundPartner(false)
+      setReady(false)
+    });
+
+    socket.current.on('initiate-offer', async ({}) => {
+      console.log("offer Activate");
+      
+      try {
         const offer = await peerConnection.current.createOffer();
         await peerConnection.current.setLocalDescription(offer);
 
         socket.current.emit('offer', {
-          targetId: targetId,
+          targetSocketId: otherUserSocketId.current,
           offer: offer,
-          senderId: senderId,
         });
 
         console.log("📤 Sent offer successfully");
@@ -201,23 +249,21 @@ export default function VideoCall() {
       }
     });
 
-    socket.current.on('offer', async ({ offer, senderId }) => {
+    socket.current.on('offer', async ({ offer,}) => {
       try {
         console.log("📤 Got offer successfully");
         await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer));
         remoteDescSet.current = true;
-        otherUserId.current = senderId;
-        // Add any stored candidates
+
         for (const candidate of pendingCandidates.current) {
           await peerConnection.current.addIceCandidate(candidate);
         }
         pendingCandidates.current = [];
         const answer = await peerConnection.current.createAnswer();
         await peerConnection.current.setLocalDescription(answer);
-        console.log('the answer', answer, 'to :', otherUserId);
-
+        // console.log('the answer', answer, 'to :', otherUserSocketId.current);
         socket.current.emit('answer', {
-          targetId: otherUserId.current,
+          targetSocketId: otherUserSocketId.current,
           answer,
         });
       } catch (e) {
@@ -229,7 +275,7 @@ export default function VideoCall() {
     // await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
     // });
 
-    socket.current.on('answer', async (answer) => {
+    socket.current.on('answer', async (answer,) => {
       await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
       remoteDescSet.current = true;
       for (const candidate of pendingCandidates.current) {
@@ -239,9 +285,8 @@ export default function VideoCall() {
 
       const startTimestamp = Date.now();
       startTimer(startTimestamp);
-
       socket.current.emit("start-call", { 
-        targetId: otherUserId.current, 
+        targetSocketId: otherUserSocketId.current, 
         startTimestamp 
       });
     });
@@ -252,7 +297,7 @@ export default function VideoCall() {
 
     socket.current.on('ice-candidate', async (data) => {
       try {
-        console.log("GOT ice-candidate---------------------");
+        // console.log("GOT ice-candidate---------------------");
         
         const candidate = new RTCIceCandidate(data.candidate);
 
@@ -267,15 +312,15 @@ export default function VideoCall() {
     });
 
     peerConnection.current.onicecandidate = (event) => {
-      if (event.candidate && otherUserId.current) {
+      if (event.candidate && otherUserSocketId.current) {
         // console.log("📤 otherUserId:", otherUserId.current);
         
-        console.log("📤 Sending ICE candidate");
+        // console.log("📤 Sending ICE candidate");
         socket.current.emit('ice-candidate', {
-          targetId: otherUserId.current,
+          targetSocketId: otherUserSocketId.current,
           candidate: event.candidate,
         });
-      } else if (!otherUserId.current) {
+      } else if (!otherUserSocketId.current) {
         console.warn("⚠️ ICE candidate generated before targetId was known. Skipping.");
       }
     };
@@ -300,7 +345,7 @@ export default function VideoCall() {
       endCall();
     });
 
-    socket.current.on('liked', (senderId) => {
+    socket.current.on('liked', () => {
   // Ask if user also likes
       console.log("got liked");
       
@@ -311,7 +356,7 @@ export default function VideoCall() {
           {
             text: 'No',
             onPress: () => {
-              socket.current.emit('like-response', { targetId: otherUserId.current, response: false });
+              socket.current.emit('like-response', { targetSocketId: otherUserSocketId.current, response: false });
               handleSaveChat(false)
               endCall();
             },
@@ -320,9 +365,9 @@ export default function VideoCall() {
           {
             text: 'Yes',
             onPress: () => {
-              socket.current.emit('like-response', { targetId: otherUserId.current, response: true });
-              console.log(userPref.userId, senderId);
-              addMatch(userPref.userId, senderId, true)
+              socket.current.emit('like-response', { targetSocketId: otherUserSocketId.current, response: true });
+              console.log(userPref.userId, otherUserId.current);
+              addMatch(userPref.userId, otherUserId.current, true)
               handleSaveChat(true)
               endCall();
             },
@@ -369,6 +414,77 @@ export default function VideoCall() {
         {connected && (
           <View >
             <Text style={styles.timer}>{elapsedTime}</Text>
+            <SimpleLineIcons style={styles.actionsIcon} name="options-vertical" size={30} color="#ffffffff" onPress={() => setMenuVisible(true)}/>
+            <Modal
+              transparent
+              visible={menuVisible}
+              animationType="slide"
+              onRequestClose={() => setMenuVisible(false)}
+            >
+              <TouchableOpacity
+                style={styles.modalOverlay}
+                activeOpacity={1}
+                onPressOut={() => setMenuVisible(false)}
+              >
+                <View style={styles.bottomSheet}>
+                  {step === 1 ? (
+                    // STEP 1 - first menu
+                    <TouchableOpacity
+                      style={styles.menuItem}
+                      onPress={() => {
+                        setStep(2); // move to next step instead of closing
+                      }}
+                    >
+                      <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    // STEP 2 - report reasons
+                    <>
+                      <Ionicons style={{alignSelf: "flex-start", paddingLeft:20,}} name="chevron-back" size={30} color="#000000ff" onPress={() => setStep(1)}/>
+                      <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
+                        Choose reason:
+                      </Text>
+
+                      <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => {
+                          console.log("Reported as Spam");
+                          report("Reported as Spam")
+                          setMenuVisible(false);
+                          setStep(1); // reset for next time
+                        }}
+                      >
+                        <Text style={styles.menuText}>Spam</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => {
+                          console.log("Reported as Harassment");
+                          report("Reported as Harassment")
+                          setMenuVisible(false);
+                          setStep(1);
+                        }}
+                      >
+                        <Text style={styles.menuText}>Harassment</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => {
+                          console.log("Reported as Fake Account");
+                          report("Reported as Fake Account")
+                          setMenuVisible(false);
+                          setStep(1);
+                        }}
+                      >
+                        <Text style={styles.menuText}>Fake Account</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
+              </TouchableOpacity>
+            </Modal>
           </View>  
         )}
         {/* Local stream small in corner */}
@@ -389,10 +505,34 @@ export default function VideoCall() {
           />
         )}
       </>
-    ) : (
+    ) : (    
       <View style={styles.searchingContent}>
-        <ActivityIndicator size="large" color="#ffffff" />
-        <Text style={styles.searchingText}>Searching for a partner...</Text>
+        {foundPartner ? (
+          <>
+            {userReady == false && (
+              <View>
+                <Text style={styles.searchingText}>Found a partner, do you want to start?</Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, gap:20 }}>
+                  <Button title="❤️ Ready" onPress={ready} />
+                  <Button title="❌ Not Ready" onPress={notReady} color="red" />
+                </View> 
+              </View>
+            )}
+            {userReady == true && (
+              <View>
+                <Text style={styles.searchingText}>Waiting for the partner</Text>
+                <ActivityIndicator size="large" color="#ffffff" />
+              </View>
+            )}
+            
+          </>
+        ) : (
+          <>
+            <ActivityIndicator size="large" color="#ffffff" />
+            <Text style={styles.searchingText}>Searching for a partner...</Text>
+          </>
+        )}
+        
       </View>
     )}
 
@@ -450,6 +590,35 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: 8,
     zIndex: 3,
+  },
+  actionsIcon: { 
+    position: "absolute",
+    alignSelf: "flex-end",
+    paddingTop: 20,
+    paddingRight:20,
+    zIndex: 3,
+  },
+  modalOverlay: {
+    flex: 1, 
+    justifyContent: "flex-end" 
+  },
+  bottomSheet: {
+    backgroundColor: 
+    "white", 
+    paddingVertical: 20, 
+    borderTopLeftRadius: 16, 
+    borderTopRightRadius: 16 
+  },
+  menuItem: {
+    paddingVertical: 15, 
+    paddingHorizontal: 20, 
+    borderBottomWidth: 1, 
+    borderBottomColor: "#eee" 
+  },
+  menuText: {
+    fontSize: 18, 
+    color: "#333", 
+    textAlign: "center" 
   },
 });
 

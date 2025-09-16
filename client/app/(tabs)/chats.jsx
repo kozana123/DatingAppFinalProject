@@ -13,7 +13,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
-import { db } from "../fireBase";  
+import { fetchMatchedUsers, unMatchUser } from "../../api";
+import { db } from "../../fireBase";  
 import {
   collection,
   query,
@@ -32,62 +33,106 @@ export default function Chats() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
 
+  // const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   if (!user?.user_id) return;
+
+  //   const q = query(
+  //     collection(db, "chats"),
+  //     where("users", "array-contains", user.user_id),
+  //     orderBy("lastMessageTimestamp", "desc")
+  //   );
+
+  //   const unsubscribe = onSnapshot(q, (snapshot) => {
+  //     const chatData = snapshot.docs.map((doc) => {
+  //       const data = doc.data();
+  //       const otherUser =
+  //         data.usersData?.find((u) => u.userId !== user.user_id) || {
+  //           userName: "Unknown",
+  //           profile_image: "https://via.placeholder.com/50",
+  //         };
+  //       return {
+  //         id: doc.id,
+  //         lastMessage: data.lastMessage || "Say hi 👋",
+  //         lastMessageTimestamp: data.lastMessageTimestamp || null,
+  //         usersData: data.usersData,
+  //         otherUser,
+  //       };
+  //     });
+  //     setChats(chatData);
+  //   });
+
+  //   return () => unsubscribe();
+  // }, [user.user_id]);
+
   useEffect(() => {
-    if (!user?.user_id) return;
-
-    const q = query(
-      collection(db, "chats"),
-      where("users", "array-contains", user.user_id),
-      orderBy("lastMessageTimestamp", "desc")
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const chatData = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        const otherUser =
-          data.usersData?.find((u) => u.userId !== user.user_id) || {
-            userName: "Unknown",
-            profile_image: "https://via.placeholder.com/50",
-          };
-        return {
-          id: doc.id,
-          lastMessage: data.lastMessage || "Say hi 👋",
-          lastMessageTimestamp: data.lastMessageTimestamp || null,
-          usersData: data.usersData,
-          otherUser,
-        };
-      });
-      setChats(chatData);
-    });
-
-    return () => unsubscribe();
-  }, [user.user_id]);
-
-  const renderItem = ({ item }) => {
-    const otherUser = item.otherUser;
-
-    return (
-      <TouchableOpacity
-        style={styles.chatItem}
-        onPress={() =>
-          navigation.navigate("ChatScreen", {
-            chatId: item.id,
-            otherUser,
-          })
+      const loadMatches = async () => {
+        try {
+          const result = await fetchMatchedUsers(user.user_id);
+          setChats(result || []);
+        } catch (error) {
+          console.error("Failed to fetch matches:", error);
+        } finally {
+          setLoading(false);
         }
-        onLongPress={() => {
-          setSelectedChat(item.id);
-          setMenuVisible(true);
-        }}
-      >
-        <Image source={{ uri: otherUser.profile_image }} style={styles.avatar} />
-        <View style={styles.messageContainer}>
-          <Text style={styles.name}>{otherUser.userName}</Text>
-          <Text style={styles.message}>{item.lastMessage}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+      };
+
+      loadMatches();
+    }, [user.matched_user_id]);
+
+  const renderItem = ({ item }) => (
+    
+    <TouchableOpacity
+      style={styles.chatItem}
+      onPress={() =>
+        navigation.navigate("ChatScreen", {
+          name: item.userName,
+          avatar: item.profile_image,
+        })
+      }
+      onLongPress={() => {
+        setSelectedUser(item.matched_user_id);
+        setMenuVisible(true);
+      }}>
+
+      <Image source={{ uri: item.profile_image }} style={styles.avatar} />
+      <View style={styles.messageContainer}>
+        <Text style={styles.name}>{item.userName}</Text>
+        <Text style={styles.message}>{item.message}</Text>
+      </View>
+      {item.unread && <View style={styles.unreadDot} />}
+      {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
+    </TouchableOpacity>
+  
+  );
+
+  // const renderItem = ({ item }) => {
+  //   const otherUser = item.otherUser;
+
+  //   return (
+  //     <TouchableOpacity
+  //       style={styles.chatItem}
+  //       onPress={() =>
+  //         navigation.navigate("ChatScreen", {
+  //           chatId: item.id,
+  //           otherUser,
+  //         })
+  //       }
+  //       onLongPress={() => {
+  //         setSelectedChat(item.id);
+  //         setMenuVisible(true);
+  //       }}
+  //     >
+  //       <Image source={{ uri: otherUser.profile_image }} style={styles.avatar} />
+  //       <View style={styles.messageContainer}>
+  //         <Text style={styles.name}>{otherUser.userName}</Text>
+  //         <Text style={styles.message}>{item.lastMessage}</Text>
+  //       </View>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
   return (
     <ImageBackground
@@ -152,7 +197,7 @@ export default function Chats() {
           <FlatList
             data={chats}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.matched_user_id}
             contentContainerStyle={{ paddingBottom: 80 }}
           />
         )}

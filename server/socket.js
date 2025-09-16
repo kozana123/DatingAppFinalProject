@@ -28,17 +28,25 @@ io.on('connection', (socket) => {
       const targetId = targeUser.callerId;
       const initiatorId = callerId;
       const initiatorSocketId = socket.id;
-
+      // console.log(userDetails);
+      
       users.delete(targetId);
-      usersInCall.set(targeUser.callerId, {socketId: targeUser.socketId, userDetails: targeUser.user})
-      usersInCall.set(callerId, { socketId: socket.id, userDetails: userDetails})
+      usersInCall.set(targeUser.callerId, {socketId: targeUser.socketId, userDetails: targeUser.user, ready: false})
+      usersInCall.set(callerId, { socketId: socket.id, userDetails: userDetails, ready: false})
       console.log(`Amount of users: ${usersInCall.size}`);
-      console.log(usersInCall);
+      // console.log(usersInCall);
 
       console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
-      io.to(initiatorSocketId).emit('initiate-offer', {
+
+      io.to(initiatorSocketId).emit('found-partner', {
         targetId: targetId,
-        senderId: initiatorId
+        targetSocketId: targeUser.socketId,
+        targetUserId: targeUser.user.userId
+      });
+      io.to(targeUser.socketId).emit('found-partner', {
+        targetId: callerId,
+        targetSocketId: initiatorSocketId,
+        targetUserId: userDetails.userId
       });
     }
     else{
@@ -48,68 +56,85 @@ io.on('connection', (socket) => {
     
   });
 
-  socket.on('offer', ({ targetId, offer, senderId }) => {
-    const targetSocketId = usersInCall.get(targetId);
+  socket.on('check-ready', ({ senderId, targetId}) => {
+    console.log(senderId);
+    const sender = usersInCall.get(senderId);
+    const target = usersInCall.get(targetId);
 
-    console.log("getting OFFER");
-    
-    if (targetSocketId) {
-      console.log(`✅ Sent offer from ${socket.id} to ${targetSocketId.socketId}`);
-      io.to(targetSocketId.socketId).emit('offer', { offer, senderId: senderId });
+    if (sender) {
+      sender.ready = true
+      console.log(sender.socketId);
+      if(target.ready == true){
+        io.to(sender.socketId).emit('initiate-offer', {});
+      }
     }
   });
 
-  socket.on('answer', ({ targetId, answer }) => {
-    const targetSocketId = usersInCall.get(targetId);
-    console.log('📥 Incoming answer - looking up:', targetId, '=>', targetSocketId.socketId);
+  socket.on('not-ready', ({targetId}) => {
+    console.log(targetId);
+    const target = usersInCall.get(targetId);
+    usersInCall.delete(target);
+    users.set(targetId, target);
+
+    io.to(target.socketId).emit('not-ready', {});
+
+  });
+
+  socket.on('offer', ({ targetSocketId, offer,}) => {
+
+    if (targetSocketId) {
+      console.log(`✅ Sent offer from ${socket.id} to ${targetSocketId}`);
+      io.to(targetSocketId).emit('offer', { offer,});
+    }
+  });
+
+  socket.on('answer', ({ targetSocketId, answer }) => {
+
+    console.log('📥 Incoming answer - looking up:', '=>', targetSocketId);
     if (targetSocketId) {
       // console.log(`✅ the answer: ${answer}`);
-      io.to(targetSocketId.socketId).emit('answer', answer);
+      io.to(targetSocketId).emit('answer', answer,);
     }
     else {
-    console.log('❌ Could not find target socket for answer:', targetId);
+    console.log('❌ Could not find target socket for answer:', targetSocketId);
     }
   });
 
-  socket.on("start-call", ({ targetId, startTimestamp }) => {
-    const targetSocketId = usersInCall.get(targetId);
+  socket.on("start-call", ({ targetSocketId, startTimestamp }) => {
+
     if (targetSocketId) {
-      io.to(targetSocketId.socketId).emit("start-call", { startTimestamp });
+      io.to(targetSocketId).emit("start-call", { startTimestamp });
     }
   });
 
-  socket.on('ice-candidate', ({ targetId, candidate }) => {
-    const targetSocketId = usersInCall.get(targetId);
+  socket.on('ice-candidate', ({ targetSocketId, candidate }) => {
 
-    // console.log("targetSocketID:",targetSocketId);
-    // console.log('📥  Ice CandidaSendingte:', '=>', targetSocketId, "With: ", candidate);
-    if (targetSocketId.socketId) {
-      io.to(targetSocketId.socketId).emit('ice-candidate', {candidate});
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('ice-candidate', {candidate});
     }
     
   });
 
-  socket.on('like', ({ targetId, senderId }) => {
-    const target = usersInCall.get(targetId);
-    console.log(targetId, senderId);
+  socket.on('like', ({ targetSocketId,}) => {
+    // const target = usersInCall.get(targetId);
+    // console.log(targetId, senderId);
     
-    if (target) {
-      io.to(target.socketId).emit('liked', senderId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('liked');
     }
   });
 
-  socket.on('dislike', ({ targetId }) => {
-    const target = usersInCall.get(targetId);
-    if (target) {
-      io.to(target.socketId).emit('disliked');
+  socket.on('dislike', ({ targetSocketId }) => {
+    // const target = usersInCall.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('disliked');
     }
   });
 
-  socket.on('like-response', ({ targetId, response }) => {
-    const target = usersInCall.get(targetId);
-    
-    if (target) {
-      io.to(target.socketId).emit('like-response', { response});
+  socket.on('like-response', ({ targetSocketId, response }) => {
+    // const target = usersInCall.get(targetId);
+    if (targetSocketId) {
+      io.to(targetSocketId).emit('like-response', {response});
     }
   });
 

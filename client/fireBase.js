@@ -1,6 +1,7 @@
 // firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore"; 
+import { collection, doc, setDoc } from "firebase/firestore";
 
 
 const firebaseConfig = {
@@ -13,8 +14,25 @@ const firebaseConfig = {
   measurementId: "G-51QY924BFX"
 };
 
-
 const app = initializeApp(firebaseConfig);
 
-
 export const db = getFirestore(app);
+
+
+
+export async function createChat() {
+  try {
+    // Create a new doc with random ID inside "chats"
+    const newChatRef = doc(collection(db, "chats"));
+
+    // Just create it empty
+    await setDoc(newChatRef, {});
+
+    console.log("Chat created with ID:", newChatRef.id);
+
+    return newChatRef.id; // return the unique ID
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    throw error;
+  }
+}

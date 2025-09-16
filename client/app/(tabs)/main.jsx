@@ -16,8 +16,10 @@ const { width, height } = Dimensions.get("window");
 import { DataContext } from "../DataContextProvider";
 
 export default function VideoCallStartScreen() {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const { user, userPref } = useContext(DataContext);
+  // const router = useRouter();
+  
   console.log("user pref:", userPref);
   console.log("user:", user);
 
@@ -66,7 +68,7 @@ export default function VideoCallStartScreen() {
             <Text style={styles.logo}>Luvio</Text>
           </View>
           <TouchableOpacity
-            onPress={() => navigation.navigate("profile")}
+            onPress={() => router.push("/settings/Settings")}
             style={{ paddingRight: 10 }}
           >
             <Image

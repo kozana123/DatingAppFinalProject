@@ -3,12 +3,7 @@ import ChatSession from './videoChats.model.js';
 export async function addSession(req, res) {
   try {
     const dto = req.body;
-    console.log(!dto);
-    console.log(!dto.CallDate);
-    console.log(!dto.CallDurationMinutes);
-    console.log(dto.IsMatch === undefined);
-
-
+    
     if (!dto || !dto.CallDate || dto.CallDurationMinutes === null || dto.IsMatch === undefined) {
       return res.status(400).json({ message: 'Missing chat session data' });
     }

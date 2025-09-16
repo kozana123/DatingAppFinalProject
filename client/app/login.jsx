@@ -26,7 +26,7 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = '192.168.68.108';
+  const SERVER_IP = '10.0.0.5';
   const LOGIN_URL = `http://${SERVER_IP}:3501/api/v1/userDetails/login`;
 
   useEffect(() => {
@@ -315,8 +315,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Prompt-Thin",
   },
-  
-  signInButton: {
+    signInButton: {
     backgroundColor: "#FF6868", // accent (30%)
     height: 50,
     borderRadius: 20,
@@ -367,6 +366,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#19607E", // tie into theme
+  borderColor: "#19607E", // tie into theme
   },
 });
