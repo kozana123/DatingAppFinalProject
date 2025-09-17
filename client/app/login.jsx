@@ -26,13 +26,13 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = '10.0.0.5';
+  const SERVER_IP = '192.168.68.106';
   const LOGIN_URL = `http://${SERVER_IP}:3501/api/v1/userDetails/login`;
 
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "719538565443-ctovkc0i4kmt19n7l4pm7mqvhnshcnnr.apps.googleusercontent.com",
+        "719538565443-026nfp0528deipai06um0me1rvncabjd.apps.googleusercontent.com",
       offlineAccess: false,
     });
   }, []);
