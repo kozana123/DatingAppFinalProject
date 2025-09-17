@@ -14,7 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
 import { fetchMatchedUsers, unMatchUser } from "../../api";
-import { db } from "../../fireBase";  
+import { getMessages } from "../../fireBase";  
 import {
   collection,
   query,
@@ -30,6 +30,7 @@ export default function Chats() {
   const { user } = useContext(DataContext);
 
   const [chats, setChats] = useState([]);
+
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
 
@@ -72,6 +73,7 @@ export default function Chats() {
         try {
           const result = await fetchMatchedUsers(user.user_id);
           setChats(result || []);
+          
         } catch (error) {
           console.error("Failed to fetch matches:", error);
         } finally {
@@ -88,8 +90,10 @@ export default function Chats() {
       style={styles.chatItem}
       onPress={() =>
         navigation.navigate("ChatScreen", {
+          id: item.matched_user_id,
           name: item.userName,
           avatar: item.profile_image,
+          chatId: item.ChatId
         })
       }
       onLongPress={() => {
