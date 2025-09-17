@@ -14,7 +14,8 @@ import {
 import { useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "./DataContextProvider";
-import { db } from "../fireBase";
+import { getMessages, addMessage , listenToMessages} from "../fireBase";  
+
 import {
   collection,
   query,
@@ -28,10 +29,11 @@ import {
 
 export default function ChatScreen() {
   const route = useRoute();
-  const { chatId, otherUser } = route.params;
+  const {id, name, avatar, chatId } = route.params;
   const { user } = useContext(DataContext);
 
   const [messages, setMessages] = useState([]);
+  
   const [text, setText] = useState("");
 
   const flatListRef = useRef(null);
@@ -39,47 +41,18 @@ export default function ChatScreen() {
   // מאזין להודעות בזמן אמת
   useEffect(() => {
     if (!chatId) return;
+    console.log(chatId);
 
-    const messagesRef = collection(db, "chats", chatId, "messages");
-    const q = query(messagesRef, orderBy("timestamp", "asc"));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const unsubscribe = listenToMessages(chatId, (msgs) => {
       setMessages(msgs);
+      console.log(msgs);
 
-      // Scroll to bottom automatically
-      if (msgs.length && flatListRef.current) {
-        flatListRef.current.scrollToEnd({ animated: true });
-      }
     });
-
+    
+    // Cleanup listener when leaving screen
     return () => unsubscribe();
+
   }, [chatId]);
-
-  // פונקציה לשליחת הודעה
-  const sendMessage = async () => {
-    if (!text.trim()) return;
-
-    const messagesRef = collection(db, "chats", chatId, "messages");
-
-    await addDoc(messagesRef, {
-      senderId: user.user_id,
-      text: text.trim(),
-      timestamp: serverTimestamp(),
-    });
-
-    // עדכון lastMessage ו-lastMessageTimestamp עבור Chats.js
-    const chatDocRef = doc(db, "chats", chatId);
-    await updateDoc(chatDocRef, {
-      lastMessage: text.trim(),
-      lastMessageTimestamp: serverTimestamp(),
-    });
-
-    setText(""); // מנקה את השדה אחרי שליחה
-  };
 
   const renderItem = ({ item }) => (
     <View
@@ -93,6 +66,13 @@ export default function ChatScreen() {
       <Text style={styles.messageText}>{item.text}</Text>
     </View>
   );
+
+  const sendMessage = (chatId, senderId, text) =>{
+    if(text != ""){
+      addMessage(chatId, senderId, text)
+      setText("")
+    } 
+  }
 
   return (
     <ImageBackground
@@ -109,10 +89,10 @@ export default function ChatScreen() {
         >
           <View style={styles.header}>
             <Image
-              source={{ uri: otherUser?.profile_image || "https://via.placeholder.com/45" }}
+              source={{ uri: avatar}}
               style={styles.avatar}
             />
-            <Text style={styles.name}>{otherUser?.userName || "User"}</Text>
+            <Text style={styles.name}>{name}</Text>
           </View>
 
           <FlatList
@@ -131,7 +111,7 @@ export default function ChatScreen() {
               value={text}
               onChangeText={setText}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <TouchableOpacity style={styles.sendButton} onPress={() => sendMessage(chatId , user.user_id ,text)}>
               <Text style={styles.sendText}>Send</Text>
             </TouchableOpacity>
           </View>
