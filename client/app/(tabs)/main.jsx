@@ -128,16 +128,19 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginBottom: 40,
     paddingLeft: 30,
+    
   },
   greet: {
-    fontSize: 28,
-    fontWeight: "700",
+    fontSize: 26,
+    // fontWeight: "700",
     color: "#CBF7FF",
+    fontFamily: "Prompt-Thin"
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: "#FF6868",
     marginTop: 6,
+    
   },
   card: {
     backgroundColor: "#ffffff",
@@ -160,17 +163,19 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "600",
     color: "#19607E",
     textAlign: "center",
     marginBottom: 8,
+    fontFamily: "Prompt-Thin"
   },
   cardText: {
-    fontSize: 15,
+    fontSize: 13,
     color: "#19607E",
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
+    
   },
   primaryBtn: {
     backgroundColor: "#FF6868",
