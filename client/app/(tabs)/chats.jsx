@@ -34,22 +34,25 @@ export default function Chats() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [customReason, setCustomReason] = useState("");
   const [customMainReason, setCustomMainReason] = useState("");
-  const [lastMessage, setLastMessage] = useState();
+  const [lastMessage, setLastMessage] = useState({timeAgo: "", text: ""});
 
-
-
-  // const [matches, setMatches] = useState([]);
-  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
       const loadMatches = async () => {
         try {
           const result = await fetchMatchedUsers(user.user_id);
-          console.log(result[0].ChatId);
+          console.log(`this is the result: ${result}`);
           
-          const lastResult = await getLastMessage(result[0].ChatId);
-          setLastMessage(lastResult)
           setChats(result || []);
+          if(result != ""){
+            console.log(`result: ${result[0].ChatId}`);
+            const lastResult = await getLastMessage(result[0].ChatId);
+            if(lastResult){
+              setLastMessage(lastResult)
+            }
+          }
+          console.log(chats);
+          
           
         } catch (error) {
           console.error("Failed to fetch matches:", error);
@@ -229,7 +232,7 @@ export default function Chats() {
             </>
           )}
           {step == 3 && (
-            <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
+            <View style={{ paddingHorizontal: 20, paddingBottom: 20, }}>
               <Ionicons
                 style={{ alignSelf: "flex-start", paddingBottom: 10 }}
                 name="chevron-back"
@@ -261,7 +264,7 @@ export default function Chats() {
               <TouchableOpacity
                 style={[
                   styles.menuItem,
-                  { backgroundColor: "#6200ee", borderRadius: 8 },
+                  { backgroundColor: "#FF6868", borderRadius: 8 },
                 ]}
                 onPress={() => {
                   report(customReason);
@@ -329,7 +332,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor:"#ffffff18"
   },
-  avatar: { width: 65, height: 65, borderRadius: 40, marginRight: 15 },
+  avatar: { width: 60, height: 60, borderRadius: 40, marginRight: 15 },
   messageContainer: { 
     flex: 1, // takes remaining space
     flexDirection: "column",

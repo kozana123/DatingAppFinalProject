@@ -26,7 +26,10 @@ export async function getMatchedUsers(req, res) {
   try {
     const { userId } = req.params;
     const matchedUsers = await Match.getMatchedUsers(parseInt(userId));
+    // console.log(matchedUsers);
+
     res.json(matchedUsers);
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -36,27 +36,29 @@ export async function createChat() {
   }
 }
 
-export async function getMessages(chatId) {
-  try {
-    const messagesRef = collection(db, "chats", chatId, "messages");
-    const q = query(messagesRef, orderBy("createdAt", "asc"));
+// export async function getMessages(chatId) {
+//   try {
+//     const messagesRef = collection(db, "chats", chatId, "messages");
+//     const q = query(messagesRef, orderBy("createdAt", "asc"));
 
-    const querySnapshot = await getDocs(q);
+//     const querySnapshot = await getDocs(q);
 
-    const messages = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        senderId: data.senderId,
-        text: data.text,
-      };
-    });
+//     const messages = querySnapshot.docs.map(doc => {
+//       const data = doc.data();
+//       console.log(data);
+      
+//       return {
+//         senderId: data.senderId,
+//         text: data.text,
+//       };
+//     });
 
-    return messages; // array of messages
-  } catch (error) {
-    console.error("Error fetching messages:", error);
-    throw error;
-  }
-}
+//     return messages; // array of messages
+//   } catch (error) {
+//     console.error("Error fetching messages:", error);
+//     throw error;
+//   }
+// }
 
 export async function addMessage(chatId, senderId, text) {
   try {
@@ -87,6 +89,7 @@ export const listenToMessages = (chatId, callback) => {
     const msgs = snapshot.docs.map((doc) => {
       const data = doc.data();
       return {
+        id: doc.id, 
         senderId: data.senderId,
         text: data.text,
       };
@@ -137,8 +140,6 @@ function formatTimeAgo(timestamp) {
 
 export async function getLastMessage(chatId) {
   try {
-    console.log(chatId);
-    
     const messagesRef = collection(db, "chats", chatId, "messages");
     const q = query(messagesRef, orderBy("createdAt", "desc"), limit(1));
 

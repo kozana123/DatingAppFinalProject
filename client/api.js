@@ -309,7 +309,7 @@ export const fetchMatchedUsers = async (userId) => {
     console.log("try to unmatch" + userId + unmatched);
     
     const response = await fetch(`${apiMatchesUrl}/unmatch/${userId}`, {
-      method: "PUT",
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json"
       },
@@ -392,7 +392,7 @@ export async function addChatSession(callDate, callDurationMinutes, isMatch) {
 
 export async function addReport(reporterID, reportedUserID, reason, reportDate) {
   try {
-    const response = await axios.delete(`${apireportsUrl}/report`, {
+    const response = await axios.post(`${apireportsUrl}/report`, {
       ReporterID: reporterID,
       ReportedUserID: reportedUserID,
       Reason: reason,
