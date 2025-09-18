@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { DataContext } from "../DataContextProvider";
+import { Avatar } from "@rneui/themed";
 
 const { width } = Dimensions.get("window");
 
@@ -35,7 +36,12 @@ export default function VideoCallStartScreen() {
 
       {/* עיגול מצב בפינה הימנית עליונה */}
       <View style={styles.statusCircle}>
-        <Text style={styles.statusInitial}>{userInitial}</Text>
+        <Avatar
+          size={50}
+          rounded
+          source={{ uri: user.profile_image }}
+        >
+        </Avatar>
         <View style={styles.onlineDot} />
       </View>
 
@@ -71,7 +77,6 @@ export default function VideoCallStartScreen() {
           <Text style={styles.btnText}>Find Someone Now</Text>
         </TouchableOpacity>
 
-        <Text style={styles.onlineText}>12 people online • Safe & Secure</Text>
       </View>
     </ImageBackground>
   );
@@ -103,7 +108,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 10,
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
     
   },
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#CBF7FF",
     borderRadius: 24,
     width: width * 0.85,
     padding: 24,
@@ -157,21 +161,21 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     padding: 20,
     marginBottom: 20,
-    backgroundColor: "#CBF7FF",
+    backgroundColor: "#ffffffff",
     alignItems: "center",
     justifyContent: "center",
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#19607E",
+    color: "#000000ff",
     textAlign: "center",
     marginBottom: 8,
     fontFamily: "Prompt-Thin"
   },
   cardText: {
     fontSize: 13,
-    color: "#19607E",
+    color: "#000000ff",
     textAlign: "center",
     marginBottom: 24,
     lineHeight: 20,
