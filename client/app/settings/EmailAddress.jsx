@@ -1,70 +1,122 @@
-
-import React, { useState, useEffect, useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, TextInput } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState, useContext } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { DataContext } from "../DataContextProvider";
 
-
 export default function EmailAddress() {
+  const { user, setUser } = useContext(DataContext);
+  const [email, setEmail] = useState(user.userEmail);
 
-  const { user, } = useContext(DataContext);
+  const handleSave = () => {
+    setUser({ ...user, userEmail: email });
+    Alert.alert("Success", "Email address saved!");
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Email address</Text>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#ffffffff" />
-        </TouchableOpacity>
-      </View>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#fff" />
+      </TouchableOpacity>
 
-      <View style={styles.inputPlace}>
-        <TextInput
-          style={[styles.input, { color: "#000000a9" }]}
-          value={user.userEmail}
-          editable={false}
-        />
+      {/* Explanation Text */}
+      <View style={styles.centeredContent}>
+        <Text style={styles.title}>Change Email Address</Text>
+        <Text style={styles.description}>
+          Update your email address below. This will be used for logging in and account notifications.
+        </Text>
+
+        {/* Card */}
+        <View style={styles.card}>
+          <View style={styles.inputContainer}>
+            <MaterialIcons name="email" size={20} color="#FF6868" style={{ marginRight: 10 }} />
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          
+        </View>
+        
       </View>
-      
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#19607E", // dominant background
-  },
-  header: {
-    height: 60,
+    backgroundColor: "#19607E",
+    paddingHorizontal: 16,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FF6868", // accent header (30%)
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#FFFFFF",
   },
   backButton: {
     position: "absolute",
     left: 15,
-    top: 15,
+    top: 40,
     padding: 5,
   },
-  inputPlace:{
-    paddingTop: 40,
+  centeredContent: {
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 14,
+    color: "#CBF7FF",
+    textAlign: "center",
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    fontFamily: "Prompt-Thin"
+  },
+  card: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 16,
+    padding: 20,
+    width: "100%",
+    maxWidth: 400,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontFamily: "Prompt-Thin",
+    marginBottom: 20,
   },
   input: {
-    backgroundColor: "#ffffffff",
-    padding: 18,
-    marginBottom: 12,
-    textAlign: "left",
-    direction: "ltr",
-    fontFamily: "Prompt-Thin",
+    flex: 1,
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#000",
+  },
+  saveButton: {
+    backgroundColor: "#FF6868",
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    marginBottom: 12,
+    alignItems: "center",
+
+    marginTop: 20,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

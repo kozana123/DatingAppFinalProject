@@ -1,99 +1,112 @@
-import React, { useState, useEffect, useContext } from "react";
-import {View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from "react-native";
-import { deleteUserById } from "../../api";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-
 export default function DeleteAccount() {
 
-    const onDeletedUser = () => {
-      Alert.alert(
-        'Delete Account',
-        'Are you sure you want to delete this account?',
-        [
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => {
-              console.log("delete this account");
-              // const deleted = deleteUserById(user.user_id)
-              // if(deleted){
-              //   router.navigate("/")
-              // }   
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-      
-    }
+  const onDeletedUser = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete this account? This action cannot be undone.",
+      [
+        { text: "No", style: "cancel" },
+        { 
+          text: "Yes", 
+          onPress: () => {
+            console.log("delete this account");
+            // const deleted = deleteUserById(user.user_id)
+            // if(deleted){ router.push("/"); }
+          }
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Delete account</Text>
+    
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#ffffffff" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.btnView}>
-        <TouchableOpacity
-          style={styles.deleteBtn}
-          onPress={onDeletedUser}
-        >
-          <Text style={styles.deleteText}>Delete Account</Text>
-        </TouchableOpacity>
+      {/* Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Remove Your Account</Text>
+        <Text style={styles.cardSubtitle}>
+          Deleting your account will remove all your data permanently. Make sure you really want to proceed.
+        </Text>
+
+       
       </View>
+      <TouchableOpacity style={styles.deleteButton} onPress={onDeletedUser}>
+          <Text style={styles.deleteButtonText}>Delete Account</Text>
+        </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#19607E", // dominant background
+    backgroundColor: "#19607E",
+    paddingHorizontal: 16,
+    paddingTop: 30,
   },
   header: {
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FF6868", // accent header (30%)
+    backgroundColor: "#19607E",
+    marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#CBF7FF",
   },
   backButton: {
     position: "absolute",
-    left: 15,
+    left: 0,
     top: 15,
     padding: 5,
   },
-  btnView:{
-    elevation: 10,            // Android shadow
-    borderRadius: 10,         // match button radius
-    backgroundColor: "#ff0000", // button color
-    overflow: "hidden",
-    marginTop: 40,  
-    marginHorizontal: 20,     // ensures ripple stays inside
+  card: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 20,
+    padding: 30,
   },
-  deleteBtn: {
-    height: 70,
-    justifyContent: "center",
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 8,
+    
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: "#CBF7FF",
+    textAlign: "center",
+        fontFamily: "Prompt-Thin",
+    marginBottom: 20,
+  },
+  deleteButton: {
+    backgroundColor: "#FF6868",
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 36,
     alignItems: "center",
+    marginTop: 10,
   },
-  deleteText: {
+  deleteButtonText: {
+    color: "#fff",
     fontSize: 16,
-    fontWeight: "800",
-    color: "#ffffffff",
-    letterSpacing: 1,
+    fontWeight: "600",
+    textAlign: "center",
   },
-
 });

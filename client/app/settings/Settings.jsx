@@ -14,16 +14,19 @@ export default function Settings() {
     setToggleStates((prev) => ({ ...prev, [key]: value }));
   };
 
+  const accountOptions = [
+    { id: "1", label: "Email address", page: "/settings/EmailAddress" },
+    { id: "2", label: "Change password", page: "/settings/ChangePassword" },
+    { id: "3", label: "Delete account", page: "/settings/DeleteAccount" },
+   
+  ];
+
   const settingsSections = [
     {
       id: "1",
       title: "Account",
       icon: "person",
-      items: [
-        { id: "1-1", label: "Edit Profile", page: "/settings/EditProfile" },
-        { id: "1-2", label: "Privacy Settings", page: "/settings/PrivacySettings" },
-        { id: "1-3", label: "Verification", page: "/settings/Verification" },
-      ],
+      items: accountOptions, 
     },
     {
       id: "2",
@@ -35,16 +38,7 @@ export default function Settings() {
         { id: "2-3", label: "Match Alerts", toggleKey: "match_alerts" },
       ],
     },
-    {
-      id: "3",
-      title: "Dating Preferences",
-      icon: "heart",
-      items: [
-        { id: "3-1", label: "Discovery Settings", page: "/settings/Discovery" },
-        { id: "3-2", label: "Age Range", page: "/settings/AgeRange" },
-        { id: "3-3", label: "Distance", page: "/settings/Distance" },
-      ],
-    },
+
     {
       id: "4",
       title: "Safety & Security",
@@ -131,9 +125,6 @@ export default function Settings() {
                 </Text>
               </View>
             </TouchableOpacity>
-
-           
-           
           </View>
         }
       />
@@ -151,10 +142,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FF6868",
+    
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    // fontWeight: "bold",
+    fontFamily: "Prompt-Thin",
     color: "#FFFFFF",
   },
   backButton: {
@@ -198,8 +191,9 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
-    fontWeight: "500",
+
     color: "#CBF7FF",
+    fontFamily: "Prompt-Thin"
   },
   separator: {
     height: 1,

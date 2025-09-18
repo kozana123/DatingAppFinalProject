@@ -1,155 +1,150 @@
-import React, { useState, useEffect, useContext } from "react";
-import {View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, TextInput } from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { DataContext } from "../DataContextProvider";
 import SHA256 from "crypto-js/sha256";
 
-
-
 export default function ChangePassword() {
+  const { user } = useContext(DataContext);
 
-	const { user, } = useContext(DataContext);
+  const [oldPassword, setOldPassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-	const [oldPassword, setOldPassword] = useState("");
+  const checkChangingPass = () => {
+    const hashedPassword = SHA256(oldPassword).toString();
 
-	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
-
-
-	const checkChangingPass = () =>{
-		const hashedPassword = SHA256(oldPassword).toString();
-
-		if (password.length < 6) {
-      alert("Password must be at least 6 characters.");
+    if (password.length < 6) {
+      Alert.alert("Error", "Password must be at least 6 characters.");
       return;
     }
 
-		if(hashedPassword == user.user_password && password == confirmPassword){
-			console.log("changed Password");
-			
-		}
-		else{
-				alert("Passwords do not match or password not correct.");
-				console.log(hashedPassword + " " + user.user_password);
-				
-      	return;
-		}
-	}
-	  
+    if (hashedPassword === user.user_password && password === confirmPassword) {
+      Alert.alert("Success", "Password changed successfully!");
+      setOldPassword("");
+      setPassword("");
+      setConfirmPassword("");
+    } else {
+      Alert.alert("Error", "Passwords do not match or old password is incorrect.");
+    }
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Change password</Text>
+   
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#ffffffff" />
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
-			<View style={styles.inputPlace}>
-				<TextInput
-					placeholder="Your password"
-					placeholderTextColor="#000000ff"
-					style={styles.input}
-					onChangeText={(password) =>
-						setOldPassword(password)
-					}
-					secureTextEntry
-					autoCapitalize="none"
-					textContentType="newPassword"
-				/>
-			</View>
 
-			<View style={styles.inputPlace}>
-				<TextInput
-				placeholder="New password"
-				placeholderTextColor="#000000ff"
-				style={styles.input}
-				onChangeText={(password) =>
-					setPassword(password)
-				}
-				secureTextEntry
-				autoCapitalize="none"
-				textContentType="newPassword"
-				/>
+      {/* Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Update Your Password</Text>
+        <Text style={styles.cardSubtitle}>
+          Enter your current password and choose a new one to update your account credentials.
+        </Text>
 
-				<TextInput
-					placeholder="Confirm password"
-					placeholderTextColor="#000000ff"
-					style={styles.input}
-					onChangeText={setConfirmPassword}
-					secureTextEntry
-					autoCapitalize="none"
-					textContentType="password"
-				/>
-			</View>
+        <TextInput
+          placeholder="Current password"
+          placeholderTextColor="#555"
+          style={styles.input}
+          value={oldPassword}
+          onChangeText={setOldPassword}
+          secureTextEntry
+        />
+        <TextInput
+          placeholder="New password"
+          placeholderTextColor="#555"
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        <TextInput
+          placeholder="Confirm new password"
+          placeholderTextColor="#555"
+          style={styles.input}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
 
-			<TouchableOpacity
-					style={styles.signInButton}
-					activeOpacity={0.85}
-					onPress={checkChangingPass}
-				>
-					<Text style={styles.signInText}>Save</Text>
-				</TouchableOpacity>
-
+   
+      </View>
+      <TouchableOpacity style={styles.saveButton} onPress={checkChangingPass}>
+          <Text style={styles.saveButtonText}>Save</Text>
+        </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
- container: {
+  container: {
     flex: 1,
-    backgroundColor: "#19607E", // dominant background
+    backgroundColor: "#19607E",
+    paddingHorizontal: 16,
+    paddingTop: 30,
   },
   header: {
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#FF6868", // accent header (30%)
+    backgroundColor: "#19607E",
+    marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#FFFFFF",
+    color: "#CBF7FF",
   },
   backButton: {
     position: "absolute",
-    left: 15,
+    left: 0,
     top: 15,
     padding: 5,
   },
-  inputPlace:{
-    paddingTop: 40,
+  card: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderRadius: 20,
+    padding: 20,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: "#CBF7FF",
+    textAlign: "center",
+    marginBottom: 20,
+    fontFamily: "Prompt-Thin"
   },
   input: {
-    backgroundColor: "#ffffffff",
-    padding: 18,
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 12,
     marginBottom: 12,
-    textAlign: "left",
-    direction: "ltr",
-    fontFamily: "Prompt-Thin",
+    fontSize: 14,
+    fontFamily: "Prompt-Thin"
+  },
+  saveButton: {
+    backgroundColor: "#FF6868",
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    marginBottom: 12,
+    marginTop: 10,
+  },
+  saveButtonText: {
+    color: "#fff",
     fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
   },
-	signInButton: {
-    backgroundColor: "#FF6868", // accent (30%)
-    height: 50,
-    borderRadius: 20,
-		marginTop: 30,
-		marginHorizontal: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  signInText: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#FFFFFF",
-    fontFamily: "Prompt-SemiBold",
-    letterSpacing: 1,
-  },
-
 });
