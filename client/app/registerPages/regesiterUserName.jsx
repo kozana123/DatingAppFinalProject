@@ -8,61 +8,48 @@ import {
   ImageBackground,
   SafeAreaView,
   StyleSheet,
-  Platform,
-  Alert,
 } from "react-native";
 import { Input, Button } from "@rneui/themed";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
-import {
-  Keyboard,
-  TouchableWithoutFeedback,
-} from "react-native";
-
 const STAGE_PROGRESS = 20;
 
 export default function RegisterUserName() {
-
   const router = useRouter();
-  const [newUser, setnewUser] = useState({name: ""});
-  console.log(`name page`, newUser.name);
-  
+  const [newUser, setnewUser] = useState({ name: "" });
+
   const handleNext = () => {
-    if(newUser.name != ""){
-      router.push({pathname:"/registerPages/personalDetails", params: newUser})
+    if (newUser.name !== "") {
+      router.push({ pathname: "/registerPages/personalDetails", params: newUser });
+    } else {
+      alert("Please fill your name");
     }
-    else{
-      alert("Please fill your name")
-    }
-  }
+  };
 
   return (
-    
     <ImageBackground
       source={require("../../assets/images/design.png")}
       style={styles.backgroundImage}
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
         <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
         </View>
         <SafeAreaView style={styles.safeArea}>
-          
-
           <View style={styles.container}>
             <Text style={styles.title}>Let's Get Started!</Text>
             <Text style={styles.subtitle}>What's Your Name?</Text>
 
             <Input
               placeholder="Enter your name"
-              placeholderTextColor="#e1bee7"
+              placeholderTextColor="#CBF7FF"
               value={newUser.name}
               inputContainerStyle={styles.inputContainerStyle}
               inputStyle={styles.inputStyle}
@@ -84,7 +71,7 @@ export default function RegisterUserName() {
   );
 }
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
@@ -97,21 +84,20 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: "center",
-    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   progressContainer: {
     position: "absolute",
-    top: 80, 
-    left: "10%", 
-    right: "10%", 
+    top: 80,
+    left: "10%",
+    right: "10%",
     height: 8,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    zIndex: 10, 
+    zIndex: 10,
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#ffffff", 
+    backgroundColor: "#FF6868",
     borderRadius: 4,
   },
   container: {
@@ -123,48 +109,42 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#ffe6ff",
+    color: "#CBF7FF",
     marginBottom: 6,
     fontFamily: "Prompt-SemiBold",
-    direction: "ltr",
   },
   subtitle: {
     fontSize: 15,
-    color: "#f8d7ff",
+    color: "#CBF7FF",
     marginBottom: 28,
     fontFamily: "Prompt-Thin",
     textAlign: "left",
-    direction: "ltr",
   },
-  
   inputContainerStyle: {
     borderBottomWidth: 1.5,
-
-     borderColor: "#cc66cc"
+    borderColor: "#CBF7FF",
   },
   inputStyle: {
     fontSize: 18,
-    color: "#ffe6ff",
+    color: "#CBF7FF",
     fontFamily: "Prompt-Thin",
   },
   buttonStyle: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868",
     height: 50,
-    // height: height * 0.2,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   buttonTitleStyle: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#FFFFFF",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },

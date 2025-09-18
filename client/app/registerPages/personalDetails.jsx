@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -19,7 +19,6 @@ import { useLocalSearchParams } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const STAGE_PROGRESS = 40;
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function PersonalDetails() {
   const params = useLocalSearchParams();
@@ -32,10 +31,6 @@ export default function PersonalDetails() {
     today.getDate()
   );
 
-  const initialBirthdate = newUser.birthDate
-    ? new Date(newUser.birthDate)
-    : eighteenYearsAgo;
-
   const [birthDate, setBirthDate] = useState(new Date(2000, 0, 1));
   const [showPicker, setShowPicker] = useState(false);
 
@@ -44,7 +39,6 @@ export default function PersonalDetails() {
   );
 
   const genders = ["Other", "Female", "Male"];
-
 
   const isAtLeast18 = (date) => {
     const now = new Date();
@@ -95,9 +89,12 @@ export default function PersonalDetails() {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
         style={styles.gradientOverlay}
       >
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+        </View>
         <SafeAreaView style={styles.safeArea}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -108,27 +105,21 @@ export default function PersonalDetails() {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <View style={styles.progressContainer}>
-                <View
-                  style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]}
-                />
-              </View>
               <View style={styles.card}>
                 <Text style={styles.title}>Your Personal Info</Text>
 
                 <Text style={styles.label}>Birth Date</Text>
                 <TouchableOpacity
                   style={[
-                    styles.dateInput,
-                    showPicker && { borderColor: "#cc66cc" },
+                    styles.input,
+                    showPicker && { borderColor: "#FF6868" },
                   ]}
                   onPress={() => setShowPicker(true)}
                 >
-                  <Text style={styles.dateText}>
+                  <Text style={styles.inputText}>
                     {birthDate.toLocaleDateString()}
                   </Text>
                 </TouchableOpacity>
-
                 {showPicker && (
                   <DateTimePicker
                     value={birthDate}
@@ -144,18 +135,19 @@ export default function PersonalDetails() {
                   buttons={genders}
                   selectedIndex={genderIndex}
                   onPress={onGenderPress}
-                  containerStyle={[styles.genderGroup, styles.purpleBackground]}
+                  containerStyle={styles.genderGroup}
                   buttonStyle={styles.genderButton}
                   selectedButtonStyle={styles.selectedGenderButton}
                   selectedTextStyle={styles.selectedText}
                   textStyle={styles.genderText}
-                  innerBorderStyle={{ width: 1 }}
+                  innerBorderStyle={{
+                    width: 2,
+                    color: "rgba(255,255,255,0.1)",
+                  }}
                 />
-                <TouchableOpacity
-                  style={styles.nextButton}
-                  onPress={handleNext}
-                >
-                  <Text style={styles.nextButtonText}>Next</Text>
+
+                <TouchableOpacity style={styles.button} onPress={handleNext}>
+                  <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -166,129 +158,90 @@ export default function PersonalDetails() {
   );
 }
 
+const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
-  gradientOverlay: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-    alignContent: "center",
-    justifyContent: "center",
-  },
+  backgroundImage: { flex: 1, width, height: "100%" },
+  gradientOverlay: { flex: 1 },
+  safeArea: { flex: 1, justifyContent: "center" },
   progressContainer: {
+    position: "absolute",
+    top: 80,
+    left: "10%",
+    right: "10%",
     height: 8,
-    width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    alignSelf: "center",
-    marginBottom: 30,
-    
+    zIndex: 10,
   },
-  progressBar: {
-    height: "100%",
-    backgroundColor: "#ffffff",
-    borderRadius: 4,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: "center",
-    paddingBottom: 40,
-  },
+  progressBar: { height: "100%", backgroundColor: "#FF6868", borderRadius: 4 },
+  keyboardAvoidingView: { flex: 1 },
+  scrollContainer: { flexGrow: 1, justifyContent: "center", paddingBottom: 40 },
   card: {
     marginHorizontal: 20,
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 24,
     padding: 20,
   },
-  purpleBackground: {
-    
-    borderRadius: 12,
-  },
   title: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#ffe6ff",
-    marginBottom: 20,
-    fontFamily: "Prompt-Thin",
-    textAlign: "left",
-    direction: "ltr",
+    color: "#CBF7FF",
+    marginBottom: 6,
+    fontFamily: "Prompt-SemiBold",
   },
   label: {
-    fontSize: 16,
-    color: "#fff",
+    fontSize: 15,
+    color: "#CBF7FF",
     marginBottom: 10,
     fontFamily: "Prompt-Thin",
-    textAlign: "left",
-    direction: "ltr",
-    
-   
   },
-  dateInput: {
-    borderWidth: 1,
-    borderColor: "#cc66cc",
+  input: {
+    borderWidth: 1.5,
+    borderColor: "#CBF7FF",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 20,
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(255,255,255,0.1)",
   },
-  dateText: {
+  inputText: {
     fontSize: 18,
-    color: "#fff",
+    color: "#CBF7FF",
     fontFamily: "Prompt-Thin",
   },
   genderGroup: {
     marginBottom: 30,
     borderRadius: 12,
-    backgroundColor: "transparent",
-     borderColor: "#cc66cc"
-    
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderColor: "#CBF7FF",
   },
   genderButton: {
-    backgroundColor: "transparent",
-     borderColor: "#cc66cc",
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderColor: "#FF6868",
   },
-  selectedGenderButton: {
-     borderColor: "#cc66cc",
-    backgroundColor: "#cc66cc",
-  },
+  selectedGenderButton: { borderColor: "#FF6868", backgroundColor: "#FF6868" },
   selectedText: {
-    color: "#fff",
+    color: "#CBF7FF",
     fontWeight: "bold",
     fontFamily: "Prompt-Thin",
-     borderColor: "#cc66cc"
   },
-  genderText: {
-    color: "#eee",
-    fontSize: 14,
-    fontFamily: "Prompt-Thin",
-     borderColor: "#cc66cc"
-  },
-  nextButton: {
-    backgroundColor: "#ffffff",
+  genderText: { color: "#CBF7FF", fontSize: 14, fontFamily: "Prompt-Thin" },
+
+  button: {
+    backgroundColor: "#FF6868",
     height: 50,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  nextButtonText: {
+  buttonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#CBF7FF",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
