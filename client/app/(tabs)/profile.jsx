@@ -29,11 +29,20 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { DataContext } from "../DataContextProvider";
 import { ButtonGroup } from "@rneui/themed";
 import RNPickerSelect from "react-native-picker-select";
-import { updateUserSearch, updateUserDetails, } from "../../api";
+import { updateUserSearch, updateUserDetails } from "../../api";
 
 export default function ProfileScreen() {
-  const { user, userPref, setUserPref, setUser, handleImageChoice, handleSearchLocation, handleUseCurrentLocation } = useContext(DataContext);
-  const [modalVisibleRelationship, setModalVisibleRelationship] = useState(false);
+  const {
+    user,
+    userPref,
+    setUserPref,
+    setUser,
+    handleImageChoice,
+    handleSearchLocation,
+    handleUseCurrentLocation,
+  } = useContext(DataContext);
+  const [modalVisibleRelationship, setModalVisibleRelationship] =
+    useState(false);
   const [modalVisibleInterests, setModalVisibleInterests] = useState(false);
   const [modalVisibleLocation, setModalVisibleLocation] = useState(false);
 
@@ -70,7 +79,6 @@ export default function ProfileScreen() {
       subtitle: "Just want to have some fun...",
     },
   ];
-
 
   const interestsData = [
     {
@@ -144,10 +152,13 @@ export default function ProfileScreen() {
     value: 100 + i,
   }));
 
-  const [ageRange, setAgeRange] = useState([userPref.minAgePreference, userPref.maxAgePreference,]);
+  const [ageRange, setAgeRange] = useState([
+    userPref.minAgePreference,
+    userPref.maxAgePreference,
+  ]);
   const [distance, setDistance] = useState(userPref.preferredDistanceKm);
   const [location, setLocation] = useState("");
-  
+
   const [genderIndex, setGenderIndex] = useState(
     genders.indexOf(userPref.preferredPartner)
   );
@@ -200,26 +211,31 @@ export default function ProfileScreen() {
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
+          <TouchableOpacity
+            onPress={() => router.push("/settings/Settings")}
+            style={styles.settingsButton}
+          >
+            <MaterialIcons name="settings" size={30} color="#fff" />
+          </TouchableOpacity>
           <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.header}>
-              <View style = {{alignItems:"center"}}>
+              <View style={{ alignItems: "center" }}>
                 <View style={styles.logoCircle}>
-                <Image
-                  source={require("../../assets/images/AppLogo.png")}
-                  style={styles.logoImage}
-                  resizeMode="contain"
-                />
+                  <Image
+                    source={require("../../assets/images/AppLogo.png")}
+                    style={styles.logoImage}
+                    resizeMode="contain"
+                  />
                 </View>
                 <Text style={styles.logo}>Luvio</Text>
               </View>
-              
             </View>
-            
+
             <View style={styles.avatarContainer}>
               <Avatar
                 size={140}
                 rounded
-                source={ { uri: user.profile_image }}
+                source={{ uri: user.profile_image }}
                 onPress={handleImageChoice}
               >
                 <Avatar.Accessory
@@ -241,9 +257,22 @@ export default function ProfileScreen() {
 
             <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
               <Text style={styles.label}>Location:</Text>
-              <TouchableOpacity style={styles.option} onPress={() => { setModalVisibleLocation(!modalVisibleLocation)}}>
-                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",}}>
-                  <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}>
+              <TouchableOpacity
+                style={styles.option}
+                onPress={() => {
+                  setModalVisibleLocation(!modalVisibleLocation);
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}
+                  >
                     {user.city}
                   </Text>
                   <MaterialIcons name="my-location" size={24} color="#6a0dad" />
@@ -252,33 +281,76 @@ export default function ProfileScreen() {
               <Modal
                 visible={modalVisibleLocation}
                 transparent={true}
-                onRequestClose={() => setModalVisibleLocation(!modalVisibleLocation)}
+                onRequestClose={() =>
+                  setModalVisibleLocation(!modalVisibleLocation)
+                }
               >
                 <View style={styles.modalBackground}>
                   <View style={styles.modalContainer}>
                     <Text style={styles.modalTitle}>Set Location</Text>
-                    <TouchableOpacity style={styles.optionLocation} onPress={handleUseCurrentLocation}>
-                      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",}}>
-                        <Text style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}> Find My Location </Text>
-                        <MaterialIcons name="my-location" size={24} color="#6a0dad" />
+                    <TouchableOpacity
+                      style={styles.optionLocation}
+                      onPress={handleUseCurrentLocation}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.deleteText,
+                            { fontFamily: "Prompt-Black" },
+                          ]}
+                        >
+                          {" "}
+                          Find My Location{" "}
+                        </Text>
+                        <MaterialIcons
+                          name="my-location"
+                          size={24}
+                          color="#6a0dad"
+                        />
                       </View>
                     </TouchableOpacity>
-                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",backgroundColor: "#f1f1f1ff", borderRadius: 8,padding: 12, marginBottom: 12,}}>
-                        <TextInput
-                          value={location}
-                          style={{ color: "#6a0dad" , width: "90%"}}
-                          placeholder="Search City"
-                          placeholderTextColor="#6a0dad7e"
-                          onChangeText={setLocation}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        backgroundColor: "#f1f1f1ff",
+                        borderRadius: 8,
+                        padding: 12,
+                        marginBottom: 12,
+                      }}
+                    >
+                      <TextInput
+                        value={location}
+                        style={{ color: "#6a0dad", width: "90%" }}
+                        placeholder="Search City"
+                        placeholderTextColor="#6a0dad7e"
+                        onChangeText={setLocation}
+                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleSearchLocation(location);
+                        }}
+                      >
+                        <MaterialIcons
+                          name="search"
+                          size={22}
+                          color="#6a0dad"
                         />
-                          <TouchableOpacity onPress={() => {handleSearchLocation(location)}}>
-                            <MaterialIcons name="search" size={22} color="#6a0dad" />
-                          </TouchableOpacity>
-                      </View>
-                    
+                      </TouchableOpacity>
+                    </View>
+
                     <TouchableOpacity
                       style={styles.saveBtn}
-                      onPress={() => setModalVisibleLocation(!modalVisibleLocation)}
+                      onPress={() =>
+                        setModalVisibleLocation(!modalVisibleLocation)
+                      }
                     >
                       <Text style={styles.saveBtnText}>Finish</Text>
                     </TouchableOpacity>
@@ -422,16 +494,18 @@ export default function ProfileScreen() {
                   onPress={() => setModalVisibleInterests(true)}
                   style={{ marginTop: 1 }}
                 >
-                  
-                  <FontAwesome name="pencil" size={20} color="#ffffff" marginLeft={10} />
+                  <FontAwesome
+                    name="pencil"
+                    size={20}
+                    color="#ffffff"
+                    marginLeft={10}
+                  />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.selectedInterestsContainer}>
                 {tempSelectedInterests.length < 5 ? (
-                  <Text style={styles.placeholderText}>
-                    Need atlist 5
-                  </Text>
+                  <Text style={styles.placeholderText}>Need atlist 5</Text>
                 ) : (
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {tempSelectedInterests.map((interest) => (
@@ -446,7 +520,9 @@ export default function ProfileScreen() {
                 visible={modalVisibleInterests}
                 transparent={true}
                 animationType="slide"
-                onRequestClose={() => setModalVisibleInterests(!modalVisibleInterests)}
+                onRequestClose={() =>
+                  setModalVisibleInterests(!modalVisibleInterests)
+                }
               >
                 <View style={styles.modalBackground}>
                   <View style={styles.modalContainer}>
@@ -559,7 +635,6 @@ export default function ProfileScreen() {
                 <Text style={styles.deleteText}> Save</Text>
               </TouchableOpacity>
             </View>
-
           </ScrollView>
         </SafeAreaView>
       </LinearGradient>
@@ -580,7 +655,6 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 80,
     padding: 16,
-
   },
   header: {
     // flexDirection: "row-reverse",
@@ -595,7 +669,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "Prompt-SemiBold",
   },
-  
+
   avatarContainer: {
     alignItems: "center",
   },
@@ -689,7 +763,7 @@ const styles = StyleSheet.create({
     elevation: 12,
     position: "relative",
   },
-  logoImage: { 
+  logoImage: {
     width: 40,
     height: 40,
   },
@@ -745,6 +819,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  settingsButton: {
+    position: "absolute",
+    top: 40,       // מרחק מהחלק העליון
+    right: 20,     // מרחק מהצד הימני
+    zIndex: 10,    // מעל שאר התוכן
+  },
+  
+
   modalContainer: {
     backgroundColor: "#fff",
     borderRadius: 16,
@@ -815,28 +897,27 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "#eee",
     alignItems: "center",
-  
   },
   traitButtonSelected: {
     backgroundColor: "#DA58B7",
   },
   traitText: {
     fontSize: 16,
-      fontFamily:"Prompt-Black"
+    fontFamily: "Prompt-Black",
   },
 
   saveBtn: {
-    backgroundColor: "#DA58B7", 
-    paddingVertical: 12, 
-    paddingHorizontal: 25, 
+    backgroundColor: "#DA58B7",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
     borderRadius: 25,
-    alignItems: "center", 
-    marginTop: 15, 
-    shadowColor: "#000", 
+    alignItems: "center",
+    marginTop: 15,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, 
+    elevation: 5,
   },
   saveBtnText: {
     color: "white",
@@ -848,10 +929,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    shadowColor: "#000", 
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-    elevation: 5, 
+    elevation: 5,
   },
 });
