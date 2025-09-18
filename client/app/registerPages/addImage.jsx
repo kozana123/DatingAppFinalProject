@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  Platform,
   Dimensions,
   Alert,
   ImageBackground,
@@ -15,17 +14,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 
-
 const STAGE_PROGRESS = 80;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
 export default function AddImage() {
-
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
-  console.log(`Image page`, newUser);
-
-  const [image, setImage] = useState(null);
 
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();
@@ -62,7 +56,7 @@ export default function AddImage() {
     });
 
     if (!result.canceled) {
-      setnewUser({...newUser, image: result.assets[0].uri})
+      setnewUser({ ...newUser, image: result.assets[0].uri });
     }
   };
 
@@ -75,7 +69,7 @@ export default function AddImage() {
     });
 
     if (!result.canceled) {
-      setnewUser({...newUser, image: result.assets[0].uri})
+      setnewUser({ ...newUser, image: result.assets[0].uri });
     }
   };
 
@@ -86,7 +80,9 @@ export default function AddImage() {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
@@ -118,8 +114,7 @@ export default function AddImage() {
 
             <TouchableOpacity
               style={[styles.nextButton, !newUser.image && styles.nextButtonDisabled]}
-              onPress={() => router.push({pathname:"/registerPages/location", params: newUser})}
-              // disabled={!newUser.image}
+              onPress={() => router.push({ pathname: "/registerPages/location", params: newUser })}
               activeOpacity={0.8}
             >
               <Text style={styles.nextButtonText}>Next</Text>
@@ -131,11 +126,12 @@ export default function AddImage() {
   );
 }
 
+const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    width,
+    height,
   },
   gradientOverlay: {
     flex: 1,
@@ -143,7 +139,6 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     justifyContent: "center",
-    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   progressContainer: {
     height: 8,
@@ -152,11 +147,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignSelf: "center",
     marginBottom: 30,
-    // flexDirection: "row-reverse",
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868",
     borderRadius: 4,
   },
   container: {
@@ -168,27 +162,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 21,
     fontWeight: "700",
-    color: "#ffe6ff",
+    color: "#CBF7FF",
     marginBottom: 12,
     fontFamily: "Prompt-SemiBold",
-    textAlign: "left",
-    direction: "ltr",
   },
   subtitle: {
     fontSize: 14,
-    color: "#f0d9f5",
+    color: "#CBF7FF",
     marginBottom: 30,
     fontFamily: "Prompt-Thin",
     textAlign: "left",
     lineHeight: 20,
-    direction: "ltr",
-
   },
   imageContainer: {
     height: 200,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: "#cc66cc",
+    borderColor: "#CBF7FF",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 40,
@@ -206,33 +196,31 @@ const styles = StyleSheet.create({
   },
   placeholderIcon: {
     fontSize: 20,
-    color: "#cc66cc",
+    color: "#FF6868",
     marginBottom: 8,
   },
   placeholderText: {
     fontSize: 18,
-    color: "#ffffff",
+    color: "#CBF7FF",
     fontFamily: "Prompt-Thin",
   },
   nextButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868",
     height: 50,
-    // width: "300",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+    borderColor: "#CBF7FF",
   },
-
   nextButtonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#FFFFFF",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },

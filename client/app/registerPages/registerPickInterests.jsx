@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,24 +8,21 @@ import {
   StyleSheet,
   Alert,
   ImageBackground,
-  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { router, useLocalSearchParams } from "expo-router";
-import {RegisterPreferences} from '../../api';
+import { useLocalSearchParams, router } from "expo-router";
+import { RegisterPreferences } from '../../api';
 
 const { width } = Dimensions.get("window");
-const CARD_SIZE = width / 4;
-
+const CARD_SIZE = (width - 60) / 3 - 4;
 export default function BubbleInterests() {
-
   const params = useLocalSearchParams();
   const [userPreference, setUserPreference] = useState(params);
   const [selected, setSelected] = useState([]);
 
   const interests = [
     {
-      title: "🧠 Personality",
+      title: "Personality",
       traits: [
         { label: "Introvert", icon: "🙈" },
         { label: "Extrovert", icon: "📢" },
@@ -40,7 +37,7 @@ export default function BubbleInterests() {
       ],
     },
     {
-      title: "🌿 Lifestyle",
+      title: " Lifestyle",
       traits: [
         { label: "Early Riser", icon: "🌅" },
         { label: "Night Owl", icon: "🌙" },
@@ -52,7 +49,7 @@ export default function BubbleInterests() {
       ],
     },
     {
-      title: "🎨 Hobbies",
+      title: "Hobbies",
       traits: [
         { label: "Painting", icon: "🎨" },
         { label: "Music", icon: "🎶" },
@@ -76,51 +73,12 @@ export default function BubbleInterests() {
     );
   };
 
-  // const apiUrl = "http://www.DatingServer.somee.com/api/userpreferences/userPreferences"
-
-  // const RegisterPreferences = async (prefs) => {
-  //   // console.log(userPreference);
-  //   console.log(userPreference);
-
-  //   const preferences = {
-  //     userId: userPreference.userId, // Replace with actual user ID
-  //     preferredPartner: userPreference.genderPreference ,
-  //     relationshipType: userPreference.interest,
-  //     heightPreferences: "",
-  //     religion: "",
-  //     isSmoker: false,
-  //     preferredDistanceKm: 30,
-  //     minAgePreference: 25,
-  //     maxAgePreference: 35,
-  //     interests: prefs,
-  //   };
-
-  //   try {
-  //     const response = await fetch(apiUrl, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(preferences),
-  //     });
-
-  //     if (response.status === 204) {
-  //       console.log("Preferences updated successfully.");
-  //     } else {
-  //       const text = await response.text();
-  //       console.warn("POST failed:",response.status, text);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error sending preferences:", error);
-  //   }
-  // };
-
   const handleContinue = async () => {
     if (selected.length < 5) {
-      Alert.alert("Please select at least 5 interest to continue.");
+      Alert.alert("Please select at least 5 interests to continue.");
       return;
     }
-    const updatedPrefs = selected.join(",")
+    const updatedPrefs = selected.join(",");
 
     const success = await RegisterPreferences(updatedPrefs, userPreference);
 
@@ -135,7 +93,7 @@ export default function BubbleInterests() {
       style={styles.background}
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        colors={["rgba(25,96,126,0.9)", "rgba(25,96,126,0.7)"]}
         style={styles.gradientOverlay}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -147,7 +105,7 @@ export default function BubbleInterests() {
                 <Text style={styles.categoryTitle}>{category.title}</Text>
                 <View style={styles.traitsContainer}>
                   {category.traits.map((item, idx) => {
-                    const isSelected = Array.isArray(selected) && selected.includes(item.label);
+                    const isSelected = selected.includes(item.label);
                     return (
                       <TouchableOpacity
                         key={idx}
@@ -182,7 +140,10 @@ export default function BubbleInterests() {
               </View>
             ))}
 
-            <TouchableOpacity onPress={handleContinue} style={styles.continueButton}>
+            <TouchableOpacity
+              onPress={handleContinue}
+              style={styles.continueButton}
+            >
               <Text style={styles.continueText}>Let's Do It</Text>
             </TouchableOpacity>
           </View>
@@ -190,7 +151,8 @@ export default function BubbleInterests() {
       </LinearGradient>
     </ImageBackground>
   );
-}
+}const CARD_WIDTH = width - 40; // רוחב כמעט מלא
+const CARD_HEIGHT = 70; // גובה בינוני לכל כרטיס
 
 const styles = StyleSheet.create({
   background: {
@@ -198,28 +160,26 @@ const styles = StyleSheet.create({
   },
   gradientOverlay: {
     flex: 1,
-    // paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
-    // paddingBottom: 60,
     alignItems: "center",
+    paddingBottom: 40,
   },
   container: {
-    // marginHorizontal: 20,
     margin: 20,
-    backgroundColor: "rgba(0,0,0,0.25)",
+    backgroundColor: "rgba(203,247,255,0.15)",
     borderRadius: 24,
-    // padding: 5,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
     alignItems: "center",
-    // width: "90%",
   },
   header: {
-    fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 20,
-    color: "#ffe6ff",
+    fontSize: 26,
+    fontWeight: "700",
+    marginBottom: 25,
+    color: "#CBF7FF",
     fontFamily: "Prompt-SemiBold",
     textAlign: "center",
   },
@@ -229,65 +189,73 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
+    
+    color: "#CBF7FF",
     textAlign: "center",
-    fontFamily: "Prompt-Bold",
+    fontFamily: "Prompt-Black",
     marginBottom: 12,
   },
   traitsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexDirection: "column", // סדר אנכי
+    alignItems: "center",
   },
   traitButton: {
-    backgroundColor: "rgba(255,255,255,0.15)",
-    width: CARD_SIZE,
-    height: CARD_SIZE,
-    margin: 6,
-    borderRadius: 12,
-    justifyContent: "center",
+    backgroundColor: "#19607E",
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    marginVertical: 6,
+    borderRadius: 16,
+    flexDirection: "row", 
     alignItems: "center",
-    padding: 4,
+    paddingHorizontal: 15,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    
   },
   selectedTraitButton: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FF6868",
+    shadowColor: "#FF6868",
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
   },
   traitIcon: {
-    fontSize: 18,
-    color: "#fff",
+    fontSize: 24,
+    color: "#CBF7FF",
+    marginRight: 15,
   },
   selectedTraitIcon: {
-    color: "#6a0dad",
+    color: "#ffffff",
   },
   traitText: {
-    fontSize: 11,
-    color: "#fff",
-    fontFamily: "Prompt-Regular",
-    textAlign: "center",
+    fontSize: 16,
+    color: "#CBF7FF",
+    fontFamily: "Prompt-Thin",
   },
   selectedTraitText: {
-    color: "#6a0dad",
+    color: "#ffffff",
     fontWeight: "700",
   },
   continueButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868",
     height: 50,
-    width: "300",
+    width: width - 80, 
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+    borderColor: "#CBF7FF",
+    marginTop: 20,
   },
   continueText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#FFFFFF",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },

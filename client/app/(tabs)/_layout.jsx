@@ -45,7 +45,7 @@
           options={{
             title: 'Chat',
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="comments" color="#ffff" />
+              <FontAwesome size={24} name="comments" color="#FF6868" />
             ),
             tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
           }}
@@ -57,7 +57,7 @@
           options={{
             title: 'Live Chat',
             tabBarIcon: ({ color }) => {
-              return <FontAwesome size={24} name="heart" color="#ffff" />
+              return <FontAwesome size={24} name="heart" color="#FF6868" />
             },tabBarButton: (props) => (
               <TouchableOpacity activeOpacity={1} {...props} />
             ),
@@ -70,7 +70,7 @@
           options={{
             title: 'Profile',
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="user" color="#ffff" />
+              <FontAwesome size={24} name="user" color="#FF6868" />
             ),
             tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
           }}

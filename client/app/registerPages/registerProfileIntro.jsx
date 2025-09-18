@@ -6,18 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Platform,
   ImageBackground,
 } from "react-native";
-import { router, useLocalSearchParams} from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import {registerUser} from '../../api';
+import { registerUser } from "../../api";
 
 export default function ProfileIntro() {
-  
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
-  console.log(`Intro page`, newUser);
 
   return (
     <ImageBackground
@@ -26,16 +23,17 @@ export default function ProfileIntro() {
       resizeMode="cover"
     >
       <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
+        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
         style={styles.gradientOverlay}
       >
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.card}>
-          
             <View style={styles.logoContainer}>
               <View style={styles.headLeft} />
               <Image
-                source={require("../../assets/images/logo.png")}
+                source={require("../../assets/images/AppLogo.png")}
                 style={styles.logoImage}
                 resizeMode="contain"
               />
@@ -44,7 +42,7 @@ export default function ProfileIntro() {
 
             <Text style={styles.header}>
               Complete your profile{"\n"}
-              <Text style={{ color: "#ff99cc" }}>to get better matches</Text>
+              <Text style={{ color: "#CBF7FF" }}>to get better matches</Text>
               {"\n"}
               and unlock more features!
             </Text>
@@ -58,7 +56,6 @@ export default function ProfileIntro() {
               style={styles.continueButton}
               onPress={() => registerUser(newUser)}
             >
-              {/* () => router.push("/registerPages/registerIntrest")  */}
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>
           </View>
@@ -79,34 +76,18 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    // paddingTop: Platform.OS === "ios" ? 60 : 30,
-    paddingHorizontal: 10,
     justifyContent: "center",
-  alignItems: "center", 
+    alignItems: "center",
+    paddingHorizontal: 10,
   },
   card: {
     backgroundColor: "rgba(0,0,0,0.25)",
     borderRadius: 20,
     alignItems: "center",
-    paddingVertical: 40,       
-    paddingHorizontal: 20,    
-    width: "100%",            
-    maxWidth: 400,             
-    alignItems: "center",
-  },
-  progressContainer: {
-    height: 8,
-    // width: "100%",
-    backgroundColor: "rgba(255,255,255,0.2)",
-    borderRadius: 4,
-    marginBottom: 30,
-    flexDirection: "row-reverse",
-    alignSelf: "center",
-  },
-  progressBar: {
-    height: "100%",
-    backgroundColor: "#ffffff",
-    borderRadius: 4,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    width: "100%",
+    maxWidth: 400,
   },
   logoContainer: {
     width: 130,
@@ -116,69 +97,67 @@ const styles = StyleSheet.create({
     alignItems: "center",
     position: "relative",
   },
-  headLeft: {
-    width: 30,
-    height: 30,
-    backgroundColor: "#ffffff",
-    borderRadius: 100,
-    position: "absolute",
-    top: 10,
-    left: 25,
-    zIndex: 1,
-  },
-  headRight: {
-    width: 22,
-    height: 22,
-    backgroundColor: "#ff69b4",
-    borderRadius: 100,
-    position: "absolute",
-    top: 17,
-    right: 22,
-    zIndex: 1,
-  },
+  // headLeft: {
+  //   width: 30,
+  //   height: 30,
+  //   backgroundColor: "#CBF7FF",
+  //   borderRadius: 100,
+  //   position: "absolute",
+  //   top: 10,
+  //   left: 25,
+  //   zIndex: 1,
+  // },
+  // headRight: {
+  //   width: 22,
+  //   height: 22,
+  //   backgroundColor: "#FF6868",
+  //   borderRadius: 100,
+  //   position: "absolute",
+  //   top: 17,
+  //   right: 22,
+  //   zIndex: 1,
+  // },
   logoImage: {
-    width: "80%",
-    height: "80%",
-    marginTop: 60,
+    width: "120%",
+    height: "120%",
+    marginTop: 30,
   },
   header: {
     fontSize: 24,
-    color: "#ffe6ff",
+    color: "#CBF7FF",
     textAlign: "center",
     marginBottom: 20,
     fontFamily: "Poppins-Bold",
     lineHeight: 34,
     paddingHorizontal: 16,
   },
-
   subheader: {
     fontSize: 16,
-    color: "#f0d9f5",
+    color: "#CBF7FF",
     textAlign: "center",
     marginBottom: 40,
     lineHeight: 22,
     fontFamily: "Prompt-Thin",
   },
   continueButton: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#FF6868",
     height: 50,
     width: "80%",
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
+    borderColor: "#CBF7FF",
   },
   continueButtonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#FFFFFF",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
-  
 });
