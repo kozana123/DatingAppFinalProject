@@ -151,8 +151,8 @@ export default function BubbleInterests() {
       </LinearGradient>
     </ImageBackground>
   );
-}const CARD_WIDTH = width - 40; // רוחב כמעט מלא
-const CARD_HEIGHT = 70; // גובה בינוני לכל כרטיס
+}const CARD_WIDTH = width - 40; 
+const CARD_HEIGHT = 70; 
 
 const styles = StyleSheet.create({
   background: {
