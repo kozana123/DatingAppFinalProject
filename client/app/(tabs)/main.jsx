@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
 import {
   View,
   Text,
@@ -7,266 +7,185 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
-  Animated,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
-const { width, height } = Dimensions.get("window");
 import { DataContext } from "../DataContextProvider";
 
-export default function VideoCallStartScreen() {
-  // const navigation = useNavigation();
-  const { user, userPref } = useContext(DataContext);
-  // const router = useRouter();
-  
-  console.log("user pref:", userPref);
-  console.log("user:", user);
+const { width } = Dimensions.get("window");
 
-  const translateY = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(translateY, {
-          toValue: -10,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, []);
+export default function VideoCallStartScreen() {
+  const { user } = useContext(DataContext);
+  const userInitial = user?.userName?.charAt(0).toUpperCase() || "F";
 
   return (
-    <LinearGradient
-      colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
-      style={styles.overlay}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+    <ImageBackground
+      source={require("../../assets/images/design.png")}
+      style={styles.background}
+      resizeMode="cover"
     >
-      {/* SECTION עליון */}
-      <View style={styles.topSection}>
-        <View style={styles.header}>
-          <View
-            style={{
-              alignItems: "center",
-              flexDirection: "column",
-              paddingTop: 16,
-            }}
-          >
-            <View style={styles.logoCircle}>
-              <Image
-                source={require("../../assets/images/AppLogo.png")}
-                style={styles.logoImage}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.logo}>Luvio</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() => router.push("/settings/Settings")}
-            style={{ paddingRight: 10 }}
-          >
-            <Image
-              source={{
-                uri: "https://cdn-icons-png.flaticon.com/512/3524/3524659.png",
-              }}
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        </View>
-
+      {/* לוגו קטן שמאל עליון */}
+      <View style={styles.logoContainer}>
         <Image
-          source={
-            user && user.profile_image
-              ? { uri: user.profile_image }
-              : {
-                  uri: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
-                }
-          }
-          style={styles.avatar}
+          source={require("../../assets/images/AppLogo.png")}
+          style={styles.logoImage}
+          resizeMode="contain"
         />
-
-        <Text>
-          <Text
-            style={{
-              fontSize: 26,
-              color: "#fff",
-              fontFamily: "Prompt-Thin",
-            }}
-          >
-            Hello{" "}
-          </Text>
-          <Text
-            style={{
-              fontSize: 22,
-              color: "#fff",
-              fontFamily: "Prompt-SemiBold",
-            }}
-          >
-          {user.userName}
-          </Text>
-        </Text>
-        {/* <Text style={styles.bubbleText}>Nice to see you!</Text> */}
+        
       </View>
 
-      <ImageBackground
-        source={require("../../assets/images/design.png")}
-        style={styles.background}
-        resizeMode="cover"
-      >
-        {/* SECTION תחתון */}
-        <View style={styles.bottomSection}>
-          <Text style={styles.title}>Ready to Connect</Text>
-          <Text style={styles.subtitle}>Tap to start your video chat</Text>
+      {/* עיגול מצב בפינה הימנית עליונה */}
+      <View style={styles.statusCircle}>
+        <Text style={styles.statusInitial}>{userInitial}</Text>
+        <View style={styles.onlineDot} />
+      </View>
 
-          <View style={styles.container}>
-            <View style={styles.shadowEllipse} />
-            <Animated.View style={{ transform: [{ translateY }] }}>
-              <TouchableOpacity
-                style={styles.bubble}
-                onPress={() => router.navigate("/videoCall")}
-              >
-                <Text style={styles.bubbleText}>Start Chat</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
+      {/* כותרת עליונה */}
+      <View style={styles.header}>
+        <Text style={styles.greet}>
+          Hey {user?.userName || "Friend"} 👋
+        </Text>
+        <Text style={styles.subtitle}>
+          Ready to make a connection?
+        </Text>
+      </View>
+
+      {/* כרטיס מרכזי */}
+      <View style={styles.card}>
+        <View style={styles.iconCircle}>
+          <Image
+            source={require("../../assets/images/icon_camera.png")}
+            style={{ width: 50, height: 50 }}
+            resizeMode="contain"
+          />
         </View>
-      </ImageBackground>
-    </LinearGradient>
+
+        <Text style={styles.cardTitle}>Start Live Video Chat</Text>
+        <Text style={styles.cardText}>
+          Connect instantly with someone new and make meaningful connections through video
+        </Text>
+
+        <TouchableOpacity
+          style={styles.primaryBtn}
+          onPress={() => router.push("/videoCall")}
+        >
+          <Text style={styles.btnText}>Find Someone Now</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.onlineText}>12 people online • Safe & Secure</Text>
+      </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  topSection: {
-    // flex: 1, // הקטנתי קצת את החלק העליון
-    width: "100%",
-    backgroundColor: "hsla(0, 11.10%, 7.10%, 0.45)",
-    alignItems: "center",
-    paddingBottom: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    borderBottomEndRadius: 29,
-    borderBottomStartRadius: 29,
-    
-    height:"42%",
-    
-  },
-
-  bottomSection: {
-    flex: 90.5,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    width: "100%",
-    paddingTop: 30,
-    paddingHorizontal: 20,
-  },
-
-  overlay: {
+  background: {
     flex: 1,
+    backgroundColor: "#19607E",
     alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 80,
   },
-  header: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    // backgroundColor: "#DA58B7",
-  },
-  logo: {
-    fontSize: 22,
-    fontFamily: "Prompt-Thin",
-    color: "#ffe6ff",
-  },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowOpacity: 0.6,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
-    position: "relative",
+  logoContainer: {
+    position: "absolute",
+    top: 20,      
+    left: 20,
+    width: 45,     
+    height: 45,
   },
   logoImage: {
-    width: 40,
-    height: 40,
+    width: "100%",
+    height: "100%",
   },
-  icon: {
-    width: 26,
-    height: 26,
-    tintColor: "#fff",
-  },
-  avatar: {
-    width: 140,
-    height: 140,
-    
-    borderRadius:90,
-    shadowColor: "#DA58B7",
-    marginBottom: 20,
-  },
-  card: {
-    backgroundColor: "rgba(0, 0, 0, 0)",
-    borderRadius: 24,
-    padding: 30,
+  statusCircle: {
+    position: "absolute",
+    top: 50,
+    right: 30,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
     alignItems: "center",
-    width: "90%",
+    justifyContent: "center",
+    zIndex: 10,
   },
-  title: {
-    fontSize: 26,
-    color: "#ffe6ff",
-    fontWeight: "bold",
-    fontFamily: "Prompt-SemiBold",
-    marginBottom: 10,
+  statusInitial: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#19607E",
+  },
+  onlineDot: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#22c55e",
+    borderWidth: 2,
+    borderColor: "#ffffff",
+  },
+  header: {
+    alignSelf: "flex-start",
+    marginBottom: 40,
+    paddingLeft: 30,
+  },
+  greet: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#CBF7FF",
   },
   subtitle: {
     fontSize: 16,
-    color: "#f8d7ff",
-    fontFamily: "Prompt-Thin",
-    marginBottom: 30,
-    textAlign: "center",
+    color: "#FF6868",
+    marginTop: 6,
   },
-  roundButton: {
-    backgroundColor: "#fff",
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    justifyContent: "center",
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 24,
+    width: width * 0.85,
+    padding: 24,
     alignItems: "center",
-    marginBottom: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 5 },
+    shadowColor: "#19607E",
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 6 },
   },
-  bubble: {
-    width: 170,
-    height: 170,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',// Transparent pink
-    justifyContent: "center",
+  iconCircle: {
+    borderRadius: 60,
+    padding: 20,
+    marginBottom: 20,
+    backgroundColor: "#CBF7FF",
     alignItems: "center",
-    borderWidth: 3,
-    borderColor: "rgba(180, 26, 103, 0.15)",
+    justifyContent: "center",
   },
-  bubbleText: {
-    color: "#ffffffda",
+  cardTitle: {
     fontSize: 20,
-    fontFamily: "Prompt-SemiBold",
+    fontWeight: "700",
+    color: "#19607E",
+    textAlign: "center",
+    marginBottom: 8,
   },
-  container: {
-    alignItems: "center",
-    justifyContent: "flex-end",
+  cardText: {
+    fontSize: 15,
+    color: "#19607E",
+    textAlign: "center",
+    marginBottom: 24,
+    lineHeight: 20,
   },
-  background: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
+  primaryBtn: {
+    backgroundColor: "#FF6868",
+    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 36,
+    marginBottom: 12,
+  },
+  btnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  onlineText: {
+    fontSize: 13,
+    color: "#19607E",
   },
 });

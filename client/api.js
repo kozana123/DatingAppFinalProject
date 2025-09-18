@@ -3,7 +3,7 @@ import axios from 'axios';
 import {createChat} from "./fireBase";
 
 
-const SERVER_IP = '10.0.0.5';
+const SERVER_IP = '192.168.68.106';
 
 const apiPreferencesUrl = `http://${SERVER_IP}:3501/api/v1/userPreferences`
 const apiUsersUrl = `http://${SERVER_IP}:3501/api/v1/userDetails`
