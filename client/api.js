@@ -3,7 +3,7 @@ import axios from 'axios';
 import {createChat} from "./fireBase";
 
 
-const SERVER_IP = '192.168.68.106';
+const SERVER_IP = '10.0.0.10';
 
 const apiPreferencesUrl = `http://${SERVER_IP}:3501/api/v1/userPreferences`
 const apiUsersUrl = `http://${SERVER_IP}:3501/api/v1/userDetails`
@@ -392,7 +392,7 @@ export async function addChatSession(callDate, callDurationMinutes, isMatch) {
 
 export async function addReport(reporterID, reportedUserID, reason, reportDate) {
   try {
-    const response = await axios.post(`${apireportsUrl}/report`, {
+    const response = await axios.delete(`${apireportsUrl}/report`, {
       ReporterID: reporterID,
       ReportedUserID: reportedUserID,
       Reason: reason,

@@ -1,7 +1,7 @@
 // firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, doc, setDoc, getDocs, orderBy, query, addDoc, serverTimestamp, onSnapshot  } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, orderBy, query, addDoc, serverTimestamp, onSnapshot, deleteDoc  } from "firebase/firestore";
 
 
 const firebaseConfig = {
@@ -93,3 +93,27 @@ export const listenToMessages = (chatId, callback) => {
     callback(msgs);
   });
 };
+
+export async function deleteChat(chatId) {
+  try {
+    // Step 1: delete all messages in subcollection
+    const messagesRef = collection(db, "chats", chatId, "messages");
+    const messagesSnapshot = await getDocs(messagesRef);
+    console.log(`try to delete Chat ${messagesSnapshot}`);
+
+    const deletePromises = messagesSnapshot.docs.map((messageDoc) =>
+      deleteDoc(messageDoc.ref)
+    );
+
+    await Promise.all(deletePromises);
+
+    // Step 2: delete the chat document
+    const chatRef = doc(db, "chats", chatId);
+    await deleteDoc(chatRef);
+
+    console.log(`Chat ${chatId} deleted successfully`);
+  } catch (error) {
+    console.error("Error deleting chat:", error);
+    throw error;
+  }
+}

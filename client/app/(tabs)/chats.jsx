@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useIsFocused } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -9,64 +10,34 @@ import {
   ImageBackground,
   Dimensions,
   Modal,
+  TextInput
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
-import { fetchMatchedUsers, unMatchUser } from "../../api";
-import { getMessages } from "../../fireBase";  
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-  orderBy,
-} from "firebase/firestore";
+import { fetchMatchedUsers, unMatchUser, addReport  } from "../../api";
+import { deleteChat} from "../../fireBase";  
+import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
 export default function Chats() {
+
+  const isFocused = useIsFocused();
   const navigation = useNavigation();
   const { user } = useContext(DataContext);
 
   const [chats, setChats] = useState([]);
 
   const [menuVisible, setMenuVisible] = useState(false);
+  const [step, setStep] = useState(1);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [customReason, setCustomReason] = useState("");
+  const [customMainReason, setCustomMainReason] = useState("");
+
 
   // const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   if (!user?.user_id) return;
-
-  //   const q = query(
-  //     collection(db, "chats"),
-  //     where("users", "array-contains", user.user_id),
-  //     orderBy("lastMessageTimestamp", "desc")
-  //   );
-
-  //   const unsubscribe = onSnapshot(q, (snapshot) => {
-  //     const chatData = snapshot.docs.map((doc) => {
-  //       const data = doc.data();
-  //       const otherUser =
-  //         data.usersData?.find((u) => u.userId !== user.user_id) || {
-  //           userName: "Unknown",
-  //           profile_image: "https://via.placeholder.com/50",
-  //         };
-  //       return {
-  //         id: doc.id,
-  //         lastMessage: data.lastMessage || "Say hi 👋",
-  //         lastMessageTimestamp: data.lastMessageTimestamp || null,
-  //         usersData: data.usersData,
-  //         otherUser,
-  //       };
-  //     });
-  //     setChats(chatData);
-  //   });
-
-  //   return () => unsubscribe();
-  // }, [user.user_id]);
+  // const [loading, setLoading] = useState(true);
 
   useEffect(() => {
       const loadMatches = async () => {
@@ -82,10 +53,10 @@ export default function Chats() {
       };
 
       loadMatches();
-    }, [user.matched_user_id]);
+    }, [user.matched_user_id, isFocused]);
+
 
   const renderItem = ({ item }) => (
-    
     <TouchableOpacity
       style={styles.chatItem}
       onPress={() =>
@@ -97,7 +68,7 @@ export default function Chats() {
         })
       }
       onLongPress={() => {
-        setSelectedUser(item.matched_user_id);
+        setSelectedChat([item.matched_user_id, item.ChatId]);
         setMenuVisible(true);
       }}>
 
@@ -109,34 +80,24 @@ export default function Chats() {
       {item.unread && <View style={styles.unreadDot} />}
       {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
     </TouchableOpacity>
-  
   );
 
-  // const renderItem = ({ item }) => {
-  //   const otherUser = item.otherUser;
+  const onUnmatch = (unMatchId, chatId) =>{
+    console.log(unMatchId, chatId);
+    unMatchUser(user.user_id, unMatchId);
+    deleteChat(chatId)
 
-  //   return (
-  //     <TouchableOpacity
-  //       style={styles.chatItem}
-  //       onPress={() =>
-  //         navigation.navigate("ChatScreen", {
-  //           chatId: item.id,
-  //           otherUser,
-  //         })
-  //       }
-  //       onLongPress={() => {
-  //         setSelectedChat(item.id);
-  //         setMenuVisible(true);
-  //       }}
-  //     >
-  //       <Image source={{ uri: otherUser.profile_image }} style={styles.avatar} />
-  //       <View style={styles.messageContainer}>
-  //         <Text style={styles.name}>{otherUser.userName}</Text>
-  //         <Text style={styles.message}>{item.lastMessage}</Text>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-  // };
+    setChats((prevChats) =>
+      prevChats.filter((c) => c.matched_user_id !== unMatchId)
+    );
+  }
+
+  const report = async (reportReason) =>{
+    const allReport = customMainReason + reportReason
+    const date = new Date().toISOString();
+    console.log("Got Reported: " + allReport);
+    await addReport(user.user_id, selectedChat[0], allReport, date)
+  }
 
   return (
     <ImageBackground
@@ -159,30 +120,121 @@ export default function Chats() {
           <TouchableOpacity
             style={styles.modalOverlay}
             activeOpacity={1}
-            onPressOut={() => setMenuVisible(false)}
+            onPressOut={() => {
+              setMenuVisible(false)
+              setStep(1)}}
           >
-            <View style={styles.bottomSheet}>
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => {
+          <View style={styles.bottomSheet}>
+            {step == 1 && ( 
+              <View>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                  onUnmatch(selectedChat[0], selectedChat[1])
                   setMenuVisible(false);
                   console.log("Unmatch chat:", selectedChat);
-                  // אפשר להוסיף מחיקה מ-Firestore כאן
-                }}
-              >
-                <Text style={styles.menuText}>Unmatch</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.menuItem}
-                onPress={() => {
-                  setMenuVisible(false);
-                  console.log("Report chat:", selectedChat);
-                  // אפשר לקרוא ל-API דיווח כאן
-                }}
-              >
-                <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
-              </TouchableOpacity>
-            </View>
+                  }}
+                >
+                  <Text style={styles.menuText}>Unmatch</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setStep(2);
+                    console.log("Report chat:", selectedChat);
+                    // אפשר לקרוא ל-API דיווח כאן
+                  }}
+                >
+                  <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {step == 2 && ( 
+              <>
+                <Ionicons style={{alignSelf: "flex-start", paddingLeft:20,}} name="chevron-back" size={30} color="#000000ff" onPress={() => setStep(1)}/>
+                <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
+                  Choose reason:
+                </Text>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setCustomMainReason("Reported as Spam - ");
+                    setStep(3); // reset for next time
+                  }}
+                >
+                  <Text style={styles.menuText}>Spam</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setCustomMainReason("Reported as Harassment - ");
+                    setStep(3);
+                  }}
+                >
+                  <Text style={styles.menuText}>Harassment</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setCustomMainReason("Reported as Fake Account - ");
+                    setStep(3);
+                  }}
+                >
+                  <Text style={styles.menuText}>Fake Account</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {step == 3 && (
+              <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
+                <Ionicons
+                  style={{ alignSelf: "flex-start", paddingBottom: 10 }}
+                  name="chevron-back"
+                  size={30}
+                  color="#000000ff"
+                  onPress={() => setStep(2)}
+                />
+
+                <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
+                  Write your reason:
+                </Text>
+
+                <TextInput
+                  style={{
+                    height: 120,
+                    borderColor: "#ccc",
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    padding: 10,
+                    textAlignVertical: "top", // makes text start from top-left
+                    marginBottom: 15,
+                  }}
+                  placeholder="Type your report here..."
+                  multiline
+                  value={customReason}
+                  onChangeText={setCustomReason}
+                />
+
+                <TouchableOpacity
+                  style={[
+                    styles.menuItem,
+                    { backgroundColor: "#6200ee", borderRadius: 8 },
+                  ]}
+                  onPress={() => {
+                    report(customReason);
+                    setCustomReason("");
+                    setMenuVisible(false);
+                    setStep(1);
+                  }}
+                >
+                  <Text style={[styles.menuText, { color: "#fff" }]}>Send</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
           </TouchableOpacity>
         </Modal>
 

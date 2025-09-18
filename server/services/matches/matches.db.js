@@ -49,14 +49,11 @@ export async function unMatchUserFromDB(userId, unmatchUserId) {
     const pool = await connectDB();
 
     const query = `
-      UPDATE Matches
-      SET MatchStatus = 0
-      WHERE MatchStatus = 1
-        AND (
-          (User1ID = @UserID AND User2ID = @OtherUserID)
-          OR
-          (User1ID = @OtherUserID AND User2ID = @UserID)
-        );
+      DELETE FROM Matches
+      WHERE 
+        (User1ID = @UserID AND User2ID = @OtherUserID)
+        OR
+        (User1ID = @OtherUserID AND User2ID = @UserID);
     `;
 
     const request = pool.request();
