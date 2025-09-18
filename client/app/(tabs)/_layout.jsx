@@ -6,12 +6,12 @@
     return (
       <Tabs
     screenOptions={{
-      tabBarActiveTintColor: "#F4C2C2", 
+      tabBarActiveTintColor: "#CBF7FF", 
   
-      tabBarInactiveTintColor: "#aaa", 
+      tabBarInactiveTintColor: "#FF6868", 
       headerShown: false,
       tabBarStyle: {
-        backgroundColor: "rgba(58, 54, 54, 0.95)", 
+        backgroundColor: "rgba(40, 49, 63, 0.95)", 
         position: "absolute",
         bottom: 16,
         left: 16,
@@ -25,11 +25,13 @@
         marginHorizontal: 10,
         height: 60,
         borderTopWidth: 0,
+        
       },
       tabBarLabelStyle: {
         fontSize: 13,
-        fontWeight: "600",
+        fontWeight: "00",
         // paddingBottom: 5,
+        fontFamily: "Prompt-Thin"
       },
       tabBarItemStyle: {
         // paddingTop: 8,
@@ -43,7 +45,7 @@
           options={{
             title: 'Chat',
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="comments" color={color} />
+              <FontAwesome size={24} name="comments" color="#ffff" />
             ),
             tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
           }}
@@ -55,7 +57,7 @@
           options={{
             title: 'Live Chat',
             tabBarIcon: ({ color }) => {
-              return <FontAwesome size={24} name="heart" color={color} />
+              return <FontAwesome size={24} name="heart" color="#ffff" />
             },tabBarButton: (props) => (
               <TouchableOpacity activeOpacity={1} {...props} />
             ),
@@ -68,7 +70,7 @@
           options={{
             title: 'Profile',
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="user" color={color} />
+              <FontAwesome size={24} name="user" color="#ffff" />
             ),
             tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
           }}
