@@ -1,7 +1,7 @@
 // firebase.js
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { collection, doc, setDoc, getDocs, orderBy, query, addDoc, serverTimestamp, onSnapshot, deleteDoc  } from "firebase/firestore";
+import { collection, doc, setDoc, getDocs, orderBy, query, addDoc, serverTimestamp, onSnapshot, deleteDoc, limit  } from "firebase/firestore";
 
 
 const firebaseConfig = {
@@ -75,6 +75,7 @@ export async function addMessage(chatId, senderId, text) {
     throw error;
   }
 }
+
 export const listenToMessages = (chatId, callback) => {
   const q = query(
     collection(db, "chats", chatId, "messages"),
@@ -114,6 +115,49 @@ export async function deleteChat(chatId) {
     console.log(`Chat ${chatId} deleted successfully`);
   } catch (error) {
     console.error("Error deleting chat:", error);
+    throw error;
+  }
+}
+
+function formatTimeAgo(timestamp) {
+  if (!timestamp) return "";
+
+  const now = new Date();
+  const messageDate = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  const diffMs = now - messageDate;
+
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffMinutes < 1) return `Now`;
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+  if (diffHours < 24) return `${diffHours} h ago`;
+  return `${diffDays} d ago`;
+}
+
+export async function getLastMessage(chatId) {
+  try {
+    console.log(chatId);
+    
+    const messagesRef = collection(db, "chats", chatId, "messages");
+    const q = query(messagesRef, orderBy("createdAt", "desc"), limit(1));
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null; // no messages yet
+    }
+
+    const lastMessageDoc = querySnapshot.docs[0];
+    const data = lastMessageDoc.data();
+
+    return {
+      text: data.text,
+      senderId: data.senderId,
+      timeAgo: formatTimeAgo(data.createdAt),
+    };
+  } catch (error) {
+    console.error("Error fetching last message:", error);
     throw error;
   }
 }

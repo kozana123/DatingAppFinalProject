@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
 import { useNavigation } from "@react-navigation/native";
 import { fetchMatchedUsers, unMatchUser, addReport  } from "../../api";
-import { deleteChat} from "../../fireBase";  
+import { deleteChat, getLastMessage} from "../../fireBase";  
 import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
@@ -34,6 +34,8 @@ export default function Chats() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [customReason, setCustomReason] = useState("");
   const [customMainReason, setCustomMainReason] = useState("");
+  const [lastMessage, setLastMessage] = useState();
+
 
 
   // const [matches, setMatches] = useState([]);
@@ -43,6 +45,10 @@ export default function Chats() {
       const loadMatches = async () => {
         try {
           const result = await fetchMatchedUsers(user.user_id);
+          console.log(result[0].ChatId);
+          
+          const lastResult = await getLastMessage(result[0].ChatId);
+          setLastMessage(lastResult)
           setChats(result || []);
           
         } catch (error) {
@@ -74,11 +80,22 @@ export default function Chats() {
 
       <Image source={{ uri: item.profile_image }} style={styles.avatar} />
       <View style={styles.messageContainer}>
-        <Text style={styles.name}>{item.userName}</Text>
-        <Text style={styles.message}>{item.message}</Text>
+        {/* Top row: name + time */}
+        <View style={styles.topRow}>
+          <Text style={styles.name}>{item.userName}</Text>
+          <Text style={styles.timeAgo}>{lastMessage.timeAgo}</Text>
+        </View>
+
+        {/* Bottom row: last message */}
+        <Text
+          style={styles.message}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {lastMessage.text}
+        </Text>
       </View>
-      {item.unread && <View style={styles.unreadDot} />}
-      {/* {item.favorite && <Text style={styles.favorite}>★</Text>} */}
+
     </TouchableOpacity>
   );
 
@@ -105,187 +122,242 @@ export default function Chats() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
-        <Modal
-          transparent
-          visible={menuVisible}
-          animationType="slide"
-          onRequestClose={() => setMenuVisible(false)}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPressOut={() => {
-              setMenuVisible(false)
-              setStep(1)}}
-          >
-          <View style={styles.bottomSheet}>
-            {step == 1 && ( 
-              <View>
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                  onUnmatch(selectedChat[0], selectedChat[1])
-                  setMenuVisible(false);
-                  console.log("Unmatch chat:", selectedChat);
-                  }}
-                >
-                  <Text style={styles.menuText}>Unmatch</Text>
-                </TouchableOpacity>
+      {/* <View style={styles.logoContainer}>
+        <Image
+          source={require("../../assets/images/AppLogo.png")}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      </View> */}
 
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setStep(2);
-                    console.log("Report chat:", selectedChat);
-                    // אפשר לקרוא ל-API דיווח כאן
-                  }}
-                >
-                  <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-            {step == 2 && ( 
-              <>
-                <Ionicons style={{alignSelf: "flex-start", paddingLeft:20,}} name="chevron-back" size={30} color="#000000ff" onPress={() => setStep(1)}/>
-                <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
-                  Choose reason:
-                </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Chats</Text>
+      </View>
 
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setCustomMainReason("Reported as Spam - ");
-                    setStep(3); // reset for next time
-                  }}
-                >
-                  <Text style={styles.menuText}>Spam</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setCustomMainReason("Reported as Harassment - ");
-                    setStep(3);
-                  }}
-                >
-                  <Text style={styles.menuText}>Harassment</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    setCustomMainReason("Reported as Fake Account - ");
-                    setStep(3);
-                  }}
-                >
-                  <Text style={styles.menuText}>Fake Account</Text>
-                </TouchableOpacity>
-              </>
-            )}
-            {step == 3 && (
-              <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
-                <Ionicons
-                  style={{ alignSelf: "flex-start", paddingBottom: 10 }}
-                  name="chevron-back"
-                  size={30}
-                  color="#000000ff"
-                  onPress={() => setStep(2)}
-                />
-
-                <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
-                  Write your reason:
-                </Text>
-
-                <TextInput
-                  style={{
-                    height: 120,
-                    borderColor: "#ccc",
-                    borderWidth: 1,
-                    borderRadius: 8,
-                    padding: 10,
-                    textAlignVertical: "top", // makes text start from top-left
-                    marginBottom: 15,
-                  }}
-                  placeholder="Type your report here..."
-                  multiline
-                  value={customReason}
-                  onChangeText={setCustomReason}
-                />
-
-                <TouchableOpacity
-                  style={[
-                    styles.menuItem,
-                    { backgroundColor: "#6200ee", borderRadius: 8 },
-                  ]}
-                  onPress={() => {
-                    report(customReason);
-                    setCustomReason("");
-                    setMenuVisible(false);
-                    setStep(1);
-                  }}
-                >
-                  <Text style={[styles.menuText, { color: "#fff" }]}>Send</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          </TouchableOpacity>
-        </Modal>
-
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Chats</Text>
-          <Image source={{ uri: user.profile_image }} style={styles.avatar} />
-        </View>
-
-        <View style={styles.separator} />
-
+      <View style={styles.separator} />
+      <View style={styles.chatContainer} >
         {chats.length === 0 ? (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ color: "#fff", fontSize: 16 }}>No chats yet 😢</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={chats}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.matched_user_id}
-            contentContainerStyle={{ paddingBottom: 80 }}
-          />
-        )}
-      </LinearGradient>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ color: "#fff", fontSize: 16 }}>No chats yet 😢</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={chats}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.matched_user_id}
+          contentContainerStyle={{ paddingBottom: 80 }}
+        />
+      )}
+      </View>
+      
+    
+      <Modal
+        transparent
+        visible={menuVisible}
+        animationType="slide"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => {
+            setMenuVisible(false)
+            setStep(1)}}
+        >
+        <View style={styles.bottomSheet}>
+          {step == 1 && ( 
+            <View>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                onUnmatch(selectedChat[0], selectedChat[1])
+                setMenuVisible(false);
+                console.log("Unmatch chat:", selectedChat);
+                }}
+              >
+                <Text style={styles.menuText}>Unmatch</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setStep(2);
+                  console.log("Report chat:", selectedChat);
+                  // אפשר לקרוא ל-API דיווח כאן
+                }}
+              >
+                <Text style={[styles.menuText, { color: "red" }]}>Report</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {step == 2 && ( 
+            <>
+              <Ionicons style={{alignSelf: "flex-start", paddingLeft:20,}} name="chevron-back" size={30} color="#000000ff" onPress={() => setStep(1)}/>
+              <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
+                Choose reason:
+              </Text>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setCustomMainReason("Reported as Spam - ");
+                  setStep(3); // reset for next time
+                }}
+              >
+                <Text style={styles.menuText}>Spam</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setCustomMainReason("Reported as Harassment - ");
+                  setStep(3);
+                }}
+              >
+                <Text style={styles.menuText}>Harassment</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setCustomMainReason("Reported as Fake Account - ");
+                  setStep(3);
+                }}
+              >
+                <Text style={styles.menuText}>Fake Account</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          {step == 3 && (
+            <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
+              <Ionicons
+                style={{ alignSelf: "flex-start", paddingBottom: 10 }}
+                name="chevron-back"
+                size={30}
+                color="#000000ff"
+                onPress={() => setStep(2)}
+              />
+
+              <Text style={[styles.menuText, { fontWeight: "bold", marginBottom: 10 }]}>
+                Write your reason:
+              </Text>
+
+              <TextInput
+                style={{
+                  height: 120,
+                  borderColor: "#ccc",
+                  borderWidth: 1,
+                  borderRadius: 8,
+                  padding: 10,
+                  textAlignVertical: "top", // makes text start from top-left
+                  marginBottom: 15,
+                }}
+                placeholder="Type your report here..."
+                multiline
+                value={customReason}
+                onChangeText={setCustomReason}
+              />
+
+              <TouchableOpacity
+                style={[
+                  styles.menuItem,
+                  { backgroundColor: "#6200ee", borderRadius: 8 },
+                ]}
+                onPress={() => {
+                  report(customReason);
+                  setCustomReason("");
+                  setMenuVisible(false);
+                  setStep(1);
+                }}
+              >
+                <Text style={[styles.menuText, { color: "#fff" }]}>Send</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+        </TouchableOpacity>
+      </Modal>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: { flex: 1 },
+  backgroundImage: {
+    flex: 1,
+    backgroundColor: "#19607E",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  logoContainer: {
+    position: "absolute",
+    top: 20,      
+    left: 20,
+    width: 45,     
+    height: 45,
+  },
+  logoImage: {
+    width: "100%",
+    height: "100%",
+  },
   gradientOverlay: { flex: 1, paddingTop: 60, paddingHorizontal: 16 },
-  separator: { backgroundColor: "#ffffff33", marginVertical: 8, height: 4 },
+  separator: { 
+    backgroundColor: "#ffffff33", 
+    marginVertical: 8, 
+    height: 4 
+  },
   header: {
+    width: "100%",
+    height: 80,
+    paddingLeft: 30,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    // borderBottomWidth: 3,
+    // borderBottomColor: "#cbf7ff6c",
+    
+  },
+  headerText: {
+    fontSize: 29, 
+    fontWeight: "bold", 
+    color: "#CBF7FF" 
+  },
+  chatItem: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    paddingVertical: 15, 
+    paddingLeft: 15,
+    borderBottomColor: "#cbf7ff6c", 
+    borderBottomWidth: 1,
+    backgroundColor:"#ffffff18"
+  },
+  avatar: { width: 65, height: 65, borderRadius: 40, marginRight: 15 },
+  messageContainer: { 
+    flex: 1, // takes remaining space
+    flexDirection: "column",
+  },
+  topRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    borderRadius: 12,
-    width: width - 12,
-    alignSelf: "center",
   },
-  headerText: { fontSize: 22, fontWeight: "bold", color: "#fff" },
-  chatItem: { flexDirection: "row", alignItems: "center", paddingVertical: 12, borderBottomColor: "rgba(255,255,255,0.1)", borderBottomWidth: 1 },
-  avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 12 },
-  messageContainer: { flex: 1 },
-  name: { fontWeight: "bold", color: "#fff", fontSize: 16 },
-  message: { color: "#eee", fontSize: 14 },
+  name: { 
+    fontWeight: "bold", 
+    color: "#fff", 
+    fontSize: 20 
+  },
+  message: { color: "#ffffffe8", fontSize: 15, maxWidth: "70%", marginTop: 5, },
   modalOverlay: { flex: 1, justifyContent: "flex-end" },
   bottomSheet: { backgroundColor: "white", paddingVertical: 20, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
   menuItem: { paddingVertical: 15, paddingHorizontal: 20, borderBottomWidth: 1, borderBottomColor: "#eee" },
   menuText: { fontSize: 18, color: "#333", textAlign: "center" },
+  chatContainer:{
+    flex: 1,
+    width:"100%",
+  },
+  timeAgo:{
+    justifyContent: "flex-end",
+    color: "#eeeeeec0",
+    fontSize: 14,
+    paddingRight: 20,
+  },
+
 });
