@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect, useCallback  } from "react";
 import {
   View,
   Text,
@@ -7,17 +7,53 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
+  
 } from "react-native";
 import { router } from "expo-router";
 import { DataContext } from "../DataContextProvider";
 import { Avatar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
+import {CallEndAlert} from "../comp/CustomAlerts";
+
 
 const { width } = Dimensions.get("window");
 
-export default function VideoCallStartScreen() {
+export default function Main() {
+
   const { user } = useContext(DataContext);
-  const userInitial = user?.userName?.charAt(0).toUpperCase() || "F";
+
+  const route = useRoute();
+  const [showEndAlert, setShowEndAlert] = useState(false);
+  const [typeOfAlart, setTypeOfAlart] = useState(0);
+
+  // const userInitial = user?.userName?.charAt(0).toUpperCase() || "F";
+
+  const alarts = [
+    {
+      title: "Call Ended",
+      message: "The other person has left the call, but new connections are just around the corner 💙"
+    },
+    {
+      title: "Didn't Felt The Same",
+      message: "Sometimes the spark just isn’t there, but don’t worry — your special connection is waiting for you ✨"
+    },
+    {
+      title: "Its A Match!",
+      message: "You both liked each other! Start chatting and see where it goes 💘"
+    }
+  ]
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log(route.params?.reason );
+      
+      if (route.params?.reason !== undefined) {
+        setShowEndAlert(true);
+        setTypeOfAlart(route.params.reason);
+      }
+    }, [route.params]) // only recreate the function if route.params changes
+  );
 
   return (
     <ImageBackground
@@ -76,6 +112,12 @@ export default function VideoCallStartScreen() {
           </TouchableOpacity>
         </View>
       </LinearGradient>
+      <CallEndAlert
+        visible={showEndAlert}
+        onClose={() => setShowEndAlert(false)}
+        title={alarts[typeOfAlart].title}
+        message={alarts[typeOfAlart].message}
+      />
     </ImageBackground>
   );
 }

@@ -328,10 +328,10 @@ const styles = StyleSheet.create({
   theirMessage: {
     backgroundColor: "#CBF7FF",
     alignSelf: "flex-start",
-    borderTopLeftRadius: 0,
+    borderBottomStartRadius: 0,
   },
   myMessageText: { 
-    color: "#ffffffff", 
+    color: "#000000ff", 
     fontSize: 15 
   },
   theirMessageText: { 

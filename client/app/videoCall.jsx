@@ -14,12 +14,14 @@ import { DataContext } from "./DataContextProvider";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { addMatch, addChatSession, addReport } from "../api";
 import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
+import {MatchAlert} from "./comp/CustomAlerts"; // adjust path
 
 
 
 
-// const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
-const SIGNALING_SERVER_URL = 'http://10.0.0.10:3501'; // replace with your local IP address
+
+const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
+// const SIGNALING_SERVER_URL = 'http://10.0.0.5:3501'; // replace with your local IP address
 
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
@@ -35,6 +37,7 @@ export default function VideoCall() {
   const timerRef = useRef(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [step, setStep] = useState(1);
+  const [showCustomAlert, setShowCustomAlert] = useState(false);
 
   const [callerId] = useState(
   Math.floor(100000 + Math.random() * 900000).toString());
@@ -57,12 +60,6 @@ export default function VideoCall() {
   const [choice, setChoise] = useState(false);
   const [foundPartner, setFoundPartner] = useState(false);
   const [userReady, setReady] = useState(false);
-
-
-
-
-  // console.log("user pref:", userPref);
-  // console.log("user:", user);
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -122,7 +119,7 @@ export default function VideoCall() {
 
   const handleDislike = () => {
     socket.current.emit('dislike', { targetSocketId: otherUserSocketId.current });
-    console.log("got disliked");
+    // console.log("got disliked");
     handleSaveChat(false)
     endCall(); // End your own call
   };
@@ -144,7 +141,7 @@ export default function VideoCall() {
   }
 
 
-  const endCall = () => {
+  const endCall = (reason) => {
     if (socket.current) socket.current.disconnect();
 
     if (localStream) {
@@ -161,7 +158,14 @@ export default function VideoCall() {
     // setConnected(false);
     setRemoteStream(null);
     setLocalStream(null);
-    navigation.goBack();
+    
+    if(reason){
+      console.log(reason);
+      navigation.push("/(tabs)/main", {reason: reason});
+    }
+    else{
+      navigation.goBack();
+    }
   };
 
   // useFocusEffect(
@@ -341,49 +345,25 @@ export default function VideoCall() {
     // };
 
     socket.current.on('disliked', () => {
-      alert('The other person ended the call.');
-      endCall();
+      console.log("got disliked");
+      endCall(0);
     });
 
     socket.current.on('liked', () => {
   // Ask if user also likes
       console.log("got liked");
-      
-      Alert.alert(
-        'Match?',
-        'The other person liked you. Do you like them too?',
-        [
-          {
-            text: 'No',
-            onPress: () => {
-              socket.current.emit('like-response', { targetSocketId: otherUserSocketId.current, response: false });
-              handleSaveChat(false)
-              endCall();
-            },
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => {
-              socket.current.emit('like-response', { targetSocketId: otherUserSocketId.current, response: true });
-              console.log(userPref.userId, otherUserId.current);
-              addMatch(userPref.userId, otherUserId.current, true)
-              handleSaveChat(true)
-              endCall();
-            },
-          },
-        ],
-        { cancelable: false }
-      );
+      setShowCustomAlert(true);
     });
 
     socket.current.on('like-response', ({ response }) => {
       if (response) {
         alert("You both liked each other! 💘");
+        endCall(3);
       } else {
         alert("They didn't feel the same.");
+        endCall(2);
       }
-      endCall();
+      
     });
 
     return () => {
@@ -406,9 +386,16 @@ export default function VideoCall() {
     {connected ? (
       <>
         {choice && (
-          <View style={{ position: 'absolute', top: 50, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, }}>
-            <Button title="❤️ Like" onPress={handleLike} />
-            <Button title="❌ Dislike" onPress={handleDislike} color="red" />
+          <View style={styles.likeDislikeView}>
+            <TouchableOpacity style={styles.notReady} onPress={handleDislike}>
+              <Text style={styles.readyText}>Dislike</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.readyButton} onPress={handleLike}>
+              <Text style={styles.readyText}>Like</Text>
+            </TouchableOpacity>
+
+            {/* <Button title="❤️ Like" onPress={handleLike} />
+            <Button title="❌ Dislike" onPress={handleDislike} color="red" /> */}
           </View>   
         )}
         {connected && (
@@ -504,6 +491,29 @@ export default function VideoCall() {
             mirror={true}
           />
         )}
+        <MatchAlert
+          visible={showCustomAlert}
+          onClose={() => setShowCustomAlert(false)}
+          onNo={() => {
+            socket.current.emit("like-response", {
+              targetSocketId: otherUserSocketId.current,
+              response: false,
+            });
+            handleSaveChat(false);
+            endCall();
+            setShowCustomAlert(false);
+          }}
+          onYes={() => {
+            socket.current.emit("like-response", {
+              targetSocketId: otherUserSocketId.current,
+              response: true,
+            });
+            addMatch(userPref.userId, otherUserId.current, true);
+            handleSaveChat(true);
+            endCall();
+            setShowCustomAlert(false);
+          }}
+        />
       </>
     ) : (    
       <View style={styles.searchingContent}>
@@ -512,9 +522,15 @@ export default function VideoCall() {
             {userReady == false && (
               <View>
                 <Text style={styles.searchingText}>Found a partner, do you want to start?</Text>
-                <View style={{flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, gap:20 }}>
-                  <Button title="❤️ Ready" onPress={ready} />
-                  <Button title="❌ Not Ready" onPress={notReady} color="red" />
+                <View style={{flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, gap:50, paddingTop: 30, }}>
+                   <TouchableOpacity style={styles.notReady} onPress={notReady}>
+                      <Text style={styles.readyText}>Not Ready</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.readyButton} onPress={ready}>
+                      <Text style={styles.readyText}>Ready</Text>
+                    </TouchableOpacity>
+                  {/* <Button style={styles.readyButton} title="Ready" onPress={ready} />
+                  <Button title="Not Ready" onPress={notReady} color="red" /> */}
                 </View> 
               </View>
             )}
@@ -619,6 +635,35 @@ const styles = StyleSheet.create({
     fontSize: 18, 
     color: "#333", 
     textAlign: "center" 
+  },
+  readyButton: {
+    flex: 1,
+    backgroundColor: "#FF6868",
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  notReady: {
+    flex: 1,
+    backgroundColor: "#19607E",
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  readyText: {
+    fontSize: 16,
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  likeDislikeView:{
+    position: 'absolute', 
+    top: 60, 
+    left: 0, 
+    right: 0, 
+    flexDirection: 'row',
+    gap: 50, 
+    paddingHorizontal: 50, 
+    justifyContent: 'space-evenly', 
+    zIndex: 2, 
   },
 });
 
