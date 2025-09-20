@@ -33,12 +33,6 @@ export default function RegisterUserName() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
         <View style={styles.progressContainer}>
           <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
         </View>
@@ -66,7 +60,6 @@ export default function RegisterUserName() {
             />
           </View>
         </SafeAreaView>
-      </LinearGradient>
     </ImageBackground>
   );
 }
@@ -77,6 +70,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width,
     height,
+    backgroundColor: "#19607E"
   },
   gradientOverlay: {
     flex: 1,
@@ -86,14 +80,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   progressContainer: {
-    position: "absolute",
-    top: 80,
-    left: "10%",
-    right: "10%",
+    marginTop:40,
+    marginHorizontal:40,
     height: 8,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    zIndex: 10,
   },
   progressBar: {
     height: "100%",

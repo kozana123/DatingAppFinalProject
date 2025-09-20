@@ -9,7 +9,7 @@ import {
   ImageBackground,
   
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { DataContext } from "../DataContextProvider";
 import { Avatar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,6 +21,7 @@ const { width } = Dimensions.get("window");
 
 export default function Main() {
 
+  const params = useLocalSearchParams();
   const { user } = useContext(DataContext);
 
   const route = useRoute();
@@ -46,11 +47,11 @@ export default function Main() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log(route.params?.reason );
-      
-      if (route.params?.reason !== undefined) {
+
+      if (params?.reason !== undefined) {
         setShowEndAlert(true);
-        setTypeOfAlart(route.params.reason);
+        setTypeOfAlart(params.reason);
+        params.reason = undefined
       }
     }, [route.params]) // only recreate the function if route.params changes
   );
@@ -106,7 +107,9 @@ export default function Main() {
 
           <TouchableOpacity
             style={styles.primaryBtn}
-            onPress={() => router.push("/videoCall")}
+            onPress={() => {
+              router.push("/videoCall")
+            }}
           >
             <Text style={styles.btnText}>Find Someone Now</Text>
           </TouchableOpacity>

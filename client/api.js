@@ -3,13 +3,15 @@ import axios from 'axios';
 import {createChat} from "./fireBase";
 
 
-const SERVER_IP = '10.0.0.5';
+const SERVER_IP = 'http://10.0.0.5:3501';
+const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-const apiPreferencesUrl = `http://${SERVER_IP}:3501/api/v1/userPreferences`
-const apiUsersUrl = `http://${SERVER_IP}:3501/api/v1/userDetails`
-const apiMatchesUrl = `http://${SERVER_IP}:3501/api/v1/matches`
-const apiChatSessionsUrl = `http://${SERVER_IP}:3501/api/v1/videoChats`
-const apireportsUrl = `http://${SERVER_IP}:3501/api/v1/reports`
+
+const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
+const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
+const apiMatchesUrl = `${SIGNALING_SERVER_URL}/api/v1/matches`
+const apiChatSessionsUrl = `${SIGNALING_SERVER_URL}/api/v1/videoChats`
+const apireportsUrl = `${SIGNALING_SERVER_URL}/api/v1/reports`
 
 
 export const checkEmailExists = async (email) => {

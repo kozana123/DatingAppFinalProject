@@ -88,10 +88,6 @@ export default function PersonalDetails() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        style={styles.gradientOverlay}
-      >
         <View style={styles.progressContainer}>
           <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
         </View>
@@ -153,25 +149,20 @@ export default function PersonalDetails() {
             </ScrollView>
           </KeyboardAvoidingView>
         </SafeAreaView>
-      </LinearGradient>
     </ImageBackground>
   );
 }
 
 const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
-  backgroundImage: { flex: 1, width, height: "100%" },
-  gradientOverlay: { flex: 1 },
+  backgroundImage: { flex: 1, width, height: "100%", backgroundColor: "#19607E" },
   safeArea: { flex: 1, justifyContent: "center" },
   progressContainer: {
-    position: "absolute",
-    top: 80,
-    left: "10%",
-    right: "10%",
+    marginTop:40,
+    marginHorizontal:40,
     height: 8,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    zIndex: 10,
   },
   progressBar: { height: "100%", backgroundColor: "#FF6868", borderRadius: 4 },
   keyboardAvoidingView: { flex: 1 },
@@ -221,7 +212,7 @@ const styles = StyleSheet.create({
   },
   selectedGenderButton: { borderColor: "#FF6868", backgroundColor: "#FF6868" },
   selectedText: {
-    color: "#CBF7FF",
+    color: "#ffffffff",
     fontWeight: "bold",
     fontFamily: "Prompt-Thin",
   },
@@ -241,7 +232,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#CBF7FF",
+    color: "#ffffffff",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },

@@ -79,17 +79,11 @@ export default function AddImage() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
+        {/* Progress bar */}
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+        </View>
         <SafeAreaView style={styles.safeArea}>
-          {/* Progress bar */}
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
-          </View>
 
           <View style={styles.container}>
             <Text style={styles.title}>Upload Profile Picture</Text>
@@ -121,7 +115,6 @@ export default function AddImage() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </LinearGradient>
     </ImageBackground>
   );
 }
@@ -132,6 +125,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width,
     height,
+    backgroundColor: "#19607E"
   },
   gradientOverlay: {
     flex: 1,
@@ -141,12 +135,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   progressContainer: {
+    marginTop:40,
+    marginHorizontal:40,
     height: 8,
-    width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    alignSelf: "center",
-    marginBottom: 30,
   },
   progressBar: {
     height: "100%",

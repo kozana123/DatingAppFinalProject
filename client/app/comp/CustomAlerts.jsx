@@ -14,7 +14,7 @@ export const MatchAlert = ({ visible, onClose, onYes, onNo }) => {
         <View style={styles.container}>
           <Text style={styles.title}>Match?</Text>
           <Text style={styles.message}>
-            The other person liked you. Do you like them too?
+            The other person liked you. Do you want to match?
           </Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.noButton} onPress={onNo}>
@@ -42,7 +42,7 @@ export const CallEndAlert  = ({ visible, onClose, title, message }) => {
         <Pressable style={styles.container}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
-          <TouchableOpacity style={styles.noButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closelButton} onPress={onClose}>
             <Text style={styles.Text}>Close</Text>
           </TouchableOpacity>
         </Pressable>
@@ -99,5 +99,11 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  closelButton: {
+    marginHorizontal: 30,
+    backgroundColor: "#19607E",
+    borderRadius: 10,
+    paddingVertical: 10,
   },
 });

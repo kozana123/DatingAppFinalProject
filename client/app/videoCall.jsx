@@ -12,6 +12,7 @@ import {
 import io from 'socket.io-client';
 import { DataContext } from "./DataContextProvider";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { addMatch, addChatSession, addReport } from "../api";
 import { SimpleLineIcons, Ionicons } from "@expo/vector-icons";
 import {MatchAlert} from "./comp/CustomAlerts"; // adjust path
@@ -27,6 +28,7 @@ const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }
 
 export default function VideoCall() {
   const navigation = useNavigation();
+  const router = useRouter();
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
@@ -158,14 +160,14 @@ export default function VideoCall() {
     // setConnected(false);
     setRemoteStream(null);
     setLocalStream(null);
+    console.log(`this is reason: ${reason}`);
+    router.push({ pathname: "/(tabs)/main", params: { reason: reason }});
     
-    if(reason){
-      console.log(reason);
-      navigation.push("/(tabs)/main", {reason: reason});
-    }
-    else{
-      navigation.goBack();
-    }
+    // if(reason){
+    // }
+    // else{
+    //   navigation.goBack();
+    // }
   };
 
   // useFocusEffect(
@@ -357,17 +359,17 @@ export default function VideoCall() {
 
     socket.current.on('like-response', ({ response }) => {
       if (response) {
-        alert("You both liked each other! 💘");
-        endCall(3);
-      } else {
-        alert("They didn't feel the same.");
         endCall(2);
+      } else {
+        endCall(1);
       }
       
     });
 
     return () => {
       socket.current.disconnect();
+      // InCallManager.stop();
+      // setConnected(false);
       stopTimer();
       if (localStream) {
         localStream.getTracks().forEach(track => {track.stop(); });
@@ -377,6 +379,9 @@ export default function VideoCall() {
         peerConnection.current.close();
         peerConnection.current = null;
       }
+
+      setRemoteStream(null);
+      setLocalStream(null);
     };
 
   }, []);

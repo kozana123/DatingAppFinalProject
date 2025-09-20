@@ -26,8 +26,9 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = '10.0.0.5';
-  const LOGIN_URL = `http://${SERVER_IP}:3501/api/v1/userDetails/login`;
+  const SERVER_IP = 'http://10.0.0.5:3501';
+  const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
+  const LOGIN_URL = `${SIGNALING_SERVER_URL}/api/v1/userDetails/login`;
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -112,7 +113,7 @@ export default function Login() {
 
   const getPreferences = async (id) => {
     const response = await fetch(
-       `http://${SERVER_IP}:3501/api/v1/userPreferences/getUserById/${id}`
+       `${SIGNALING_SERVER_URL}/api/v1/userPreferences/getUserById/${id}`
     );
 
     if (response.status == 201) {

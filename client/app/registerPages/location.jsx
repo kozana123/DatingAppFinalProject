@@ -90,56 +90,50 @@ export default function LocationScreen() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.title}>Location</Text>
-            <Text style={styles.subtitle}>
-              Let the app locate you to provide best searched results around you
+      <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+      </View>
+
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Location</Text>
+          <Text style={styles.subtitle}>
+            Let the app locate you to provide best searched results around you
+          </Text>
+
+          <Text style={styles.label}>Current Location</Text>
+          <View style={styles.currentLocationContainer}>
+            <Text style={styles.currentLocationText} numberOfLines={1}>
+              {currentLocation}
             </Text>
-
-            <Text style={styles.label}>Current Location</Text>
-            <View style={styles.currentLocationContainer}>
-              <Text style={styles.currentLocationText} numberOfLines={1}>
-                {currentLocation}
-              </Text>
-              <TouchableOpacity style={styles.locationIcon} onPress={handleUseCurrentLocation}>
-                <MaterialIcons name="my-location" size={24} color="#CBF7FF" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.searchContainer}>
-              <TextInput
-                placeholder="Search New Location"
-                placeholderTextColor="#CBF7FF"
-                style={styles.searchInput}
-                value={searchLocation}
-                onChangeText={setSearchLocation}
-              />
-              <TouchableOpacity onPress={handleSearchLocation}>
-                <MaterialIcons
-                  name="search"
-                  size={22}
-                  color="#FF6868"
-                  style={styles.searchIcon}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-              <Text style={styles.continueButtonText}>Next</Text>
+            <TouchableOpacity style={styles.locationIcon} onPress={handleUseCurrentLocation}>
+              <MaterialIcons name="my-location" size={24} color="#FF6868" />
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
-      </LinearGradient>
+
+          <View style={styles.searchContainer}>
+            <TextInput
+              placeholder="Search New Location"
+              placeholderTextColor="#CBF7FF"
+              style={styles.searchInput}
+              value={searchLocation}
+              onChangeText={setSearchLocation}
+            />
+            <TouchableOpacity onPress={handleSearchLocation}>
+              <MaterialIcons
+                name="search"
+                size={22}
+                color="#FF6868"
+                style={styles.searchIcon}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueButtonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -150,21 +144,19 @@ const styles = StyleSheet.create({
     flex: 1,
     width,
     height,
+    backgroundColor: "#19607E"
   },
-  gradientOverlay: {
-    flex: 1,
-  },
+
   safeArea: {
     flex: 1,
     justifyContent: "center",
   },
   progressContainer: {
+    marginTop:40,
+    marginHorizontal:40,
     height: 8,
-    width: "80%",
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    alignSelf: "center",
-    marginBottom: 30,
   },
   progressBar: {
     height: "100%",

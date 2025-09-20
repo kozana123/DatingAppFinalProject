@@ -100,82 +100,77 @@ export default function RegisterPage() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        style={styles.gradientOverlay}
-      >
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
-          </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
+        </View>
 
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
+          <ScrollView
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-            <ScrollView
-              contentContainerStyle={styles.scrollContainer}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.card}>
-                <Text style={styles.title}>Create Your Account</Text>
+            <View style={styles.card}>
+              <Text style={styles.title}>Create Your Account</Text>
 
-                <TextInput
-                  placeholder="Email"
-                  placeholderTextColor="#CBF7FF"
-                  style={styles.input}
-                  onChangeText={(email) =>
-                    setnewUser({ ...newUser, email: email })
-                  }
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  textContentType="emailAddress"
-                />
+              <TextInput
+                placeholder="Email"
+                placeholderTextColor="#CBF7FF"
+                style={styles.input}
+                onChangeText={(email) =>
+                  setnewUser({ ...newUser, email: email })
+                }
+                keyboardType="email-address"
+                autoCapitalize="none"
+                textContentType="emailAddress"
+              />
 
-                <TextInput
-                  placeholder="Password"
-                  placeholderTextColor="#CBF7FF"
-                  style={styles.input}
-                  onChangeText={(password) =>
-                    setnewUser({ ...newUser, password: password })
-                  }
-                  secureTextEntry
-                  autoCapitalize="none"
-                  textContentType="newPassword"
-                />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor="#CBF7FF"
+                style={styles.input}
+                onChangeText={(password) =>
+                  setnewUser({ ...newUser, password: password })
+                }
+                secureTextEntry
+                autoCapitalize="none"
+                textContentType="newPassword"
+              />
 
-                <TextInput
-                  placeholder="Confirm Password"
-                  placeholderTextColor="#CBF7FF"
-                  style={styles.input}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                  autoCapitalize="none"
-                  textContentType="password"
-                />
+              <TextInput
+                placeholder="Confirm Password"
+                placeholderTextColor="#CBF7FF"
+                style={styles.input}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                textContentType="password"
+              />
 
-                <View style={styles.dividerContainer}>
-                  <View style={styles.divider} />
-                  <Text style={styles.dividerText}>Or continue with</Text>
-                  <View style={styles.divider} />
-                </View>
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>Or continue with</Text>
+                <View style={styles.divider} />
+              </View>
 
-                <View style={styles.socialContainer}>
-                  <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
-                    <FontAwesome name="google" size={24} color="#ea4335" />
-                    <Text style={styles.googleButtonText}>Sign in with Google</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <TouchableOpacity style={styles.button} onPress={handleNext}>
-                  <Text style={styles.buttonText}>Next</Text>
+              <View style={styles.socialContainer}>
+                <TouchableOpacity style={styles.googleButton} onPress={signInWithGoogle}>
+                  <FontAwesome name="google" size={24} color="#ea4335" />
+                  <Text style={styles.googleButtonText}>Sign in with Google</Text>
                 </TouchableOpacity>
               </View>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      </LinearGradient>
+
+              <TouchableOpacity style={styles.button} onPress={handleNext}>
+                <Text style={styles.buttonText}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -183,18 +178,14 @@ export default function RegisterPage() {
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
-  backgroundImage: { flex: 1, width, height: "100%" },
-  gradientOverlay: { flex: 1 },
+  backgroundImage: { flex: 1, width, height: "100%", backgroundColor: "#19607E"},
   safeArea: { flex: 1, justifyContent: "center" },
   progressContainer: {
-    position: "absolute",
-    top: 60,
-    left: "10%",
-    right: "10%",
+    marginTop:40,
+    marginHorizontal:40,
     height: 8,
     backgroundColor: "rgba(255,255,255,0.2)",
     borderRadius: 4,
-    zIndex: 10,
   },
   progressBar: { height: "100%", backgroundColor: "#FF6868", borderRadius: 4 },
   scrollContainer: { flexGrow: 1, justifyContent: "center", paddingBottom: 40 },
@@ -235,7 +226,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#CBF7FF",
+    color: "#ffffffff",
     fontFamily: "Prompt-Black",
     letterSpacing: 1,
   },
