@@ -22,12 +22,6 @@ export default function ProfileIntro() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.card}>
             <View style={styles.logoContainer}>
@@ -60,7 +54,6 @@ export default function ProfileIntro() {
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-      </LinearGradient>
     </ImageBackground>
   );
 }
@@ -70,9 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
-  },
-  gradientOverlay: {
-    flex: 1,
+    backgroundColor: "#19607E"
   },
   safeArea: {
     flex: 1,

@@ -43,51 +43,46 @@ export default function GenderPreferenceScreen() {
       source={require("../../assets/images/design.png")}
       style={styles.background}
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        style={styles.gradientOverlay}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.card}>
-            <Text style={styles.header}>Choose your type</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.card}>
+          <Text style={styles.header}>Choose your type</Text>
 
-            <TouchableOpacity
-              onPress={() => setShowOptions(!showOptions)}
-              style={styles.grayCard}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.cardText}>
-                {selected ? selected : "Tap to select gender preference"}
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setShowOptions(!showOptions)}
+            style={styles.grayCard}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cardText}>
+              {selected ? selected : "Tap to select gender preference"}
+            </Text>
+          </TouchableOpacity>
 
-            {showOptions && (
-              <View style={styles.optionsContainer}>
-                {options.map((option, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.optionCard,
-                      selected === option && styles.selectedCard,
-                    ]}
-                    onPress={() => onOptionPress(option)}
-                  >
-                    <Text style={styles.optionText}>{option}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+          {showOptions && (
+            <View style={styles.optionsContainer}>
+              {options.map((option, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionCard,
+                    selected === option && styles.selectedCard,
+                  ]}
+                  onPress={() => onOptionPress(option)}
+                >
+                  <Text style={styles.optionText}>{option}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
-            <TouchableOpacity
-              onPress={handleNext}
-              style={[styles.nextButton, !selected && styles.nextButtonDisabled]}
-              disabled={!selected}
-            >
-              <Text style={styles.nextText}>Next</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </LinearGradient>
+          <TouchableOpacity
+            onPress={handleNext}
+            style={[styles.nextButton, !selected && styles.nextButtonDisabled]}
+            disabled={!selected}
+          >
+            <Text style={styles.nextText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </ImageBackground>
   );
 }
@@ -95,10 +90,7 @@ export default function GenderPreferenceScreen() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-  },
-  gradientOverlay: {
-    flex: 1,
-    paddingTop: Platform.OS === "ios" ? 60 : 30,
+    backgroundColor: "#19607E"
   },
   scrollContainer: {
     flexGrow: 1,

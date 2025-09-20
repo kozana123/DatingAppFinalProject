@@ -21,7 +21,7 @@ export default function LocationScreen() {
   const [newUser, setnewUser] = useState(params);
 
   const [currentLocation, setCurrentLocation] = useState(
-    "Choose your current location or search for a new one"
+    "Click here to find your location"
   );
   const [searchLocation, setSearchLocation] = useState("");
 
@@ -102,18 +102,19 @@ export default function LocationScreen() {
           </Text>
 
           <Text style={styles.label}>Current Location</Text>
-          <View style={styles.currentLocationContainer}>
-            <Text style={styles.currentLocationText} numberOfLines={1}>
-              {currentLocation}
-            </Text>
-            <TouchableOpacity style={styles.locationIcon} onPress={handleUseCurrentLocation}>
-              <MaterialIcons name="my-location" size={24} color="#FF6868" />
-            </TouchableOpacity>
-          </View>
+
+          <TouchableOpacity style={styles.locationIcon} onPress={handleUseCurrentLocation}>
+            <View style={styles.currentLocationContainer} >
+              <Text style={styles.currentLocationText} numberOfLines={1}>
+                {currentLocation}
+              </Text>
+                <MaterialIcons name="my-location" size={24} color="#FF6868" />
+            </View>
+          </TouchableOpacity>
 
           <View style={styles.searchContainer}>
             <TextInput
-              placeholder="Search New Location"
+              placeholder="Search Your Location"
               placeholderTextColor="#CBF7FF"
               style={styles.searchInput}
               value={searchLocation}
@@ -210,7 +211,6 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
   },
   locationIcon: {
-    marginLeft: 12,
   },
   searchContainer: {
     flexDirection: "row",

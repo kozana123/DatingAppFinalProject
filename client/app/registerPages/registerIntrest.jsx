@@ -61,45 +61,38 @@ export default function InterestsScreen() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.8)", "rgba(25,96,126,0.8)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.card}>
-            <Text style={styles.title}>What interests you first?</Text>
-            <Text style={styles.subtitle}>
-              Tell others what you expect from online dating.{"\n"}
-              You can always change your answer later.
-            </Text>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.card}>
+          <Text style={styles.title}>What interests you first?</Text>
+          <Text style={styles.subtitle}>
+            Tell others what you expect from online dating.{"\n"}
+            You can always change your answer later.
+          </Text>
 
-            <View style={styles.options}>
-              {options.map((item) => (
-                <TouchableOpacity
-                  key={item.key}
-                  onPress={() => setSelected(item.key)}
-                  style={[
-                    styles.optionCard,
-                    selected === item.key && styles.selectedOptionCard,
-                  ]}
-                >
-                  <View style={styles.icon}>{item.icon}</View>
-                  <View style={styles.textContainer}>
-                    <Text style={styles.optionTitle}>{item.title}</Text>
-                    <Text style={styles.optionSubtitle}>{item.subtitle}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-              <Text style={styles.nextText}>Next</Text>
-            </TouchableOpacity>
+          <View style={styles.options}>
+            {options.map((item) => (
+              <TouchableOpacity
+                key={item.key}
+                onPress={() => setSelected(item.key)}
+                style={[
+                  styles.optionCard,
+                  selected === item.key && styles.selectedOptionCard,
+                ]}
+              >
+                <View style={styles.icon}>{item.icon}</View>
+                <View style={styles.textContainer}>
+                  <Text style={[styles.optionTitle, selected === item.key && styles.selectOptionTitle]}>{item.title}</Text>
+                  <Text style={[styles.optionSubtitle, selected === item.key && styles.selectSubtitle]}>{item.subtitle}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
           </View>
-        </SafeAreaView>
-      </LinearGradient>
+
+          <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+            <Text style={styles.nextText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -108,9 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
-  },
-  gradientOverlay: {
-    flex: 1,
+    backgroundColor: "#19607E"
   },
   safeArea: {
     flex: 1,
@@ -162,6 +153,7 @@ const styles = StyleSheet.create({
   selectedOptionCard: {
     backgroundColor: "rgba(48, 55, 69, 0.19)", 
     borderColor: "#CBF7FF",
+    color:"#ffffffff"
 },
 
   icon: {
@@ -180,6 +172,16 @@ const styles = StyleSheet.create({
   },
   optionSubtitle: {
     color: "#555", // צבע כהה יותר לקריאות
+    fontSize: 12,
+    fontFamily: "Prompt-Regular",
+  },
+  selectOptionTitle: {
+    color: "#ffffffff", // צבע כהה לקריאות
+    fontSize: 16,
+    fontFamily: "Poppins-Bold",
+  },
+  selectSubtitle: {
+    color: "#ffffffff", // צבע כהה יותר לקריאות
     fontSize: 12,
     fontFamily: "Prompt-Regular",
   },

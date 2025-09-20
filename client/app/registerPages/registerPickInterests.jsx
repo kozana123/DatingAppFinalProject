@@ -92,63 +92,58 @@ export default function BubbleInterests() {
       source={require("../../assets/images/design.png")}
       style={styles.background}
     >
-      <LinearGradient
-        colors={["rgba(25,96,126,0.9)", "rgba(25,96,126,0.7)"]}
-        style={styles.gradientOverlay}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.container}>
-            <Text style={styles.header}>What are your interests?</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Text style={styles.header}>What are your interests?</Text>
 
-            {interests.map((category, index) => (
-              <View key={index} style={styles.categoryBlock}>
-                <Text style={styles.categoryTitle}>{category.title}</Text>
-                <View style={styles.traitsContainer}>
-                  {category.traits.map((item, idx) => {
-                    const isSelected = selected.includes(item.label);
-                    return (
-                      <TouchableOpacity
-                        key={idx}
-                        onPress={() => toggleInterest(item.label)}
+          {interests.map((category, index) => (
+            <View key={index} style={styles.categoryBlock}>
+              <Text style={styles.categoryTitle}>{category.title}</Text>
+              <View style={styles.traitsContainer}>
+                {category.traits.map((item, idx) => {
+                  const isSelected = selected.includes(item.label);
+                  return (
+                    <TouchableOpacity
+                      key={idx}
+                      onPress={() => toggleInterest(item.label)}
+                      style={[
+                        styles.traitButton,
+                        isSelected && styles.selectedTraitButton,
+                      ]}
+                    >
+                      <Text
                         style={[
-                          styles.traitButton,
-                          isSelected && styles.selectedTraitButton,
+                          styles.traitIcon,
+                          isSelected && styles.selectedTraitIcon,
                         ]}
                       >
-                        <Text
-                          style={[
-                            styles.traitIcon,
-                            isSelected && styles.selectedTraitIcon,
-                          ]}
-                        >
-                          {item.icon}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.traitText,
-                            isSelected && styles.selectedTraitText,
-                          ]}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {item.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+                        {item.icon}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.traitText,
+                          isSelected && styles.selectedTraitText,
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
-            ))}
+            </View>
+          ))}
 
-            <TouchableOpacity
-              onPress={handleContinue}
-              style={styles.continueButton}
-            >
-              <Text style={styles.continueText}>Let's Do It</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </LinearGradient>
+          <TouchableOpacity
+            onPress={handleContinue}
+            style={styles.continueButton}
+          >
+            <Text style={styles.continueText}>Let's Do It</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </ImageBackground>
   );
 }const CARD_WIDTH = width - 40; 
@@ -157,9 +152,7 @@ const CARD_HEIGHT = 70;
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-  },
-  gradientOverlay: {
-    flex: 1,
+    backgroundColor: "#19607E"
   },
   scrollContainer: {
     flexGrow: 1,
