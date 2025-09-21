@@ -34,36 +34,44 @@ export default function Chats() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [customReason, setCustomReason] = useState("");
   const [customMainReason, setCustomMainReason] = useState("");
-  const [lastMessage, setLastMessage] = useState({timeAgo: "", text: ""});
-
 
   useEffect(() => {
-      const loadMatches = async () => {
-        try {
-          const result = await fetchMatchedUsers(user.user_id);
-          console.log(`this is the result: ${result}`);
-          
-          setChats(result || []);
-          if(result != ""){
-            console.log(`result: ${result[0].ChatId}`);
-            const lastResult = await getLastMessage(result[0].ChatId);
-            if(lastResult){
-              setLastMessage(lastResult)
-            }
-          }
-          console.log(chats);
-          
-          
-        } catch (error) {
-          console.error("Failed to fetch matches:", error);
-        } finally {
-          setLoading(false);
+    if (!isFocused) return;
+    const loadMatches = async () => {
+      try {
+        const result = await fetchMatchedUsers(user.user_id);
+        console.log(`this is the result: ${result}`);
+        if(result != ""){
+          const withLastMessage = await Promise.all(
+            result.map(async (chat) => {
+              const lastMessage = await getLastMessage(chat.ChatId);
+              return {
+                ...chat,
+                lastMessage: lastMessage || { timeAgo: "", text: "" },
+              };
+          }))
+          setChats(withLastMessage);
         }
-      };
+        console.log(chats);
+        
+        
+      } catch (error) {
+        console.error("Failed to fetch matches:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      loadMatches();
-    }, [user.matched_user_id, isFocused]);
+    loadMatches();
+  }, [user.matched_user_id, isFocused]);
 
+  
+  // const getLast = async () =>{
+  //     const lastResult = await getLastMessage(result[0].ChatId);
+  //     if(lastResult){
+  //     setLastMessage(lastResult)
+  //     }
+  // }
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -86,7 +94,7 @@ export default function Chats() {
         {/* Top row: name + time */}
         <View style={styles.topRow}>
           <Text style={styles.name}>{item.userName}</Text>
-          <Text style={styles.timeAgo}>{lastMessage.timeAgo}</Text>
+          <Text style={styles.timeAgo}>{item.lastMessage.timeAgo}</Text>
         </View>
 
         {/* Bottom row: last message */}
@@ -95,7 +103,7 @@ export default function Chats() {
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {lastMessage.text}
+          {item.lastMessage.text}
         </Text>
       </View>
 

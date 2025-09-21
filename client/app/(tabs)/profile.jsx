@@ -204,463 +204,426 @@ export default function ProfileScreen() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      <LinearGradient
-        colors={["rgba(106,13,173,0.7)", "rgba(209,71,163,0.7)"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradientOverlay}
-      >
-        <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={{flexDirection: 'row',justifyContent: 'space-between',alignItems: 'center', paddingVertical: 20, paddingHorizontal:20}}>
+          <Image
+            source={require("../../assets/images/AppLogo.png")}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <TouchableOpacity
             onPress={() => router.push("/settings/Settings")}
             style={styles.settingsButton}
           >
             <MaterialIcons name="settings" size={30} color="#fff" />
           </TouchableOpacity>
-          <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.header}>
-              <View style={{ alignItems: "center" }}>
-                <View style={styles.logoCircle}>
-                  <Image
-                    source={require("../../assets/images/AppLogo.png")}
-                    style={styles.logoImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Text style={styles.logo}>Luvio</Text>
-              </View>
-            </View>
+        </View>
 
-            <View style={styles.avatarContainer}>
-              <Avatar
-                size={140}
-                rounded
-                source={{ uri: user.profile_image }}
-                onPress={handleImageChoice}
-              >
-                <Avatar.Accessory
-                  size={26}
-                  style={{ backgroundColor: "#DA58B7" }}
-                />
-              </Avatar>
-              <Text style={[styles.name, { fontFamily: "Prompt-SemiBold" }]}>
-                {user.userName},{" "}
-                <Text style={[styles.birthDate, { fontFamily: "Prompt-Thin" }]}>
-                  {getAge(user.birth_date)}
-                </Text>
-              </Text>
-            </View>
+        <View style={styles.avatarContainer}>
+          <Avatar
+            size={140}
+            rounded
+            source={{ uri: user.profile_image }}
+            onPress={handleImageChoice}
+          >
+            <Avatar.Accessory
+              size={26}
+              style={{ backgroundColor: "#FF6868" }}
+            />
+          </Avatar>
 
-            <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
-              Account Settings
+          <Text style={[styles.name, { fontFamily: "Prompt-SemiBold" }]}>
+            {user.userName},{" "}
+            <Text style={[styles.birthDate, { fontFamily: "Prompt-Thin" }]}>
+              {getAge(user.birth_date)}
             </Text>
+          </Text>
+        </View>
 
-            <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-              <Text style={styles.label}>Location:</Text>
-              <TouchableOpacity
-                style={styles.option}
-                onPress={() => {
-                  setModalVisibleLocation(!modalVisibleLocation);
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    style={[styles.deleteText, { fontFamily: "Prompt-Black" }]}
+        <View style={styles.container} >
+          <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
+            Account Settings
+          </Text>
+
+          <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
+            <Text style={styles.label}>Location:</Text>
+            <TouchableOpacity 
+              style={styles.option}
+              onPress={() => { setModalVisibleLocation(!modalVisibleLocation); }}
+            >
+              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between",}}>
+                <Text style={[styles.buttonText]}>
+                  {user.city}
+                </Text>
+                <MaterialIcons name="my-location" size={24} color="#ffffffff" />
+              </View>
+            </TouchableOpacity>
+            <Modal
+              visible={modalVisibleLocation}
+              transparent={true}
+              onRequestClose={() =>
+                setModalVisibleLocation(!modalVisibleLocation)
+              }
+            >
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                  <Text style={styles.modalTitle}>Set Location</Text>
+                  <TouchableOpacity
+                    style={styles.optionLocation}
+                    onPress={handleUseCurrentLocation}
                   >
-                    {user.city}
-                  </Text>
-                  <MaterialIcons name="my-location" size={24} color="#6a0dad" />
-                </View>
-              </TouchableOpacity>
-              <Modal
-                visible={modalVisibleLocation}
-                transparent={true}
-                onRequestClose={() =>
-                  setModalVisibleLocation(!modalVisibleLocation)
-                }
-              >
-                <View style={styles.modalBackground}>
-                  <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Set Location</Text>
-                    <TouchableOpacity
-                      style={styles.optionLocation}
-                      onPress={handleUseCurrentLocation}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Text
-                          style={[
-                            styles.deleteText,
-                            { fontFamily: "Prompt-Black" },
-                          ]}
-                        >
-                          {" "}
-                          Find My Location{" "}
-                        </Text>
-                        <MaterialIcons
-                          name="my-location"
-                          size={24}
-                          color="#6a0dad"
-                        />
-                      </View>
-                    </TouchableOpacity>
                     <View
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        backgroundColor: "#f1f1f1ff",
-                        borderRadius: 8,
-                        padding: 12,
-                        marginBottom: 12,
                       }}
                     >
-                      <TextInput
-                        value={location}
-                        style={{ color: "#6a0dad", width: "90%" }}
-                        placeholder="Search City"
-                        placeholderTextColor="#6a0dad7e"
-                        onChangeText={setLocation}
+                      <Text style={[styles.buttonText,{ fontFamily: "Prompt-Black" }, ]}>
+                        Find My Location
+                      </Text>
+                      <MaterialIcons name="my-location" size={24} color="#6a0dad" />
+                    </View>
+                  </TouchableOpacity>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      backgroundColor: "#f1f1f1ff",
+                      borderRadius: 8,
+                      padding: 12,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <TextInput
+                      value={location}
+                      style={{ color: "#6a0dad", width: "90%" }}
+                      placeholder="Search City"
+                      placeholderTextColor="#6a0dad7e"
+                      onChangeText={setLocation}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleSearchLocation(location);
+                      }}
+                    >
+                      <MaterialIcons
+                        name="search"
+                        size={22}
+                        color="#6a0dad"
                       />
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.saveBtn}
+                    onPress={() =>
+                      setModalVisibleLocation(!modalVisibleLocation)
+                    }
+                  >
+                    <Text style={styles.saveBtnText}>Finish</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
+            <Text style={styles.label}>Hieght:</Text>
+
+            <RNPickerSelect
+              onValueChange={(value) =>
+                setUserPref({ ...userPref, heightPreferences: String(value) })
+              }
+              items={heightOptions}
+              value={userPref.heightPreferences}
+              useNativeAndroidPickerStyle={false}
+              placeholder={{ label: "Choose height", value: null }}
+              style={{
+                inputAndroid: styles.input,
+                placeholder: { color: "#000000ff" },
+              }}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginVertical: 10,
+              }}
+            >
+              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
+                Smoking:
+              </Text>
+              <Switch
+                value={userPref.isSmoker}
+                onValueChange={(value) =>
+                  setUserPref({ ...userPref, isSmoker: value })
+                }
+                thumbColor={userPref.isSmoker ? "#DA58B7" : "#ccc"}
+                trackColor={{ true: "#f2add9", false: "#ccc" }}
+                style={{
+                  transform: [{ scaleX: 1.3 }, { scaleY: 1.2 }],
+                  marginRight: 20,
+                }}
+              />
+            </View>
+
+            <Text style={styles.label}>Religion:</Text>
+
+            <RNPickerSelect
+              onValueChange={(value) =>
+                setUserPref({ ...userPref, religion: value })
+              }
+              items={religions}
+              value={userPref.religion}
+              useNativeAndroidPickerStyle={false}
+              placeholder={{ label: "Choose Religion", value: null }}
+              style={{
+                inputAndroid: styles.input,
+                placeholder: { color: "#000000ff" },
+              }}
+            />
+
+            <Text style={styles.label}>Relationship Type:</Text>
+            <TouchableOpacity
+              onPress={() => setModalVisibleRelationship(true)}
+              style={styles.selectorContainer}
+            >
+              {(() => {
+                const selectedItem = RelaOptions.find(
+                  (item) => item.key === userPref.relationshipType
+                );
+                return selectedItem ? (
+                  <View style={styles.selectedItemContainer}>
+                    <View style={{ marginLeft: 8 }}>{selectedItem.icon}</View>
+                    <Text style={styles.selectedItemText}>
+                      {selectedItem.title}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={styles.placeholderText}>
+                    Choose Relationship Type:
+                  </Text>
+                );
+              })()}
+            </TouchableOpacity>
+
+            <Modal
+              visible={modalVisibleRelationship}
+              transparent={true}
+              animationType="slide"
+              onRequestClose={() => setModalVisibleRelationship(false)}
+            >
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                  <Text style={styles.modalTitle}>
+                    Choose your relationship
+                  </Text>
+                  <FlatList
+                    data={RelaOptions}
+                    keyExtractor={(item) => item.key}
+                    renderItem={({ item }) => (
                       <TouchableOpacity
+                        style={[
+                          styles.optionItem,
+                          item.key === userPref.relationshipType &&
+                            styles.optionItemSelected,
+                        ]}
                         onPress={() => {
-                          handleSearchLocation(location);
+                          setUserPref({
+                            ...userPref,
+                            relationshipType: item.key,
+                          });
+                          setModalVisibleRelationship(false);
                         }}
                       >
-                        <MaterialIcons
-                          name="search"
-                          size={22}
-                          color="#6a0dad"
-                        />
+                        <View style={{ marginRight: 12 }}>{item.icon}</View>
+                        <View>
+                          <Text style={styles.optionTitle}>{item.title}</Text>
+                          <Text style={styles.optionSubtitle}>
+                            {item.subtitle}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.saveBtn}
-                      onPress={() =>
-                        setModalVisibleLocation(!modalVisibleLocation)
-                      }
-                    >
-                      <Text style={styles.saveBtnText}>Finish</Text>
-                    </TouchableOpacity>
-                  </View>
+                    )}
+                  />
                 </View>
-              </Modal>
-
-              <Text style={styles.label}>Hieght:</Text>
-
-              <RNPickerSelect
-                onValueChange={(value) =>
-                  setUserPref({ ...userPref, heightPreferences: String(value) })
-                }
-                items={heightOptions}
-                value={userPref.heightPreferences}
-                useNativeAndroidPickerStyle={false}
-                placeholder={{ label: "Choose height", value: null }}
-                style={{
-                  inputAndroid: styles.input,
-                  placeholder: { color: "#000000ff" },
-                }}
-              />
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginVertical: 10,
-                }}
-              >
-                <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
-                  Smoking:
-                </Text>
-                <Switch
-                  value={userPref.isSmoker}
-                  onValueChange={(value) =>
-                    setUserPref({ ...userPref, isSmoker: value })
-                  }
-                  thumbColor={userPref.isSmoker ? "#DA58B7" : "#ccc"}
-                  trackColor={{ true: "#f2add9", false: "#ccc" }}
-                  style={{
-                    transform: [{ scaleX: 1.3 }, { scaleY: 1.2 }],
-                    marginRight: 20,
-                  }}
-                />
               </View>
+            </Modal>
 
-              <Text style={styles.label}>Religion:</Text>
-
-              <RNPickerSelect
-                onValueChange={(value) =>
-                  setUserPref({ ...userPref, religion: value })
-                }
-                items={religions}
-                value={userPref.religion}
-                useNativeAndroidPickerStyle={false}
-                placeholder={{ label: "Choose Religion", value: null }}
-                style={{
-                  inputAndroid: styles.input,
-                  placeholder: { color: "#000000ff" },
-                }}
-              />
-
-              <Text style={styles.label}>Relationship Type:</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
+              <Text style={styles.label}>Selected Interests:</Text>
               <TouchableOpacity
-                onPress={() => setModalVisibleRelationship(true)}
-                style={styles.selectorContainer}
+                onPress={() => setModalVisibleInterests(true)}
+                style={{ marginTop: 1 }}
               >
-                {(() => {
-                  const selectedItem = RelaOptions.find(
-                    (item) => item.key === userPref.relationshipType
-                  );
-                  return selectedItem ? (
-                    <View style={styles.selectedItemContainer}>
-                      <View style={{ marginLeft: 8 }}>{selectedItem.icon}</View>
-                      <Text style={styles.selectedItemText}>
-                        {selectedItem.title}
-                      </Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.placeholderText}>
-                      Choose Relationship Type:
-                    </Text>
-                  );
-                })()}
+                <FontAwesome
+                  name="pencil"
+                  size={20}
+                  color="#ffffff"
+                  marginLeft={10}
+                />
               </TouchableOpacity>
+            </View>
 
-              <Modal
-                visible={modalVisibleRelationship}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() => setModalVisibleRelationship(false)}
-              >
-                <View style={styles.modalBackground}>
-                  <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>
-                      Choose your relationship
-                    </Text>
-                    <FlatList
-                      data={RelaOptions}
-                      keyExtractor={(item) => item.key}
-                      renderItem={({ item }) => (
+            <View style={styles.selectedInterestsContainer}>
+              {tempSelectedInterests.length < 5 ? (
+                <Text style={styles.placeholderText}>Need atlist 5</Text>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {tempSelectedInterests.map((interest) => (
+                    <View key={interest} style={styles.interestBox}>
+                      <Text style={styles.interestText}>{interest}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+            <Modal
+              visible={modalVisibleInterests}
+              transparent={true}
+              animationType="slide"
+              onRequestClose={() =>
+                setModalVisibleInterests(!modalVisibleInterests)
+              }
+            >
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                  <Text style={styles.modalTitle}>Choose Interests</Text>
+
+                  <FlatList
+                    style={{ maxHeight: 300 }}
+                    data={interestsData.flatMap(
+                      (category) => category.traits
+                    )}
+                    keyExtractor={(item) => item.label}
+                    renderItem={({ item }) => {
+                      const selected = tempSelectedInterests.includes(
+                        item.label
+                      );
+                      return (
                         <TouchableOpacity
                           style={[
-                            styles.optionItem,
-                            item.key === userPref.relationshipType &&
-                              styles.optionItemSelected,
+                            styles.traitButton,
+                            selected && styles.traitButtonSelected,
                           ]}
-                          onPress={() => {
-                            setUserPref({
-                              ...userPref,
-                              relationshipType: item.key,
-                            });
-                            setModalVisibleRelationship(false);
-                          }}
+                          onPress={() => toggleInterest(item.label)}
                         >
-                          <View style={{ marginRight: 12 }}>{item.icon}</View>
-                          <View>
-                            <Text style={styles.optionTitle}>{item.title}</Text>
-                            <Text style={styles.optionSubtitle}>
-                              {item.subtitle}
-                            </Text>
-                          </View>
+                          <Text style={styles.traitText}>
+                            {item.icon} {item.label}
+                          </Text>
                         </TouchableOpacity>
-                      )}
-                    />
-                  </View>
-                </View>
-              </Modal>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <Text style={styles.label}>Selected Interests:</Text>
-                <TouchableOpacity
-                  onPress={() => setModalVisibleInterests(true)}
-                  style={{ marginTop: 1 }}
-                >
-                  <FontAwesome
-                    name="pencil"
-                    size={20}
-                    color="#ffffff"
-                    marginLeft={10}
+                      );
+                    }}
                   />
-                </TouchableOpacity>
-              </View>
 
-              <View style={styles.selectedInterestsContainer}>
-                {tempSelectedInterests.length < 5 ? (
-                  <Text style={styles.placeholderText}>Need atlist 5</Text>
-                ) : (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {tempSelectedInterests.map((interest) => (
-                      <View key={interest} style={styles.interestBox}>
-                        <Text style={styles.interestText}>{interest}</Text>
-                      </View>
-                    ))}
-                  </ScrollView>
-                )}
-              </View>
-              <Modal
-                visible={modalVisibleInterests}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() =>
-                  setModalVisibleInterests(!modalVisibleInterests)
-                }
-              >
-                <View style={styles.modalBackground}>
-                  <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>Choose Interests</Text>
-
-                    <FlatList
-                      style={{ maxHeight: 300 }}
-                      data={interestsData.flatMap(
-                        (category) => category.traits
-                      )}
-                      keyExtractor={(item) => item.label}
-                      renderItem={({ item }) => {
-                        const selected = tempSelectedInterests.includes(
-                          item.label
-                        );
-                        return (
-                          <TouchableOpacity
-                            style={[
-                              styles.traitButton,
-                              selected && styles.traitButtonSelected,
-                            ]}
-                            onPress={() => toggleInterest(item.label)}
-                          >
-                            <Text style={styles.traitText}>
-                              {item.icon} {item.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      }}
-                    />
-
-                    <TouchableOpacity
-                      style={styles.saveBtn}
-                      onPress={onCloseModal}
-                    >
-                      <Text style={styles.saveBtnText}>Save</Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    style={styles.saveBtn}
+                    onPress={onCloseModal}
+                  >
+                    <Text style={styles.saveBtnText}>Save</Text>
+                  </TouchableOpacity>
                 </View>
-              </Modal>
+              </View>
+            </Modal>
 
-              <TouchableOpacity
-                style={styles.deleteBtn}
-                onPress={() => updateUserDetails(userPref, user.user_id)}
-              >
-                <Text style={styles.deleteText}> Save</Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
-              Discovery Settings
+            <TouchableOpacity
+              style={styles.deleteBtn}
+              onPress={() => updateUserDetails(userPref, user.user_id)}
+            >
+              <Text style={styles.buttonText}> Save</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.sectionTitle, { fontFamily: "Prompt-Thin" }]}>
+            Discovery Settings
+          </Text>
+          <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
+            <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
+              Gender
             </Text>
-            <View style={[styles.inputBox, { fontFamily: "Prompt-Thin" }]}>
-              <Text style={[styles.label, { fontFamily: "Prompt-Thin" }]}>
-                Gender
-              </Text>
-              <ButtonGroup
-                buttons={genders}
-                selectedIndex={genderIndex}
-                onPress={onGenderPress}
-                containerStyle={styles.genderGroup}
-                buttonStyle={styles.genderButton}
-                selectedButtonStyle={styles.selectedGenderButton}
-                selectedTextStyle={styles.selectedText}
-                textStyle={styles.genderText}
-                innerBorderStyle={{ width: 1 }}
-              />
+            <ButtonGroup
+              buttons={genders}
+              selectedIndex={genderIndex}
+              onPress={onGenderPress}
+              containerStyle={styles.genderGroup}
+              buttonStyle={styles.genderButton}
+              selectedButtonStyle={styles.selectedGenderButton}
+              selectedTextStyle={styles.selectedText}
+              textStyle={styles.genderText}
+              innerBorderStyle={{ width: 1 }}
+            />
 
-              <Text style={styles.label}>
-                Age Range: {userPref.minAgePreference} -{" "}
-                {userPref.maxAgePreference}
-              </Text>
-              <MultiSlider
-                values={[userPref.minAgePreference, userPref.maxAgePreference]}
-                max={70}
-                min={18}
-                step={1}
-                onValuesChange={(val) =>
-                  setUserPref({
-                    ...userPref,
-                    minAgePreference: val[0],
-                    maxAgePreference: val[1],
-                  })
-                }
-                selectedStyle={{ backgroundColor: "#DA58B7" }}
-                markerStyle={{ backgroundColor: "#DA58B7" }}
-                containerStyle={{ marginHorizontal: 10, direction: "ltr" }}
-              />
+            <Text style={styles.label}>
+              Age Range: {userPref.minAgePreference} -{" "}
+              {userPref.maxAgePreference}
+            </Text>
+            <MultiSlider
+              values={[userPref.minAgePreference, userPref.maxAgePreference]}
+              max={70}
+              min={18}
+              step={1}
+              onValuesChange={(val) =>
+                setUserPref({
+                  ...userPref,
+                  minAgePreference: val[0],
+                  maxAgePreference: val[1],
+                })
+              }
+              selectedStyle={{ backgroundColor: "#DA58B7" }}
+              markerStyle={{ backgroundColor: "#DA58B7" }}
+              containerStyle={{ marginHorizontal: 10, direction: "ltr" }}
+            />
 
-              <Text style={styles.label}>
-                Maximum Distance: {userPref.preferredDistanceKm} km
-              </Text>
+            <Text style={styles.label}>
+              Maximum Distance: {userPref.preferredDistanceKm} km
+            </Text>
 
-              <Slider
-                style={{ width: "100%", height: 40 }}
-                minimumValue={1}
-                maximumValue={200}
-                step={1}
-                value={userPref.preferredDistanceKm}
-                onValueChange={(val) =>
-                  setUserPref({ ...userPref, preferredDistanceKm: val })
-                }
-                minimumTrackTintColor="#DA58B7"
-                maximumTrackTintColor="#999"
-                thumbTintColor="#DA58B7"
-              />
-              <TouchableOpacity
-                style={styles.deleteBtn}
-                onPress={() => updateUserSearch(userPref, user.user_id)}
-              >
-                <Text style={styles.deleteText}> Save</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </LinearGradient>
+            <Slider
+              style={{ width: "100%", height: 40 }}
+              minimumValue={1}
+              maximumValue={200}
+              step={1}
+              value={userPref.preferredDistanceKm}
+              onValueChange={(val) =>
+                setUserPref({ ...userPref, preferredDistanceKm: val })
+              }
+              minimumTrackTintColor="#DA58B7"
+              maximumTrackTintColor="#999"
+              thumbTintColor="#DA58B7"
+            />
+            <TouchableOpacity
+              style={styles.deleteBtn}
+              onPress={() => updateUserSearch(userPref, user.user_id)}
+            >
+              <Text style={styles.buttonText}> Save</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        
+      </ScrollView>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-  },
+
   backgroundImage: {
     flex: 1,
+    backgroundColor: "#19607E",
   },
-  gradientOverlay: {
-    flex: 1,
+  scrollView: {
+    paddingBottom: 80,
   },
   container: {
-    paddingBottom: 80,
-    padding: 16,
-  },
-  header: {
-    // flexDirection: "row-reverse",
-    // justifyContent: "",
-    alignItems: "flex-start",
-    // marginBottom: 16,
+    paddingHorizontal:20,
   },
   title: {
     fontSize: 28,
@@ -715,7 +678,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   option: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FF6868",
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
@@ -727,22 +690,17 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
   },
   deleteBtn: {
-    backgroundColor: "#ffffffff",
+    backgroundColor: "#FF6868",
     height: 50,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 10,
-    shadowColor: "#cc6699",
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    borderColor: "#cc6699",
   },
-  deleteText: {
+  buttonText: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#6a0dad",
+    color: "#ffffffff",
     letterSpacing: 1,
     // fontFamily: "Prompt-Black"
   },
@@ -751,21 +709,10 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
     color: "#ffe6ff",
   },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowOpacity: 0.6,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 12,
-    position: "relative",
-  },
   logoImage: {
-    width: 40,
-    height: 40,
+    // alignSelf: "flex-start",
+    width: 45,
+    height: 45,
   },
   genderGroup: {
     marginBottom: 30,
@@ -820,10 +767,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   settingsButton: {
-    position: "absolute",
-    top: 40,       // מרחק מהחלק העליון
-    right: 20,     // מרחק מהצד הימני
-    zIndex: 10,    // מעל שאר התוכן
+    
   },
   
 
