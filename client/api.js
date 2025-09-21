@@ -3,7 +3,7 @@ import axios from 'axios';
 import {createChat} from "./fireBase";
 
 
-const SERVER_IP = 'http://10.0.0.5:3501';
+const SERVER_IP = 'http://192.168.68.106:3501';
 const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
 
@@ -334,6 +334,8 @@ export const fetchMatchedUsers = async (userId) => {
   }
 };
 
+
+
 // export const deleteUserById = async (userId) => {
 //   try {
 //     const response = await fetch(`${apiUsersUrl}${userId}`, {
@@ -409,3 +411,29 @@ export async function addReport(reporterID, reportedUserID, reason, reportDate) 
     throw error;
   }
 }
+
+
+export const changeUserPassword = async (userId, oldPassword, newPassword) => {
+  try {
+    const response = await fetch(`${apiUsersUrl}/change-password/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ oldPassword, newPassword }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || 'Failed to change password');
+    }
+
+    const data = await response.json();
+    console.log('✅ Password changed successfully:', data);
+    return data;
+
+  } catch (error) {
+    console.error('❌ Error changing password:', error);
+    throw error;
+  }
+};
