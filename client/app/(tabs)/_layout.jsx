@@ -38,43 +38,38 @@
       },
     }}
   >
+<Tabs.Screen
+  name="chats"
+  options={{
+    title: 'Chat',
+    tabBarIcon: ({ color }) => (
+      <FontAwesome size={24} name="comments" color={color} />
+    ),
+    tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
+  }}
+/>
 
+<Tabs.Screen
+  name="main"
+  options={{
+    title: 'Live Chat',
+    tabBarIcon: ({ color }) => (
+      <FontAwesome size={24} name="heart" color={color} />
+    ),
+    tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
+  }}
+/>
 
-        <Tabs.Screen
-          name="chats"
-          options={{
-            title: 'Chat',
-            tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="comments" color="#FF6868" />
-            ),
-            tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
-          }}
-        />
-
-    
-  <Tabs.Screen
-          name="main"
-          options={{
-            title: 'Live Chat',
-            tabBarIcon: ({ color }) => {
-              return <FontAwesome size={24} name="heart" color="#FF6868" />
-            },tabBarButton: (props) => (
-              <TouchableOpacity activeOpacity={1} {...props} />
-            ),
-          }}
-        />
-      
-
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: 'Profile',
-            tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="user" color="#FF6868" />
-            ),
-            tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
-          }}
-        />
+<Tabs.Screen
+  name="profile"
+  options={{
+    title: 'Profile',
+    tabBarIcon: ({ color }) => (
+      <FontAwesome size={24} name="user" color={color} />
+    ),
+    tabBarButton: (props) => <TouchableOpacity activeOpacity={1} {...props} />,
+  }}
+/>
 
       </Tabs>
     );
