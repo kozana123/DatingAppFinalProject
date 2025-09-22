@@ -52,8 +52,6 @@ export default function Chats() {
           }))
           setChats(withLastMessage);
         }
-        console.log(chats);
-        
         
       } catch (error) {
         console.error("Failed to fetch matches:", error);
@@ -65,13 +63,6 @@ export default function Chats() {
     loadMatches();
   }, [user.matched_user_id, isFocused]);
 
-  
-  // const getLast = async () =>{
-  //     const lastResult = await getLastMessage(result[0].ChatId);
-  //     if(lastResult){
-  //     setLastMessage(lastResult)
-  //     }
-  // }
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
