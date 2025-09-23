@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { DataContext } from "../DataContextProvider";
 import SHA256 from "crypto-js/sha256";
+import { changeUserPassword } from "../../api";
 
 export default function ChangePassword() {
   const { user } = useContext(DataContext);
@@ -21,10 +22,8 @@ export default function ChangePassword() {
     }
 
     if (hashedPassword === user.user_password && password === confirmPassword) {
+      changeUserPassword(user.user_id, hashedPassword)
       Alert.alert("Success", "Password changed successfully!");
-      setOldPassword("");
-      setPassword("");
-      setConfirmPassword("");
     } else {
       Alert.alert("Error", "Passwords do not match or old password is incorrect.");
     }

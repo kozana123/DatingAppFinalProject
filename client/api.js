@@ -334,27 +334,6 @@ export const fetchMatchedUsers = async (userId) => {
   }
 };
 
-
-
-// export const deleteUserById = async (userId) => {
-//   try {
-//     const response = await fetch(`${apiUsersUrl}${userId}`, {
-//       method: 'DELETE',
-//     });
-
-//     const data = await response.json();
-//     if (response.ok) {
-//       console.log('User deleted:', data.message);
-//     } else {
-//       console.warn('Deletion failed:', data.message);
-//     }
-//   } catch (error) {
-//     console.error('Network error:', error);
-//   }
-// };
-
-
-
 export const deleteUserById = async (userId) => {
   try {
     console.log("userId", userId);
@@ -413,14 +392,14 @@ export async function addReport(reporterID, reportedUserID, reason, reportDate) 
 }
 
 
-export const changeUserPassword = async (userId, oldPassword, newPassword) => {
+export const changeUserPassword = async (userId, password) => {
   try {
     const response = await fetch(`${apiUsersUrl}/change-password/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ oldPassword, newPassword }),
+      body: JSON.stringify({password}),
     });
 
     if (!response.ok) {

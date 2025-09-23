@@ -5,7 +5,8 @@ import {
     login,
     updateLocation,
     updateProfileImage,
-    deleteUser
+    deleteUser,
+    ChangePassword
   } from './userDetails.controller.js';
 // import { auth } from '../../middlewares/auth.js';
 import multer from 'multer';
@@ -25,5 +26,7 @@ userDetailsRouter.post('/login', login);
 userDetailsRouter.put('/location/:id', updateLocation);
 userDetailsRouter.put('/profile-image/:userId', upload.single('profileImageFile'), updateProfileImage);
 userDetailsRouter.delete('/delete/:id', deleteUser);
+userDetailsRouter.put('/change-password/:id', ChangePassword);
+
 
 export default userDetailsRouter;

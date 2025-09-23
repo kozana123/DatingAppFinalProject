@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import {
   addUserToDB,
   getUserByEmailAndPasswordFromDB,
@@ -7,7 +5,8 @@ import {
   getUserByIdFromDB,
   updateProfileImageInDB,
   updateUserLocationInDB,
-  deleteUserByIdFromDB
+  deleteUserByIdFromDB,
+  updateUserPasswordInDB
 } from "./userDetails.db.js";
 
 
@@ -26,13 +25,13 @@ export default class User {
   }
 
   
-    async addUser() {
-      console.log("run module");
-      let user = await addUserToDB(this);
+    // async addUser() {
+    //   console.log("run module");
+    //   let user = await addUserToDB(this);
       
-      // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
-      return user
-    } 
+    //   // let token = jwt.sign(user, 'user', {algorithm: 'HS256'})
+    //   return user
+    // } 
 
     async addUser() {
       return await addUserToDB(this);
@@ -76,6 +75,11 @@ export default class User {
     static async deleteUserById(userId) {
       return await deleteUserByIdFromDB(userId);
     }
+
+     static async updateUserPassword(userId, password) {
+      return await updateUserPasswordInDB(userId, password);
+    }
+  
   
   
     

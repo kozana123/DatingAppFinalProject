@@ -144,4 +144,19 @@ export async function deleteUserByIdFromDB(userId) {
   }
 }
 
+export async function updateUserPasswordInDB(userId, password) {
+  try {
+    const pool = await connectDB();
+    const result = await pool.query`
+      UPDATE user_details
+      SET user_password = ${password}
+      WHERE user_id = ${userId}
+    `;
+    return result.rowsAffected[0] > 0;
+  } catch (error) {
+    console.error("SQL Update password Error:", error);
+    throw new Error("Failed to update user password");
+  }
+}
+
 
