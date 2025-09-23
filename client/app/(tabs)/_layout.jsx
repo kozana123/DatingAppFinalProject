@@ -1,8 +1,28 @@
+  import React, { useEffect, useRef, useState, useContext } from 'react';
+
   import FontAwesome from '@expo/vector-icons/FontAwesome';
-  import { TouchableOpacity } from 'react-native';
+  import { TouchableOpacity, BackHandler } from 'react-native';
+  import { useFocusEffect } from "@react-navigation/native";
   import { Tabs } from 'expo-router';
 
   export default function TabLayout() {
+
+    
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Block back button completely
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      };
+    }, [])
+  );
+
     return (
       <Tabs
     screenOptions={{

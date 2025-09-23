@@ -26,7 +26,7 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = 'http://192.168.68.106:3501';
+  const SERVER_IP = 'http://10.0.0.3:3501';
   const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
   const LOGIN_URL = `${SIGNALING_SERVER_URL}/api/v1/userDetails/login`;
 
@@ -85,29 +85,35 @@ export default function Login() {
     const hashedPassword = SHA256(password).toString();
     console.log(userEmail, hashedPassword);
     
-    try {
-      const response = await fetch(LOGIN_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: userEmail,
-          password: hashedPassword,
-        }),
-      });
-      
-      if (response.status === 201) {
-        const user = await response.json();
-        setUser(user);
-        await getPreferences(user.user_id);
-        console.log('Logged in:', user);
-        router.navigate('/(tabs)/main');
-      } else {
-        console.warn('Login failed:', await response.text());
+    if(userEmail != "" || password != ""){
+      try {
+        const response = await fetch(LOGIN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: userEmail,
+            password: hashedPassword,
+          }),
+        });
+        
+        if (response.status === 201) {
+          const user = await response.json();
+          setUser(user);
+          await getPreferences(user.user_id);
+          console.log('Logged in:', user);
+          router.navigate('/(tabs)/main');
+        } else {
+          Alert.alert("Email or password are incorrect");
+          console.warn('Login failed:', await response.text());
+        }
+      } catch (error) {
+        console.error('Login request error:', error);
       }
-    } catch (error) {
-      console.error('Login request error:', error);
+    }
+    else{
+      Alert.alert("Please fill email and passeord");
     }
   };
 

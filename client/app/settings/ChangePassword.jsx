@@ -14,14 +14,19 @@ export default function ChangePassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const checkChangingPass = () => {
-    const hashedPassword = SHA256(oldPassword).toString();
+    const hashedPassword = SHA256(password).toString();
+
+    console.log(oldPassword);
+    console.log(password);
+    console.log(hashedPassword);
+    
 
     if (password.length < 6) {
       Alert.alert("Error", "Password must be at least 6 characters.");
       return;
     }
 
-    if (hashedPassword === user.user_password && password === confirmPassword) {
+    if (SHA256(oldPassword).toString() === user.user_password && password === confirmPassword) {
       changeUserPassword(user.user_id, hashedPassword)
       Alert.alert("Success", "Password changed successfully!");
     } else {
@@ -53,6 +58,7 @@ export default function ChangePassword() {
           value={oldPassword}
           onChangeText={setOldPassword}
           secureTextEntry
+          autoCapitalize="none"
         />
         <TextInput
           placeholder="New password"
@@ -61,6 +67,7 @@ export default function ChangePassword() {
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+          autoCapitalize="none"
         />
         <TextInput
           placeholder="Confirm new password"
@@ -69,6 +76,7 @@ export default function ChangePassword() {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry
+          autoCapitalize="none"
         />
 
    

@@ -8,10 +8,6 @@ export default function EmailAddress() {
   const { user, setUser } = useContext(DataContext);
   const [email, setEmail] = useState(user.userEmail);
 
-  const handleSave = () => {
-    setUser({ ...user, userEmail: email });
-    Alert.alert("Success", "Email address saved!");
-  };
 
   return (
     <View style={styles.container}>
@@ -22,13 +18,9 @@ export default function EmailAddress() {
 
       {/* Explanation Text */}
       <View style={styles.centeredContent}>
-        <Text style={styles.title}>Change Email Address</Text>
-        <Text style={styles.description}>
-          Update your email address below. This will be used for logging in and account notifications.
-        </Text>
-
         {/* Card */}
         <View style={styles.card}>
+          <Text style={styles.title}>Email Address</Text>
           <View style={styles.inputContainer}>
             <MaterialIcons name="email" size={20} color="#FF6868" style={{ marginRight: 10 }} />
             <TextInput
@@ -38,16 +30,12 @@ export default function EmailAddress() {
               placeholder="Enter your email"
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={false}
             />
           </View>
-
-          
         </View>
         
       </View>
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
     </View>
   );
 }
@@ -57,7 +45,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#19607E",
     paddingHorizontal: 16,
-    justifyContent: "center",
+    paddingTop: 100,
+    // justifyContent: "center",
   },
   backButton: {
     position: "absolute",
@@ -72,15 +61,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     color: "#fff",
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 14,
-    color: "#CBF7FF",
-    textAlign: "center",
     marginBottom: 20,
-    paddingHorizontal: 10,
-    fontFamily: "Prompt-Thin"
   },
   card: {
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -88,6 +69,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "100%",
     maxWidth: 400,
+    alignItems: "center",
   },
   inputContainer: {
     flexDirection: "row",
@@ -103,20 +85,5 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#000",
-  },
-  saveButton: {
-    backgroundColor: "#FF6868",
-    borderRadius: 30,
-    paddingVertical: 14,
-    paddingHorizontal: 36,
-    marginBottom: 12,
-    alignItems: "center",
-
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

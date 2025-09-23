@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { DataContext } from "../DataContextProvider";
+import { deleteUserById } from "../../api";
 
 export default function DeleteAccount() {
+
+  const { user } = useContext(DataContext);
+  
 
   const onDeletedUser = () => {
     Alert.alert(
@@ -15,8 +20,8 @@ export default function DeleteAccount() {
           text: "Yes", 
           onPress: () => {
             console.log("delete this account");
-            // const deleted = deleteUserById(user.user_id)
-            // if(deleted){ router.push("/"); }
+            const deleted = deleteUserById(user.user_id)
+            if(deleted){ router.push("/"); }
           }
         },
       ],

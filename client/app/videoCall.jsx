@@ -170,20 +170,20 @@ export default function VideoCall() {
     // }
   };
 
-  // useFocusEffect(
-  //     React.useCallback(() => {
-  //       const onBackPress = () => {
-  //         // Block back button completely
-  //         return true;
-  //       };
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Block back button completely
+        return true;
+      };
 
-  //       BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-  //       return () => {
-  //         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-  //       };
-  //     }, [])
-  //   );
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      };
+    }, [])
+  );
 
   useEffect(() => {
     peerConnection.current = new RTCPeerConnection(configuration);

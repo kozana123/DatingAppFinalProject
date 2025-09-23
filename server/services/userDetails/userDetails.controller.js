@@ -123,7 +123,7 @@ export async function checkEmailExists(req, res) {
     try {
       const { id } = req.params;
       const { password } = req.body;
-      console.log(password);
+      console.log(`this is the pass: ${password}`);
       
       const success = await User.updateUserPassword(id, password);
   
