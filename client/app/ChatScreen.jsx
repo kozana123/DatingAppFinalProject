@@ -9,11 +9,9 @@ import {
   FlatList,
   ImageBackground,
   Modal,
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "./DataContextProvider";
 import { addMessage , listenToMessages, deleteChat} from "../fireBase";
 import { unMatchUser, addReport  } from "../api";
@@ -72,10 +70,24 @@ export default function ChatScreen() {
   );
 
   const onUnmatch = () =>{
-    console.log(id, chatId);
-    unMatchUser(user.user_id, id);
-    deleteChat(chatId)
-    router.back()
+
+    Alert.alert(
+      "Unmatch",
+      "Are you sure you want to Unmatch with this user? This action cannot be undone.",
+      [
+        { text: "No", style: "cancel" },
+        { 
+          text: "Yes", 
+          onPress: () => {
+            console.log(id, chatId);
+            unMatchUser(user.user_id, id);
+            deleteChat(chatId)
+            router.back()
+          }
+        },
+      ],
+      { cancelable: false }
+    );
   }
 
   const report = async (reportReason) =>{

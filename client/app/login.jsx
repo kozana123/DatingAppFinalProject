@@ -26,7 +26,7 @@ export default function Login() {
   const { setUser, setUserPref } = useContext(DataContext);
 
 
-  const SERVER_IP = 'http://10.0.0.3:3501';
+  // const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
   const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
   const LOGIN_URL = `${SIGNALING_SERVER_URL}/api/v1/userDetails/login`;
 

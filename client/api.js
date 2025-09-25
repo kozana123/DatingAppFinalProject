@@ -3,7 +3,7 @@ import axios from 'axios';
 import {createChat} from "./fireBase";
 
 
-const SERVER_IP = 'http://10.0.0.3:3501';
+// const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
 const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
 

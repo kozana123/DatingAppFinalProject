@@ -34,6 +34,7 @@ io.on('connection', (socket) => {
       usersInCall.set(targeUser.callerId, {socketId: targeUser.socketId, userDetails: targeUser.user, ready: false})
       usersInCall.set(callerId, { socketId: socket.id, userDetails: userDetails, ready: false})
       console.log(`Amount of users: ${usersInCall.size}`);
+      console.log(`Amount of usersInCall: ${usersInCall.size}`);
       // console.log(usersInCall);
 
       console.log(`🚀 Triggering offer from ${initiatorId} to ${targetId}`);
@@ -53,27 +54,29 @@ io.on('connection', (socket) => {
       users.set(callerId, { socketId: socket.id, userDetails: userDetails});
     }
     console.log(`Amount of users: ${users.size}`);
+    console.log(`Amount of usersInCall: ${usersInCall.size}`);
     
   });
 
   socket.on('check-ready', ({ senderId, targetId}) => {
-    console.log(senderId);
+    // console.log(senderId);
     const sender = usersInCall.get(senderId);
     const target = usersInCall.get(targetId);
 
     if (sender) {
       sender.ready = true
-      console.log(sender.socketId);
+      // console.log(sender.socketId);
       if(target.ready == true){
         io.to(sender.socketId).emit('initiate-offer', {});
       }
     }
   });
 
-  socket.on('not-ready', ({targetId}) => {
+  socket.on('not-ready', ({senderId, targetId}) => {
     console.log(targetId);
     const target = usersInCall.get(targetId);
-    usersInCall.delete(target);
+    usersInCall.delete(targetId);
+    usersInCall.delete(senderId);
     users.set(targetId, target);
 
     io.to(target.socketId).emit('not-ready', {});

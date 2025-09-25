@@ -10,7 +10,8 @@ import {
   ImageBackground,
   Dimensions,
   Modal,
-  TextInput
+  TextInput,
+  Alert
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
@@ -51,6 +52,9 @@ export default function Chats() {
               };
           }))
           setChats(withLastMessage);
+        }
+        else{
+          setChats([]);
         }
         
       } catch (error) {
@@ -102,12 +106,25 @@ export default function Chats() {
   );
 
   const onUnmatch = (unMatchId, chatId) =>{
-    console.log(unMatchId, chatId);
-    unMatchUser(user.user_id, unMatchId);
-    deleteChat(chatId)
+    Alert.alert(
+      "Unmatch",
+      "Are you sure you want to Unmatch with this user? This action cannot be undone.",
+      [
+        { text: "No", style: "cancel" },
+        { 
+          text: "Yes", 
+          onPress: () => {
+            console.log(unMatchId, chatId);
+            unMatchUser(user.user_id, unMatchId);
+            deleteChat(chatId)
 
-    setChats((prevChats) =>
-      prevChats.filter((c) => c.matched_user_id !== unMatchId)
+            setChats((prevChats) =>
+              prevChats.filter((c) => c.matched_user_id !== unMatchId)
+            );
+          }
+        },
+      ],
+      { cancelable: false }
     );
   }
 
@@ -124,13 +141,6 @@ export default function Chats() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      {/* <View style={styles.logoContainer}>
-        <Image
-          source={require("../../assets/images/AppLogo.png")}
-          style={styles.logoImage}
-          resizeMode="contain"
-        />
-      </View> */}
 
       <View style={styles.header}>
         <Text style={styles.headerText}>Chats</Text>

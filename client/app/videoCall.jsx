@@ -21,8 +21,8 @@ import {MatchAlert} from "./comp/CustomAlerts"; // adjust path
 
 
 
-const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
-// const SIGNALING_SERVER_URL = 'http://10.0.0.5:3501'; // replace with your local IP address
+// const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
+const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501'; // replace with your local IP address
 
 const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
@@ -52,12 +52,9 @@ export default function VideoCall() {
   const otherUserCallId = useRef(null);
   const otherUserSocketId = useRef(null);
   const otherUserId = useRef(null);
-
-  // const [otherUserId, setOtherUserId] = useState();
   
   const { user, userPref,} = useContext(DataContext);
   
-
   const [connected, setConnected] = useState(false);
   const [choice, setChoise] = useState(false);
   const [foundPartner, setFoundPartner] = useState(false);
@@ -70,7 +67,6 @@ export default function VideoCall() {
   };
 
   const startTimer = (startTimestamp) => {
-    // setCallStartTime(startTimestamp);
 
     timerRef.current = setInterval(() => {
       const now = Date.now();
@@ -91,7 +87,6 @@ export default function VideoCall() {
       timerRef.current = null;
     }
     setElapsedTime("00:00");
-    // setCallStartTime(null);
   };
 
   const getAge = (birthDateString) => {
@@ -111,7 +106,7 @@ export default function VideoCall() {
   }
 
   const notReady = () => {
-    socket.current.emit('not-ready', {targetId: otherUserCallId.current});
+    socket.current.emit('not-ready', {senderId: callerId, targetId: otherUserCallId.current});
     endCall();
   }
 
@@ -121,7 +116,6 @@ export default function VideoCall() {
 
   const handleDislike = () => {
     socket.current.emit('dislike', { targetSocketId: otherUserSocketId.current });
-    // console.log("got disliked");
     handleSaveChat(false)
     endCall(); // End your own call
   };
@@ -144,51 +138,46 @@ export default function VideoCall() {
 
 
   const endCall = (reason) => {
-    if (socket.current) socket.current.disconnect();
+    // if (socket.current) socket.current.disconnect();
 
-    if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop());
-    }
+    // if (localStream) {
+    //   localStream.getTracks().forEach((track) => track.stop());
+    // }
 
-    if (peerConnection.current) {
-      peerConnection.current.close();
-      peerConnection.current = null;
-    }
+    // if (peerConnection.current) {
+    //   peerConnection.current.close();
+    //   peerConnection.current = null;
+    // }
 
-    stopTimer();
+    // stopTimer();
     // InCallManager.stop();
     // setConnected(false);
-    setRemoteStream(null);
-    setLocalStream(null);
-    console.log(`this is reason: ${reason}`);
-    router.push({ pathname: "/(tabs)/main", params: { reason: reason }});
-    
-    // if(reason){
-    // }
-    // else{
-    //   navigation.goBack();
-    // }
+    // setRemoteStream(null);
+    // setLocalStream(null);
+    // console.log(`this is reason: ${reason}`);
+    // router.push({ pathname: "/(tabs)/main", params: { reason: reason }});
+    router.replace({ pathname: "/(tabs)/main", params: { reason } });
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const onBackPress = () => {
-        // Block back button completely
-        return true;
-      };
+  const cantGoBack = () =>{
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+  }
 
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-      };
-    }, [])
-  );
+  const canGoBack = () =>{
+    console.log("can go back");
+    BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+  }
+
+  const onBackPress = () => {
+    // Block back button completely
+      return true;
+  };
+
 
   useEffect(() => {
     peerConnection.current = new RTCPeerConnection(configuration);
     const userInterests = userPref.interests.split(",").map(s => s.trim())
-    // console.log(userInterests);
     
     const userDetails = {userId: userPref.userId, userGender: user.gender, userAge: getAge(user.birth_date), latitude: user.latitude, longitude: user.longitude, interests: userInterests , userPref: userPref, }
     socket.current = io.connect(SIGNALING_SERVER_URL);
@@ -196,7 +185,7 @@ export default function VideoCall() {
     socket.current.on('connect', () => {
     socket.current.emit('register', callerId, userDetails);
     });
-
+  
     peerConnection.current.ontrack = (event) => {
       const remoteStream = event.streams[0];
       setRemoteStream(remoteStream);
@@ -219,7 +208,8 @@ export default function VideoCall() {
 
     socket.current.on('found-partner', async ({targetId, targetSocketId, targetUserId }) => {
       console.log("found partner");
-      
+      cantGoBack();
+
       try {
         otherUserCallId.current = targetId
         otherUserSocketId.current = targetSocketId;
@@ -233,6 +223,7 @@ export default function VideoCall() {
     });
 
     socket.current.on('not-ready', () => {
+      canGoBack();
       setFoundPartner(false)
       setReady(false)
     });
@@ -243,6 +234,8 @@ export default function VideoCall() {
       try {
         const offer = await peerConnection.current.createOffer();
         await peerConnection.current.setLocalDescription(offer);
+        
+        
 
         socket.current.emit('offer', {
           targetSocketId: otherUserSocketId.current,
@@ -276,10 +269,6 @@ export default function VideoCall() {
         console.error('Error handling offer:', e);
       }
     });
-
-    // socket.current.on('answer', async (answer) => {
-    // await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
-    // });
 
     socket.current.on('answer', async (answer,) => {
       await peerConnection.current.setRemoteDescription(new RTCSessionDescription(answer));
@@ -367,21 +356,26 @@ export default function VideoCall() {
     });
 
     return () => {
+      console.log("Return runs");
+      canGoBack()
       socket.current.disconnect();
       // InCallManager.stop();
-      // setConnected(false);
       stopTimer();
+
       if (localStream) {
         localStream.getTracks().forEach(track => {track.stop(); });
       }
+
       // Close peer connection
       if (peerConnection.current) {
         peerConnection.current.close();
         peerConnection.current = null;
       }
 
+      setConnected(false);
       setRemoteStream(null);
       setLocalStream(null);
+
     };
 
   }, []);
@@ -398,9 +392,6 @@ export default function VideoCall() {
             <TouchableOpacity style={styles.readyButton} onPress={handleLike}>
               <Text style={styles.readyText}>Like</Text>
             </TouchableOpacity>
-
-            {/* <Button title="❤️ Like" onPress={handleLike} />
-            <Button title="❌ Dislike" onPress={handleDislike} color="red" /> */}
           </View>   
         )}
         {connected && (
@@ -549,6 +540,9 @@ export default function VideoCall() {
           </>
         ) : (
           <>
+            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="#fff" />
+            </TouchableOpacity>
             <ActivityIndicator size="large" color="#ffffff" />
             <Text style={styles.searchingText}>Searching for a partner...</Text>
           </>
@@ -571,8 +565,6 @@ const styles = StyleSheet.create({
   searchingContainer: {
     flex: 1,
     backgroundColor: '#1e1e2f',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   localVideo: {
    position: 'absolute',
@@ -593,7 +585,9 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   searchingContent: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   searchingText: {
     marginTop: 20,
@@ -670,5 +664,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly', 
     zIndex: 2, 
   },
+    backButton: {
+    position: "absolute",
+    left: 15,
+    top: 15,
+    padding: 5,
+  },
 });
+
 
