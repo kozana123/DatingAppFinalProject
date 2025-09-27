@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,6 +16,12 @@ import { registerUser } from "../../api";
 export default function ProfileIntro() {
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
+  const [loading, setLoading] = useState(false);
+
+  const saveUser = async () =>{
+    setLoading(true)
+    setLoading(await registerUser(newUser))
+  }
 
   return (
     <ImageBackground
@@ -22,6 +29,11 @@ export default function ProfileIntro() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+      {loading == true && (
+        <View style={{flex:1, position: 'absolute', width:"100%",height:"100%", alignItems: "center", justifyContent: "center", backgroundColor: '#00000056',zIndex:10,}}>
+          <ActivityIndicator size="large" color="#FF6868" />
+        </View>
+      )}  
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.card}>
             <View style={styles.logoContainer}>
@@ -48,7 +60,7 @@ export default function ProfileIntro() {
 
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={() => registerUser(newUser)}
+              onPress={() => saveUser()}
             >
               <Text style={styles.continueButtonText}>Let's Do It</Text>
             </TouchableOpacity>

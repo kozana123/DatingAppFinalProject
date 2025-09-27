@@ -8,8 +8,10 @@ import {
   SafeAreaView,
   Dimensions,
   ImageBackground,
+  BackHandler
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
@@ -20,6 +22,21 @@ export default function Index() {
     "Prompt-Thin": require("../assets/fonts/Prompt-Thin.ttf"),
     "Prompt-SemiBold": require("../assets/fonts/Prompt-SemiBold.ttf"),
   });
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Block back button completely
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => {
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      };
+    }, [])
+  );
 
   if (!fontsLoaded) return null;
 

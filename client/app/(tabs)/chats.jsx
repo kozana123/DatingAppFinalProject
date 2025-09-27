@@ -11,7 +11,8 @@ import {
   Dimensions,
   Modal,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { DataContext } from "../DataContextProvider";
@@ -35,38 +36,38 @@ export default function Chats() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [customReason, setCustomReason] = useState("");
   const [customMainReason, setCustomMainReason] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isFocused) return;
-    const loadMatches = async () => {
-      try {
-        const result = await fetchMatchedUsers(user.user_id);
-        console.log(`this is the result: ${result}`);
-        if(result != ""){
-          const withLastMessage = await Promise.all(
-            result.map(async (chat) => {
-              const lastMessage = await getLastMessage(chat.ChatId);
-              return {
-                ...chat,
-                lastMessage: lastMessage || { timeAgo: "", text: "" },
-              };
-          }))
-          setChats(withLastMessage);
-        }
-        else{
-          setChats([]);
-        }
-        
-      } catch (error) {
-        console.error("Failed to fetch matches:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadMatches();
   }, [user.matched_user_id, isFocused]);
 
+  const loadMatches = async () => {
+    try {
+      const result = await fetchMatchedUsers(user.user_id);
+      console.log(`this is the result: ${result}`);
+      if(result != ""){
+        const withLastMessage = await Promise.all(
+          result.map(async (chat) => {
+            const lastMessage = await getLastMessage(chat.ChatId);
+            return {
+              ...chat,
+              lastMessage: lastMessage || { timeAgo: "", text: "" },
+            };
+        }))
+        setChats(withLastMessage);
+      }
+      else{
+        setChats([]);
+      }
+      
+    } catch (error) {
+      console.error("Failed to fetch matches:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -141,28 +142,39 @@ export default function Chats() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Chats</Text>
-      </View>
-
-      <View style={styles.separator} />
       <View style={styles.chatContainer} >
-        {chats.length === 0 ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <Text style={{ color: "#fff", fontSize: 16 }}>No chats yet 😢</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Chats</Text>
         </View>
-      ) : (
-        <FlatList
-          data={chats}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.matched_user_id}
-          contentContainerStyle={{ paddingBottom: 80 }}
-        />
-      )}
-      </View>
-      
-    
+
+        {loading === true ? ( 
+          <View style={{ flex: 1, alignItems: "center", paddingTop: 160}}>
+            <ActivityIndicator size="large" color="#FF6868" />
+          </View>
+        ) : (
+          <>
+            {chats.length === 0 ? (
+              <View style={{ flex: 1, alignItems: "center", paddingTop: 80, gap: 15 }}>
+                <Image
+                  source={require("../../assets/images/icon_camera.png")}
+                  style={{ width: 80, height: 80, tintColor: "#CBF7FF" }} // כאן הצבע
+                  resizeMode="contain"
+                />
+                <Text style={{ color: "#fff", fontSize: 22 }}>No chats yet</Text>
+                <Text style={{ color: "#fff", fontSize: 18,textAlign: "center" }}>Start video chatting to make your first connection!</Text>
+                  
+              </View>
+              ) : (
+                <FlatList
+                  data={chats}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.matched_user_id}
+                  contentContainerStyle={{ paddingBottom: 80 }}
+                />
+            )}
+          </> 
+        )} 
+      </View> 
       <Modal
         transparent
         visible={menuVisible}
@@ -297,25 +309,6 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     backgroundColor: "#19607E",
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  logoContainer: {
-    position: "absolute",
-    top: 20,      
-    left: 20,
-    width: 45,     
-    height: 45,
-  },
-  logoImage: {
-    width: "100%",
-    height: "100%",
-  },
-  gradientOverlay: { flex: 1, paddingTop: 60, paddingHorizontal: 16 },
-  separator: { 
-    backgroundColor: "#ffffff33", 
-    marginVertical: 8, 
-    height: 4 
   },
   header: {
     width: "100%",
@@ -323,8 +316,6 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
     justifyContent: "center",
     alignItems: "flex-start",
-    // borderBottomWidth: 3,
-    // borderBottomColor: "#cbf7ff6c",
     
   },
   headerText: {
@@ -341,7 +332,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     backgroundColor:"#ffffff18"
   },
-  avatar: { width: 60, height: 60, borderRadius: 40, marginRight: 15 },
+  avatar: { 
+    width: 60, 
+    height: 60, 
+    borderRadius: 40, 
+    marginRight: 15 
+  },
   messageContainer: { 
     flex: 1, // takes remaining space
     flexDirection: "column",
@@ -363,7 +359,7 @@ const styles = StyleSheet.create({
   menuText: { fontSize: 18, color: "#333", textAlign: "center" },
   chatContainer:{
     flex: 1,
-    width:"100%",
+    justifyContent: "center",
   },
   timeAgo:{
     justifyContent: "flex-end",

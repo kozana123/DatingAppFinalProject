@@ -10,6 +10,7 @@ import {
   Platform,
   Button,
   Alert,
+  ActivityIndicator
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,6 +25,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { setUser, setUserPref } = useContext(DataContext);
+  const [loading, setLoading] = useState(false);
 
 
   // const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
@@ -82,6 +84,9 @@ export default function Login() {
   };
   
   const login = async () => {
+    console.log("start loading");
+    
+    setLoading(true)
     const hashedPassword = SHA256(password).toString();
     console.log(userEmail, hashedPassword);
     
@@ -108,8 +113,13 @@ export default function Login() {
           Alert.alert("Email or password are incorrect");
           console.warn('Login failed:', await response.text());
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Login request error:', error);
+      }
+      finally {
+        setLoading(false);
+        console.log("end loading");
       }
     }
     else{
@@ -134,6 +144,11 @@ export default function Login() {
   return (
     
     <View style={styles.gradientOverlay}>
+      {loading == true && (
+        <View style={{flex:1, position: 'absolute', width:"100%",height:"100%", alignItems: "center", justifyContent: "center", backgroundColor: '#00000056',zIndex:10,}}>
+          <ActivityIndicator size="large" color="#FF6868" />
+        </View>
+      )}      
       <ImageBackground
         source={require("../assets/images/design.png")}
         style={styles.backgroundImage}
@@ -250,14 +265,9 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "100%",
-    marginTop: Platform.OS === "ios" ? 60 : 30,
     backgroundColor: "rgba(0,0,0,0.2)",
     borderRadius: 24,
     padding: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
   },
   title: {
     fontSize: 26,

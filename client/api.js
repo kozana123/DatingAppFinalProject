@@ -76,6 +76,9 @@ export const registerUser = async (newUser) => {
   } catch (error) {
     console.error('Registration failed:', error.response?.data || error.message);
   }
+  finally{
+    return false
+  }
 };
 
 export const RegisterPreferences = async (prefs, userPreference) => {
