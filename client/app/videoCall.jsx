@@ -517,9 +517,9 @@ export default function VideoCall() {
         {foundPartner ? (
           <>
             {userReady == false && (
-              <View>
+              <View style={{ padding: 14, }}>
                 <Text style={styles.searchingText}>Found a partner, do you want to start?</Text>
-                <View style={{flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, gap:50, paddingTop: 30, }}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-evenly', zIndex: 2, gap:50, paddingTop: 50, }}>
                    <TouchableOpacity style={styles.notReady} onPress={notReady}>
                       <Text style={styles.readyText}>Not Ready</Text>
                     </TouchableOpacity>
@@ -533,8 +533,8 @@ export default function VideoCall() {
             )}
             {userReady == true && (
               <View>
-                <Text style={styles.searchingText}>Waiting for the partner</Text>
-                <ActivityIndicator size="large" color="#ffffff" />
+                <ActivityIndicator size="large" color="#FF6868" />
+                <Text style={styles.searchingText}>Waiting for the partner...</Text>
               </View>
             )}
             
@@ -542,9 +542,9 @@ export default function VideoCall() {
         ) : (
           <>
             <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
+              <Ionicons name="arrow-back" size={28} color="#fff" />
             </TouchableOpacity>
-            <ActivityIndicator size="large" color="#ffffff" />
+            <ActivityIndicator size="large" color="#FF6868" />
             <Text style={styles.searchingText}>Searching for a partner...</Text>
           </>
         )}
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
   },
   searchingContainer: {
     flex: 1,
-    backgroundColor: '#1e1e2f',
+    backgroundColor: '#22253fff',
   },
   localVideo: {
    position: 'absolute',
@@ -592,8 +592,10 @@ const styles = StyleSheet.create({
   },
   searchingText: {
     marginTop: 20,
+    paddingHorizontal: 25,
+    textAlign: "center",
     color: 'white',
-    fontSize: 18,
+    fontSize: 22,
   },
   timer: {
     position: "absolute",
