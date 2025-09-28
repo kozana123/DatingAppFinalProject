@@ -1,6 +1,5 @@
 import pandas
 import matplotlib.pyplot as plt
-import pyodbc
 import sqlalchemy
 from datetime import date
 import os
@@ -29,8 +28,6 @@ def save_graph(name):
 def get_gender_distribution(name):
 
     try:
-        # conn = pyodbc.connect(CONNECTION)
-
         query = "SELECT * FROM GenderPercentage"
         df = pandas.read_sql_query(query, ENGINE)
 
@@ -47,15 +44,12 @@ def get_gender_distribution(name):
         save_graph(name)
 
         plt.close()
-        # conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
 
 def get_distance_preference(name):
     try:
-        conn = pyodbc.connect(CONNECTION)
-
         df = pandas.read_sql("""
         SELECT * FROM UserDistanceDistribution
         ORDER BY
@@ -65,7 +59,7 @@ def get_distance_preference(name):
         WHEN '30-50 km' THEN 3
         WHEN '50-100 km' THEN 4
         WHEN '100+ km' THEN 5
-        END;""", conn)
+        END;""", ENGINE)
 
         df.plot(kind='bar', x='distance_range', y='users_count', color='coral', legend=False)
         plt.title('Distribution of Preferred Search Distance')
@@ -77,17 +71,14 @@ def get_distance_preference(name):
         save_graph(name)
 
         plt.close()
-        conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
 
 def get_age_division(name):
     try:
-        conn = pyodbc.connect(CONNECTION)
-
         query = "SELECT age_range, gender FROM UserAgeRanges"
-        df = pandas.read_sql(query, conn)
+        df = pandas.read_sql(query, ENGINE)
 
         age_gender_dist = df.groupby(['age_range', 'gender']).size().unstack(fill_value=0)
         ordered_ranges = ['18-24', '25-34', '35-44', '45-54', '55+']
@@ -104,7 +95,6 @@ def get_age_division(name):
         save_graph(name)
 
         plt.close()
-        conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
@@ -112,26 +102,22 @@ def get_age_division(name):
 
 def get_most_active_cities(name):
     try:
-        conn = pyodbc.connect(CONNECTION)
-
         query = """
-        SELECT TOP 5 city_name, users_count
-        FROM UsersCountByCity
-        ORDER BY users_count DESC   
+        SELECT * FROM [dbo].[UsersCountByCity]
+        ORDER BY users_count DESC;   
         """
 
-        df = pandas.read_sql(query, conn)
-        df['city_name'] = df['city_name'].apply(reverse_if_hebrew)
+        df = pandas.read_sql(query, ENGINE)
+        df['city'] = df['city'].apply(reverse_if_hebrew)
 
         # ציור גרף עוגה
         plt.figure(figsize=(8, 8))
-        plt.pie(df['users_count'], labels=df['city_name'], autopct='%1.1f%%', startangle=140,colors=plt.cm.Paired.colors)
+        plt.pie(df['users_count'], labels=df['city'], autopct='%1.1f%%', startangle=140,colors=plt.cm.Paired.colors)
         plt.title('Top 5 Cities by Number of Users')
         plt.axis('equal')  # עיגול מושלם
 
         save_graph(name)
         plt.close()
-        conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
@@ -145,8 +131,6 @@ def reverse_if_hebrew(text):
 
 def get_amount_of_call_times(name):
     try:
-        # conn = pyodbc.connect(CONNECTION)
-
         query = "SELECT DurationRange, COUNT(*) AS CallCount FROM CallsDurationDistribution GROUP BY DurationRange ORDER BY CallCount DESC"
 
         df = pandas.read_sql(query, ENGINE)
@@ -160,18 +144,15 @@ def get_amount_of_call_times(name):
         save_graph(name)
 
         plt.close()
-        # conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
 
 def get_amount_of_calls_daily(name):
     try:
-        conn = pyodbc.connect(CONNECTION)
-
         query = "SELECT CallHour, ActiveCalls FROM HourlyActivity ORDER BY CallHour"
 
-        df = pandas.read_sql(query, conn)
+        df = pandas.read_sql(query, ENGINE)
 
         # גרף עמודות של פעילות לפי שעה
         plt.figure(figsize=(10, 6))
@@ -185,14 +166,12 @@ def get_amount_of_calls_daily(name):
         save_graph(name)
 
         plt.close()
-        conn.close()
 
     except Exception as e:
         print("❌ Error:", e)
 
 def get_match_calls(name):
     try:
-        # conn = pyodbc.connect(CONNECTION)
         query = "SELECT CallDay, TotalCalls, MatchedCalls FROM View_MatchPercentageLast7Days"
         df = pandas.read_sql_query(query, ENGINE)
 
@@ -220,7 +199,6 @@ def get_match_calls(name):
 
         save_graph(name)
         plt.close()
-        # conn.close()
 
     except Exception as e:
         print("❌ Error:", e)

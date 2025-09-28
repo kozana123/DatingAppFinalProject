@@ -134,6 +134,7 @@ export default function VideoCall() {
     console.log("Got Reported: " + reportReason);
     const date = new Date().toISOString();
     await addReport(userPref.userId, otherUserId.current, reportReason, date)
+    handleDislike()
   }
 
 
