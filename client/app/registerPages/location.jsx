@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ImageBackground,
   Dimensions,
+  ActivityIndicator
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -19,13 +20,14 @@ const STAGE_PROGRESS = 100;
 export default function LocationScreen() {
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
+  const [loading, setLoading] = useState(false);
 
   const [currentLocation, setCurrentLocation] = useState(
     "Click here to find your location"
   );
   const [searchLocation, setSearchLocation] = useState("");
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = async () => {  
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       alert("Permission to access location was denied");
@@ -33,6 +35,7 @@ export default function LocationScreen() {
     }
 
     try {
+      setLoading(true)
       let location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
 
@@ -49,6 +52,9 @@ export default function LocationScreen() {
     } catch (error) {
       alert("Error getting location: " + error.message);
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleSearchLocation = async () => {
@@ -58,6 +64,7 @@ export default function LocationScreen() {
     }
 
     try {
+      setLoading(true)
       const results = await Location.geocodeAsync(searchLocation);
 
       if (results.length === 0) {
@@ -78,6 +85,9 @@ export default function LocationScreen() {
     } catch (error) {
       alert("Error searching for location: " + error.message);
     }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleContinue = () => {
@@ -90,6 +100,11 @@ export default function LocationScreen() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+      {loading == true && (
+        <View style={{flex:1, position: 'absolute', width:"100%",height:"100%", alignItems: "center", justifyContent: "center", backgroundColor: '#00000056',zIndex:10,}}>
+          <ActivityIndicator size="large" color="#FF6868" />
+        </View>
+      )}  
       <View style={styles.progressContainer}>
           <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
       </View>
@@ -108,7 +123,7 @@ export default function LocationScreen() {
               <Text style={styles.currentLocationText} numberOfLines={1}>
                 {currentLocation}
               </Text>
-                <MaterialIcons name="my-location" size={24} color="#FF6868" />
+                <MaterialIcons name="my-location" size={24} color="#ffffffff" />
             </View>
           </TouchableOpacity>
 
@@ -195,9 +210,10 @@ const styles = StyleSheet.create({
     fontFamily: "Prompt-Thin",
   },
   currentLocationContainer: {
+    backgroundColor:'#FF6868',
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#CBF7FF",
+    borderColor: "#ffffffff",
     borderWidth: 1,
     borderRadius: 40,
     paddingHorizontal: 20,
@@ -208,7 +224,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#CBF7FF",
     fontSize: 12,
-    fontFamily: "Prompt-Thin",
+    fontFamily: "Prompt-bold",
   },
   locationIcon: {
   },

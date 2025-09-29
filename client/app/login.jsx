@@ -26,6 +26,7 @@ export default function Login() {
   const router = useRouter();
   const { setUser, setUserPref } = useContext(DataContext);
   const [loading, setLoading] = useState(false);
+   const [isSecure, setIsSecure] = useState(true);
 
 
   // const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
@@ -84,8 +85,7 @@ export default function Login() {
   };
   
   const login = async () => {
-    console.log("start loading");
-    
+
     setLoading(true)
     const hashedPassword = SHA256(password).toString();
     console.log(userEmail, hashedPassword);
@@ -119,7 +119,6 @@ export default function Login() {
       }
       finally {
         setLoading(false);
-        console.log("end loading");
       }
     }
     else{
@@ -140,6 +139,10 @@ export default function Login() {
       console.warn("failed geting pref:", await response.text());
     }
   };
+
+  const toggleSecure = () => {
+    setIsSecure(!isSecure)
+  }
 
   return (
     
@@ -187,7 +190,6 @@ export default function Login() {
               <FontAwesome
                 name="key"
                 size={20}
-                color="#dda0dd"
                 style={styles.inputIcon}
               />
               <TextInput
@@ -196,20 +198,18 @@ export default function Login() {
                 placeholderTextColor="#CBF7FF"
                 value={password}
                 onChangeText={setPassword}
-                secureTextEntry
+                secureTextEntry={isSecure}
                 textAlign="left"
                 autoCapitalize="none"
               />
-              <FontAwesome
-                name="eye-slash"
-                size={20}
-                color="#dda0dd"
-                style={styles.inputIconRight}
-              />
+              <TouchableOpacity onPress={toggleSecure}>
+                <FontAwesome name="eye-slash" size={20} style={styles.inputIconRight}/>
+              </TouchableOpacity>
+              
             </View>
-            <TouchableOpacity style={styles.forgotPassword}>
+            {/* <TouchableOpacity style={styles.forgotPassword}>
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <TouchableOpacity
@@ -339,9 +339,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
+    marginTop: 10,
     elevation: 4,
   },
   signInText: {

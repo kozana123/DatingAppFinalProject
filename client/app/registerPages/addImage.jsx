@@ -73,6 +73,15 @@ export default function AddImage() {
     }
   };
 
+  const handleNext = async () => {
+    if(newUser.image){
+      router.push({ pathname: "/registerPages/location", params: newUser })
+    }
+    else{
+      Alert.alert("Picture Error","Please add a picture");
+    }
+  }
+
   return (
     <ImageBackground
       source={require("../../assets/images/design.png")}
@@ -108,7 +117,7 @@ export default function AddImage() {
 
             <TouchableOpacity
               style={[styles.nextButton, !newUser.image && styles.nextButtonDisabled]}
-              onPress={() => router.push({ pathname: "/registerPages/location", params: newUser })}
+              onPress={handleNext}
               activeOpacity={0.8}
             >
               <Text style={styles.nextButtonText}>Next</Text>

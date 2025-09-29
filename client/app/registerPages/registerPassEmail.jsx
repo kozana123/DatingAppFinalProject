@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -30,6 +31,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+   const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
@@ -66,32 +68,41 @@ export default function RegisterPage() {
 
   const handleNext = async () => {
     if (!newUser.email || !newUser.password || confirmPassword === "") {
-      Alert.alert("Please fill all fields.");
+      Alert.alert("Missing Field","Please fill all fields.");
       return;
     }
 
     if (!validateEmail(newUser.email)) {
-      Alert.alert("Invalid email format.");
+      Alert.alert("Email Error","Invalid email format.");
       return;
     }
 
     if (newUser.password.length < 6) {
-      Alert.alert("Password must be at least 6 characters.");
+      Alert.alert("Passwords Error","Password must be at least 6 characters.");
       return;
     }
 
     if (newUser.password !== confirmPassword) {
-      Alert.alert("Passwords do not match.");
+      Alert.alert("Passwords Error","Passwords do not match",);
       return;
     }
+    setLoading(true)
+    try{
+      const pass = await checkEmailExists(newUser.email);
 
-    const pass = await checkEmailExists(newUser.email);
-
-    if (pass) {
-      const hashedPassword = SHA256(newUser.password).toString();
-      const updatedUser = { ...newUser, password: hashedPassword };
-      router.push({ pathname: "/registerPages/addImage", params: updatedUser });
+      if (pass) {
+        const hashedPassword = SHA256(newUser.password).toString();
+        const updatedUser = { ...newUser, password: hashedPassword };
+        router.push({ pathname: "/registerPages/addImage", params: updatedUser });
+      }
     }
+    catch (error){
+      console.error('Login request error:', error);
+    }
+    finally {
+      setLoading(false);
+    }
+    
   };
 
   return (
@@ -100,6 +111,11 @@ export default function RegisterPage() {
       style={styles.backgroundImage}
       resizeMode="cover"
     >
+      {loading == true && (
+        <View style={{flex:1, position: 'absolute', width:"100%",height:"100%", alignItems: "center", justifyContent: "center", backgroundColor: '#00000056',zIndex:10,}}>
+          <ActivityIndicator size="large" color="#FF6868" />
+        </View>
+      )}  
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.progressContainer}>
           <View style={[styles.progressBar, { width: `${STAGE_PROGRESS}%` }]} />
