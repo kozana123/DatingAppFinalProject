@@ -6,7 +6,6 @@ import {createChat} from "./fireBase";
 // const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
 const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
 
-
 const apiPreferencesUrl = `${SIGNALING_SERVER_URL}/api/v1/userPreferences`
 const apiUsersUrl = `${SIGNALING_SERVER_URL}/api/v1/userDetails`
 const apiMatchesUrl = `${SIGNALING_SERVER_URL}/api/v1/matches`

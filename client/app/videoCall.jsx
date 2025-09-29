@@ -74,7 +74,7 @@ export default function VideoCall() {
       const format = formatTime(elapsedSeconds)
       setElapsedTime(format);
         // console.log(format);
-      if(format == "00:05"){
+      if(format == "00:30"){
         console.log("GOT TO TIME" + format);
         setChoise(true)
       }
@@ -203,8 +203,8 @@ export default function VideoCall() {
       }); 
     });
 
-    // InCallManager.start({ media: 'audio/video' });
-    // InCallManager.setForceSpeakerphoneOn(true);
+    InCallManager.start({ media: 'audio/video' });
+    InCallManager.setForceSpeakerphoneOn(true);
     // InCallManager.setVolume(0.1);
 
     socket.current.on('found-partner', async ({targetId, targetSocketId, targetUserId }) => {
@@ -360,7 +360,7 @@ export default function VideoCall() {
       console.log("Return runs");
       canGoBack()
       socket.current.disconnect();
-      // InCallManager.stop();
+      InCallManager.stop();
       stopTimer();
 
       if (localStream) {

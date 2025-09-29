@@ -11,7 +11,7 @@ export function initIO(server) {
   });
 
   const users = new Map(); // Map<callerId, socketId>
-  const usersInCall = new Map(); 
+  const usersInCall = new Map();
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
