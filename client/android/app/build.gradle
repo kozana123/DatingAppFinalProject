@@ -93,7 +93,8 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.DatingAppFinalProject'
+    namespace 'com.anonymous.DatingAppFinalProject' // name of the app *not to change*
+
     defaultConfig {
         applicationId 'com.anonymous.DatingAppFinalProject'
         minSdkVersion rootProject.ext.minSdkVersion
@@ -190,3 +191,6 @@ dependencies {
     implementation project(':react-native-incall-manager')
     // implementation 'com.google.android.gms:play-services-auth:20.7.0' // or latest
 }
+
+apply plugin: 'com.google.gms.google-services'
+

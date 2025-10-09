@@ -20,6 +20,8 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 export default function AddImage() {
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
+  console.log(newUser);
+  
 
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
   const [cameraStatus, requestCameraPermission] = ImagePicker.useCameraPermissions();

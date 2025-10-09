@@ -36,8 +36,8 @@ export default function Login() {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        "719538565443-026nfp0528deipai06um0me1rvncabjd.apps.googleusercontent.com",
-      offlineAccess: false,
+        "939839252627-v9mb92gn6sc3hkdc7dtgb00dafatqadm.apps.googleusercontent.com",
+      // offlineAccess: false,
     });
   }, []);
 
@@ -54,14 +54,18 @@ export default function Login() {
       if (!user || !user.email) {
         throw new Error("No user info returned from Google Sign-In");
       }
-  
+      
       const email = user.email;
-      const password = "goolePass"; 
-  
+      const hashedPassword = SHA256("googlepass").toString();
+      console.log(email, hashedPassword);
+      setLoading(true)
       const response = await fetch(LOGIN_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }), 
+        body: JSON.stringify({ 
+          email: email,
+          password: hashedPassword,
+        }), 
       });
   
       if (response.status === 201) {
@@ -75,12 +79,14 @@ export default function Login() {
           "User Not Found",
           "This email is not registered in our system."
         );
-        router.push("/");
       } else {
         console.warn("Unexpected error checking Google user:", await response.text());
       }
     } catch (error) {
       console.error("Google Sign-In Error:", error);
+    }
+    finally {
+      setLoading(false);
     }
   };
   

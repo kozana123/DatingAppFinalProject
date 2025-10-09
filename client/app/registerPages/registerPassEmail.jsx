@@ -24,6 +24,8 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const STAGE_PROGRESS = 60;
 
+
+
 export default function RegisterPage() {
   const params = useLocalSearchParams();
   const [newUser, setnewUser] = useState(params);
@@ -31,31 +33,36 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-   const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId:
-        "719538565443-ctovkc0i4kmt19n7l4pm7mqvhnshcnnr.apps.googleusercontent.com",
+    webClientId:
+      "939839252627-v9mb92gn6sc3hkdc7dtgb00dafatqadm.apps.googleusercontent.com",
     });
+    
   }, []);
 
   const signInWithGoogle = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      await GoogleSignin.signOut();
+      const currentUser = await GoogleSignin.getCurrentUser();
+      if (currentUser) {
+        await GoogleSignin.signOut();
+      }
       const userInfo = await GoogleSignin.signIn();
+      console.log("Signed in user:", userInfo.data.user.email);
+      
+      if (!userInfo || !userInfo.data.user.email) throw new Error("No user info returned");
 
-      if (!userInfo || !userInfo.user) throw new Error("No user info returned");
-
-      const user = userInfo.user;
+      const hashedPassword = SHA256("googlepass").toString();
 
       const updatedUser = {
         ...newUser,
-        email: user.email,
-        password: "googlePass",
+        email: userInfo.data.user.email,
+        password: hashedPassword,
       };
 
       setnewUser(updatedUser);
