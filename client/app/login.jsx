@@ -29,7 +29,7 @@ export default function Login() {
    const [isSecure, setIsSecure] = useState(true);
 
 
-  // const SIGNALING_SERVER_URL = 'http://10.0.0.3:3501';
+  // const SIGNALING_SERVER_URL = 'http://10.0.0.2:3501';
   const SIGNALING_SERVER_URL = 'https://datingappfinalproject-signaling-server.onrender.com';
   const LOGIN_URL = `${SIGNALING_SERVER_URL}/api/v1/userDetails/login`;
 

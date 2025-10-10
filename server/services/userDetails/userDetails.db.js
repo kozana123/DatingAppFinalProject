@@ -69,6 +69,7 @@ export async function getUserByEmailAndPasswordFromDB(email) {
       FROM user_details
       WHERE userEmail = ${email}
     `;
+    
     return result.recordset.length > 0 ? result.recordset[0] : null;
   } catch (error) {
     console.error("SQL Get User By Email Error:", error);

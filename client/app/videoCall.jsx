@@ -32,9 +32,7 @@ export default function VideoCall() {
 
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
-  // const [callStartTime, setCallStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState();
-  // console.log(elapsedTime);
   
   const timerRef = useRef(null);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -120,7 +118,6 @@ export default function VideoCall() {
     endCall(); // End your own call
   };
 
-
   const handleSaveChat = async (isMatch) => {
     const minutes = parseInt(elapsedTime.split(":")[0], 10);
     const date = new Date().toISOString(); // current timestamp
@@ -137,26 +134,7 @@ export default function VideoCall() {
     handleDislike()
   }
 
-
   const endCall = (reason) => {
-    // if (socket.current) socket.current.disconnect();
-
-    // if (localStream) {
-    //   localStream.getTracks().forEach((track) => track.stop());
-    // }
-
-    // if (peerConnection.current) {
-    //   peerConnection.current.close();
-    //   peerConnection.current = null;
-    // }
-
-    // stopTimer();
-    // InCallManager.stop();
-    // setConnected(false);
-    // setRemoteStream(null);
-    // setLocalStream(null);
-    // console.log(`this is reason: ${reason}`);
-    // router.push({ pathname: "/(tabs)/main", params: { reason: reason }});
     router.replace({ pathname: "/(tabs)/main", params: { reason } });
   };
 
@@ -192,7 +170,6 @@ export default function VideoCall() {
       setRemoteStream(remoteStream);
       if (remoteStream) {
         setConnected(true);
-        // InCallManager.setForceSpeakerphoneOn(true);
       }
     };
 
@@ -203,9 +180,8 @@ export default function VideoCall() {
       }); 
     });
 
-    // InCallManager.start({ media: 'audio/video' });
-    // InCallManager.setForceSpeakerphoneOn(true);
-    // InCallManager.setVolume(0.1);
+    InCallManager.start({ media: 'audio/video' });
+    InCallManager.setForceSpeakerphoneOn(true);
 
     socket.current.on('found-partner', async ({targetId, targetSocketId, targetUserId }) => {
       console.log("found partner");
@@ -235,8 +211,6 @@ export default function VideoCall() {
       try {
         const offer = await peerConnection.current.createOffer();
         await peerConnection.current.setLocalDescription(offer);
-        
-        
 
         socket.current.emit('offer', {
           targetSocketId: otherUserSocketId.current,
@@ -261,7 +235,6 @@ export default function VideoCall() {
         pendingCandidates.current = [];
         const answer = await peerConnection.current.createAnswer();
         await peerConnection.current.setLocalDescription(answer);
-        // console.log('the answer', answer, 'to :', otherUserSocketId.current);
         socket.current.emit('answer', {
           targetSocketId: otherUserSocketId.current,
           answer,
@@ -293,8 +266,7 @@ export default function VideoCall() {
 
     socket.current.on('ice-candidate', async (data) => {
       try {
-        // console.log("GOT ice-candidate---------------------");
-        
+
         const candidate = new RTCIceCandidate(data.candidate);
 
         if (remoteDescSet.current) {
@@ -309,9 +281,7 @@ export default function VideoCall() {
 
     peerConnection.current.onicecandidate = (event) => {
       if (event.candidate && otherUserSocketId.current) {
-        // console.log("📤 otherUserId:", otherUserId.current);
-        
-        // console.log("📤 Sending ICE candidate");
+
         socket.current.emit('ice-candidate', {
           targetSocketId: otherUserSocketId.current,
           candidate: event.candidate,
@@ -360,7 +330,7 @@ export default function VideoCall() {
       console.log("Return runs");
       canGoBack()
       socket.current.disconnect();
-      // InCallManager.stop();
+      InCallManager.stop();
       stopTimer();
 
       if (localStream) {
