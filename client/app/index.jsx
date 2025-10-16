@@ -51,8 +51,8 @@ export default function Index() {
           <Text style={styles.appName}>Luvio</Text>
           
           <Text style={styles.headline}>
-            Find Love {"\n"}
-            With Style
+            Let love{"\n"}
+            Find you
           </Text>
 
           <Text style={styles.description}>
@@ -102,15 +102,15 @@ const styles = StyleSheet.create({
     height: 160,
   },
   appName: {
-    fontSize: 42,
+    fontSize: 62,
     color: "#CBF7FF", // highlight (10%)
-    fontFamily: "Prompt-SemiBold",
+    fontFamily: "Prompt-Bold",
     letterSpacing: 2,
   },
   headline: {
     fontSize: 28,
     color: "#CBF7FF", // highlight (10%)
-    fontFamily: "Prompt-SemiBold",
+    fontFamily: "Prompt-Bold",
     lineHeight: 36,
     textAlign: "center",
   },
