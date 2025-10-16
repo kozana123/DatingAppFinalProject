@@ -72,7 +72,7 @@ export default function VideoCall() {
       const format = formatTime(elapsedSeconds)
       setElapsedTime(format);
         // console.log(format);
-      if(format == "00:05"){
+      if(format == "00:30"){
         console.log("GOT TO TIME" + format);
         setChoise(true)
       }
@@ -177,6 +177,8 @@ export default function VideoCall() {
       setLocalStream(stream);
       stream.getTracks().forEach(track => {
         peerConnection.current.addTrack(track, stream);
+        InCallManager.setForceSpeakerphoneOn(true);
+
       }); 
     });
 
